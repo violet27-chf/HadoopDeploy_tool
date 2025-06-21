@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}隐私政策{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">隐私政策</h1>
+    
+    <section class="mb-5">
+        <h2>1. 信息收集</h2>
+        <p>我们可能会收集以下信息：</p>
+        <ul>
+            <li>您提供的个人信息（如姓名、联系方式）</li>
+            <li>设备信息（IP地址、浏览器类型）</li>
+            <li>使用数据（访问时间、页面浏览）</li>
+        </ul>
+    </section>
+
+    <section class="mb-5">
+        <h2>2. 信息使用</h2>
+        <p>收集的信息将用于：</p>
+        <ul>
+            <li>提供和维护服务</li>
+            <li>改进用户体验</li>
+            <li>安全保障</li>
+        </ul>
+    </section>
+
+    <section class="mb-5">
+        <h2>3. 数据保护</h2>
+        <p>我们采取合理措施保护您的数据：</p>
+        <ul>
+            <li>加密传输数据</li>
+            <li>限制数据访问权限</li>
+            <li>定期安全评估</li>
+        </ul>
+    </section>
+
+    <section class="mb-5">
+        <h2>4. 您的权利</h2>
+        <p>您有权：</p>
+        <ul>
+            <li>访问我们持有的您的数据</li>
+            <li>要求更正或删除数据</li>
+            <li>撤回同意</li>
+        </ul>
+    </section>
+
+    <p class="text-muted">最后更新日期：{{ current_year }}</p>
+</div>
+{% endblock %}

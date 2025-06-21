@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}服务条款{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">服务条款</h1>
+    
+    <section class="mb-5">
+        <h2>1. 服务使用</h2>
+        <p>使用本服务即表示您同意：</p>
+        <ul>
+            <li>遵守所有适用法律法规</li>
+            <li>不进行任何非法或有害活动</li>
+            <li>不干扰服务正常运行</li>
+        </ul>
+    </section>
+
+    <section class="mb-5">
+        <h2>2. 用户责任</h2>
+        <p>您需对以下内容负责：</p>
+        <ul>
+            <li>您账户下的所有活动</li>
+            <li>您提供的信息的真实性</li>
+            <li>妥善保管您的登录凭证</li>
+        </ul>
+    </section>
+
+    <section class="mb-5">
+        <h2>3. 知识产权</h2>
+        <p>本服务所有内容受知识产权保护：</p>
+        <ul>
+            <li>保留所有权利</li>
+            <li>未经许可不得复制或修改</li>
+            <li>允许个人非商业使用</li>
+        </ul>
+    </section>
+
+    <section class="mb-5">
+        <h2>4. 免责声明</h2>
+        <p>在适用法律允许的最大范围内：</p>
+        <ul>
+            <li>不保证服务不间断或无错误</li>
+            <li>不承担因使用服务导致的间接损失</li>
+            <li>服务按"现状"提供</li>
+        </ul>
+    </section>
+
+    <section class="mb-5">
+        <h2>5. 条款变更</h2>
+        <p>我们保留权利：</p>
+        <ul>
+            <li>随时修改本条款</li>
+            <li>通过适当方式通知用户</li>
+            <li>继续使用视为接受变更</li>
+        </ul>
+    </section>
+
+    <p class="text-muted">最后更新日期：{{ current_year }}</p>
+</div>
+{% endblock %}

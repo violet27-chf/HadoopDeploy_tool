@@ -1,0 +1,44 @@
+/* 首页特定样式 */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+}
+
+/* 服务器表单样式 */
+.server-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.server-item {
+    background-color: #fff;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+}
+
+.server-item h5 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+/* 按钮样式 */
+.btn-add-server {
+    margin-bottom: 1rem;
+}
+
+/* 结果区域样式 */
+#results {
+    background-color: #fff;
+    border-radius: 0.25rem;
+    padding: 1.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .server-form {
+        padding: 0 15px;
+    }
+}

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}关于我们{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- 页面标题 -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">关于 Hadoop 部署工具</h1>
+        <p class="lead text-muted">简化 Hadoop 集群部署与管理的专业工具</p>
+    </div>
+
+    <!-- 产品介绍 -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title h4"><i class="bi bi-info-circle me-2"></i>产品简介</h2>
+                    <p class="card-text">
+                        Hadoop 部署工具是一个开源项目，旨在简化 Hadoop 生态系统的部署、配置和管理流程。
+                        通过自动化脚本和友好的用户界面，帮助用户快速搭建生产级的 Hadoop 集群环境。
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="/documentation" class="btn btn-sm btn-outline-primary">查看文档</a>
+                            <a href="https://github.com/your-repo" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                <i class="bi bi-github me-1"></i>GitHub
+                            </a>
+                        </div>
+                        <small class="text-muted">当前版本: v2.1.0</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 特性展示 -->
+    <div class="row mb-5">
+        <h2 class="text-center mb-4">核心特性</h2>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-lightning-fill text-primary fs-1 mb-3"></i>
+                    <h3 class="h5">快速部署</h3>
+                    <p class="card-text">一键式部署 Hadoop 集群，节省 80% 的配置时间</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-sliders text-success fs-1 mb-3"></i>
+                    <h3 class="h5">灵活配置</h3>
+                    <p class="card-text">支持多种配置方案，满足不同规模集群需求</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-check text-warning fs-1 mb-3"></i>
+                    <h3 class="h5">安全可靠</h3>
+                    <p class="card-text">内置安全配置最佳实践，保障集群安全</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 技术栈 -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4"><i class="bi bi-code-square me-2"></i>技术栈</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><span class="badge bg-primary me-2">Python</span> 后端核心</li>
+                                <li class="mb-2"><span class="badge bg-primary me-2">Flask</span> Web框架</li>
+                                <li class="mb-2"><span class="badge bg-primary me-2">Ansible</span> 自动化部署</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><span class="badge bg-primary me-2">Bootstrap 5</span> 前端框架</li>
+                                <li class="mb-2"><span class="badge bg-primary me-2">Docker</span> 容器化支持</li>
+                                <li class="mb-2"><span class="badge bg-primary me-2">Hadoop 3.x</span> 核心支持</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 开发团队 -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4"><i class="bi bi-people-fill me-2"></i>开发团队</h2>
+                    <p>由大数据基础设施团队开发和维护，致力于提供简单易用的 Hadoop 管理工具。</p>
+                    
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <div class="m-2 text-center">
+                            <img src="https://via.placeholder.com/80" class="rounded-circle mb-2" alt="团队成员">
+                            <h5 class="h6 mb-1">张三</h5>
+                            <small class="text-muted">项目负责人</small>
+                        </div>
+                        <!-- 更多团队成员... -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系方式 -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4"><i class="bi bi-envelope-fill me-2"></i>联系我们</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-github me-2"></i> GitHub: <a href="https://github.com/your-repo">项目仓库</a></li>
+                        <li class="mb-2"><i class="bi bi-chat-left-text me-2"></i> 社区: <a href="#">论坛链接</a></li>
+                        <li><i class="bi bi-bug-fill me-2"></i> 问题反馈: <a href="#">提交Issue</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 页面样式 -->
+<style>
+    .feature-icon {
+        font-size: 2.5rem;
+    }
+    .team-member img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}

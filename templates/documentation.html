@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}文档中心{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- 侧边栏导航 -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky pt-3">
+                <h5 class="sidebar-heading px-3">文档目录</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#section1">
+                            快速入门
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#section2">
+                            安装指南
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#section3">
+                            配置参考
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#section4">
+                            API文档
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#section5">
+                            常见问题
+                        </a>
+                    </li>
+                </ul>
+
+                <h6 class="sidebar-heading px-3 mt-4">版本</h6>
+                <select class="form-select form-select-sm">
+                    <option>v2.1.0 (最新)</option>
+                    <option>v2.0.3</option>
+                    <option>v1.4.2</option>
+                </select>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">文档中心</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                </div>
+            </div>
+
+            <!-- 文档内容部分 -->
+            <section id="section1" class="mb-5">
+                <h2>快速入门</h2>
+                <p>本节将引导您快速了解基本功能和使用方法。</p>
+                
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        基本示例
+                    </div>
+                    <div class="card-body">
+                        <pre><code class="language-python">from hadoop_deployer import Deployer
+d = Deployer(config='path/to/config.yaml')
+d.install()</code></pre>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i> 提示：首次使用时建议参考完整安装指南。
+                </div>
+            </section>
+
+            <section id="section2" class="mb-5">
+                <h2>安装指南</h2>
+                <p>详细安装步骤和系统要求。</p>
+                
+                <div class="accordion" id="installAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                系统要求
+                            </button>
+                        </h3>
+                        <div id="collapseOne" class="accordion-collapse collapse show">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>Linux 操作系统</li>
+                                    <li>Python 3.8+</li>
+                                    <li>至少4GB内存</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-exclamation-triangle-fill"></i> 注意：生产环境部署前请务必阅读安全配置章节。
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- 添加文档专用样式 -->
+<style>
+    #sidebar {
+        position: fixed;
+        height: calc(100vh - 56px);
+        overflow-y: auto;
+    }
+    pre code {
+        border-radius: 5px;
+        padding: 1rem;
+    }
+    section {
+        scroll-margin-top: 80px;
+    }
+</style>
+
+{% endblock %}
