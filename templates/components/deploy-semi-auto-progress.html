@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}半自动部署进度 - Hadoop部署系统{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="bi bi-hourglass-split me-2"></i>半自动部署进度
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>半自动模式：</strong>系统将根据您的配置进行部署，部分步骤可能需要人工确认。
+                    </div>
+                    
+                    <!-- 配置摘要 -->
+                    <div id="configSummary" class="mb-4">
+                        <h5>配置摘要</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Hadoop版本:</span>
+                                        <span id="hadoopVersion">-</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Java版本:</span>
+                                        <span id="javaVersion">-</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>NameNode主机:</span>
+                                        <span id="namenodeHost">-</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>DataNode数量:</span>
+                                        <span id="datanodeCount">-</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>副本因子:</span>
+                                        <span id="replicationFactor">-</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>MapReduce内存:</span>
+                                        <span id="mapReduceMemory">-</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 部署进度 -->
+                    <div id="deployProgress" class="mb-4">
+                        <h5>部署进度</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" 
+                                 role="progressbar" style="width: 0%" id="progressBar">0%</div>
+                        </div>
+                        <div id="progressText" class="text-muted">准备开始部署...</div>
+                    </div>
+
+                    <!-- 部署步骤 -->
+                    <div id="deploySteps" class="mb-4">
+                        <h5>部署步骤</h5>
+                        <div class="list-group">
+                            <div class="list-group-item list-group-item-action" id="step1">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">1. 验证配置</h6>
+                                    <small class="text-muted">等待中...</small>
+                                </div>
+                                <p class="mb-1">验证用户配置的合理性</p>
+                            </div>
+                            <div class="list-group-item list-group-item-action" id="step2">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">2. 环境准备</h6>
+                                    <small class="text-muted">等待中...</small>
+                                </div>
+                                <p class="mb-1">准备部署环境，创建必要目录</p>
+                            </div>
+                            <div class="list-group-item list-group-item-action" id="step3">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">3. 安装组件</h6>
+                                    <small class="text-muted">等待中...</small>
+                                </div>
+                                <p class="mb-1">根据选择安装Hadoop和相关组件</p>
+                            </div>
+                            <div class="list-group-item list-group-item-action" id="step4">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">4. 应用配置</h6>
+                                    <small class="text-muted">等待中...</small>
+                                </div>
+                                <p class="mb-1">应用用户自定义的配置参数</p>
+                            </div>
+                            <div class="list-group-item list-group-item-action" id="step5">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">5. 启动服务</h6>
+                                    <small class="text-muted">等待中...</small>
+                                </div>
+                                <p class="mb-1">启动Hadoop集群服务</p>
+                            </div>
+                            <div class="list-group-item list-group-item-action" id="step6">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">6. 验证部署</h6>
+                                    <small class="text-muted">等待中...</small>
+                                </div>
+                                <p class="mb-1">验证集群运行状态和配置</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 用户确认区域 -->
+                    <div id="userConfirmation" class="mb-4" style="display: none;">
+                        <h5>需要用户确认</h5>
+                        <div class="alert alert-info">
+                            <div id="confirmationMessage"></div>
+                            <div class="mt-3">
+                                <button class="btn btn-success me-2" onclick="confirmAction()">
+                                    <i class="bi bi-check-circle me-2"></i>确认
+                                </button>
+                                <button class="btn btn-danger" onclick="cancelAction()">
+                                    <i class="bi bi-x-circle me-2"></i>取消
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary" onclick="goBack()">
+                            <i class="bi bi-arrow-left me-2"></i>返回
+                        </button>
+                        <button class="btn btn-warning" id="startDeploy" onclick="startSemiAutoDeploy()">
+                            <i class="bi bi-play-fill me-2"></i>开始部署
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let deployInProgress = false;
+let currentStep = 0;
+let waitingForConfirmation = false;
+
+function goBack() {
+    window.location.href = '/deploy/semiAutoConfig';
+}
+
+function loadConfigSummary() {
+    const config = sessionStorage.getItem('semiAutoConfig');
+    if (config) {
+        const configData = JSON.parse(config);
+        document.getElementById('hadoopVersion').textContent = configData.hadoopVersion || '-';
+        document.getElementById('javaVersion').textContent = configData.javaVersion || '-';
+        document.getElementById('namenodeHost').textContent = configData.namenodeHost || '-';
+        document.getElementById('datanodeCount').textContent = configData.datanodeCount || '-';
+        document.getElementById('replicationFactor').textContent = configData.replicationFactor || '-';
+        document.getElementById('mapReduceMemory').textContent = (configData.mapReduceMemory || '-') + ' MB';
+    }
+}
+
+function startSemiAutoDeploy() {
+    if (deployInProgress) return;
+    
+    deployInProgress = true;
+    document.getElementById('startDeploy').disabled = true;
+    document.getElementById('startDeploy').innerHTML = '<i class="bi bi-hourglass-split me-2"></i>部署中...';
+    
+    // 获取配置
+    const config = sessionStorage.getItem('semiAutoConfig');
+    if (!config) {
+        alert('未找到配置信息');
+        return;
+    }
+    
+    // 开始部署过程
+    simulateSemiAutoDeploy();
+}
+
+function simulateSemiAutoDeploy() {
+    const steps = [
+        { 
+            id: 'step1', 
+            name: '验证配置', 
+            duration: 2000,
+            needsConfirmation: false
+        },
+        { 
+            id: 'step2', 
+            name: '环境准备', 
+            duration: 3000,
+            needsConfirmation: false
+        },
+        { 
+            id: 'step3', 
+            name: '安装组件', 
+            duration: 5000,
+            needsConfirmation: true,
+            confirmationMessage: '检测到需要安装Apache Hive和Spark组件，是否继续？'
+        },
+        { 
+            id: 'step4', 
+            name: '应用配置', 
+            duration: 3000,
+            needsConfirmation: false
+        },
+        { 
+            id: 'step5', 
+            name: '启动服务', 
+            duration: 4000,
+            needsConfirmation: false
+        },
+        { 
+            id: 'step6', 
+            name: '验证部署', 
+            duration: 2000,
+            needsConfirmation: false
+        }
+    ];
+    
+    function executeStep() {
+        if (currentStep >= steps.length) {
+            completeDeploy();
+            return;
+        }
+        
+        const step = steps[currentStep];
+        const stepElement = document.getElementById(step.id);
+        
+        // 更新步骤状态
+        stepElement.classList.remove('list-group-item-action');
+        stepElement.classList.add('list-group-item-warning');
+        stepElement.querySelector('small').textContent = '进行中...';
+        stepElement.querySelector('small').className = 'text-warning';
+        
+        // 更新进度条
+        const progress = ((currentStep + 1) / steps.length) * 100;
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = progress + '%';
+        progressBar.textContent = Math.round(progress) + '%';
+        
+        // 更新进度文本
+        document.getElementById('progressText').textContent = `正在执行：${step.name}`;
+        
+        if (step.needsConfirmation) {
+            // 需要用户确认
+            waitingForConfirmation = true;
+            document.getElementById('confirmationMessage').textContent = step.confirmationMessage;
+            document.getElementById('userConfirmation').style.display = 'block';
+            return;
+        }
+        
+        // 继续执行
+        setTimeout(() => {
+            // 标记步骤完成
+            stepElement.querySelector('small').textContent = '已完成';
+            stepElement.querySelector('small').className = 'text-success';
+            stepElement.classList.remove('list-group-item-warning');
+            stepElement.classList.add('list-group-item-success');
+            currentStep++;
+            executeStep();
+        }, step.duration);
+    }
+    
+    executeStep();
+}
+
+function confirmAction() {
+    if (!waitingForConfirmation) return;
+    
+    waitingForConfirmation = false;
+    document.getElementById('userConfirmation').style.display = 'none';
+    
+    // 继续执行当前步骤
+    const stepElement = document.getElementById(`step${currentStep + 1}`);
+    setTimeout(() => {
+        stepElement.querySelector('small').textContent = '已完成';
+        stepElement.querySelector('small').className = 'text-success';
+        stepElement.classList.remove('list-group-item-warning');
+        stepElement.classList.add('list-group-item-success');
+        currentStep++;
+        simulateSemiAutoDeploy();
+    }, 1000);
+}
+
+function cancelAction() {
+    if (!waitingForConfirmation) return;
+    
+    waitingForConfirmation = false;
+    document.getElementById('userConfirmation').style.display = 'none';
+    
+    // 标记步骤失败
+    const stepElement = document.getElementById(`step${currentStep + 1}`);
+    stepElement.querySelector('small').textContent = '已取消';
+    stepElement.querySelector('small').className = 'text-danger';
+    stepElement.classList.remove('list-group-item-warning');
+    stepElement.classList.add('list-group-item-danger');
+    
+    // 停止部署
+    deployInProgress = false;
+    document.getElementById('startDeploy').disabled = false;
+    document.getElementById('startDeploy').innerHTML = '<i class="bi bi-play-fill me-2"></i>重新开始';
+    
+    document.getElementById('progressText').textContent = '部署已取消';
+}
+
+function completeDeploy() {
+    document.getElementById('progressText').textContent = '部署完成！';
+    document.getElementById('progressBar').classList.remove('progress-bar-animated');
+    document.getElementById('progressBar').classList.add('bg-success');
+    
+    // 显示成功消息
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success mt-3';
+    alertDiv.innerHTML = `
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>半自动部署成功！</strong> Hadoop集群已根据您的配置成功部署。
+        <div class="mt-2">
+            <a href="/cluster/status" class="btn btn-sm btn-outline-success me-2">查看集群状态</a>
+            <a href="/cluster/manage" class="btn btn-sm btn-outline-primary">集群管理</a>
+            <a href="/cluster/config" class="btn btn-sm btn-outline-info">查看配置</a>
+        </div>
+    `;
+    document.querySelector('.card-body').appendChild(alertDiv);
+}
+
+// 页面加载时检查配置
+document.addEventListener('DOMContentLoaded', function() {
+    const config = sessionStorage.getItem('semiAutoConfig');
+    if (!config) {
+        alert('未找到配置信息，请返回重新配置');
+        window.location.href = '/deploy/semiAutoConfig';
+    }
+    
+    loadConfigSummary();
+});
+</script>
+{% endblock %} 

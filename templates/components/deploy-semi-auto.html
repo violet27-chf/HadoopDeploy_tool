@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}半自动Hadoop配置 - Hadoop部署系统{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="bi bi-sliders me-2"></i>半自动Hadoop集群配置
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>半自动模式：</strong>系统将完成基础配置，但允许您自定义关键参数。
+                    </div>
+                    
+                    <form id="semiAutoForm">
+                        <!-- 基础配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-gear me-2"></i>基础配置</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="hadoopVersion" class="form-label">Hadoop版本</label>
+                                        <select class="form-select" id="hadoopVersion" name="hadoopVersion" onchange="handleVersionChange()">
+                                            <option value="3.3.6">Hadoop 3.3.6 (推荐)</option>
+                                            <option value="3.3.5">Hadoop 3.3.5</option>
+                                            <option value="3.2.4">Hadoop 3.2.4</option>
+                                            <option value="2.10.2">Hadoop 2.10.2</option>
+                                            <option value="custom">自定义上传 (.tar.gz)</option>
+                                        </select>
+                                        <div id="uploadSection" class="mt-2" style="display: none;">
+                                            <input class="form-control" type="file" id="hadoopUpload" accept=".tar.gz,.tgz">
+                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadHadoopPackage()">上传</button>
+                                            <div id="uploadStatus" class="form-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="javaVersion" class="form-label">Java版本</label>
+                                        <select class="form-select" id="javaVersion" name="javaVersion" onchange="handleJavaVersionChange()">
+                                            <option value="8">Java 8 (推荐)</option>
+                                            <option value="11">Java 11</option>
+                                            <option value="17">Java 17</option>
+                                            <option value="custom">自定义上传 (.tar.gz/.zip)</option>
+                                        </select>
+                                        <div id="javaUploadSection" class="mt-2" style="display: none;">
+                                            <input class="form-control" type="file" id="javaUpload" accept=".tar.gz,.tgz,.zip">
+                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadJavaPackage()">上传</button>
+                                            <div id="javaUploadStatus" class="form-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 集群配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-diagram-3 me-2"></i>集群配置</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="namenodeHost" class="form-label">NameNode主机</label>
+                                        <input type="text" class="form-control" id="namenodeHost" name="namenodeHost" 
+                                               placeholder="例如: master.example.com" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="datanodeCount" class="form-label">DataNode数量</label>
+                                        <input type="number" class="form-control" id="datanodeCount" name="datanodeCount" 
+                                               min="1" max="100" value="3" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="replicationFactor" class="form-label">副本因子</label>
+                                        <input type="number" class="form-control" id="replicationFactor" name="replicationFactor" 
+                                               min="1" max="10" value="3" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 性能配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-speedometer2 me-2"></i>性能配置</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mapReduceMemory" class="form-label">MapReduce内存 (MB)</label>
+                                        <input type="number" class="form-control" id="mapReduceMemory" name="mapReduceMemory" 
+                                               min="512" max="8192" value="2048" required>
+                                        <div class="form-text">建议设置为可用内存的50-70%</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="yarnMemory" class="form-label">YARN内存 (MB)</label>
+                                        <input type="number" class="form-control" id="yarnMemory" name="yarnMemory" 
+                                               min="1024" max="16384" value="4096" required>
+                                        <div class="form-text">建议设置为可用内存的70-80%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mapReduceCores" class="form-label">MapReduce CPU核心数</label>
+                                        <input type="number" class="form-control" id="mapReduceCores" name="mapReduceCores" 
+                                               min="1" max="32" value="2" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="yarnCores" class="form-label">YARN CPU核心数</label>
+                                        <input type="number" class="form-control" id="yarnCores" name="yarnCores" 
+                                               min="1" max="32" value="4" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 组件选择 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-puzzle me-2"></i>组件选择</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="installHive" name="installHive" checked>
+                                        <label class="form-check-label" for="installHive">
+                                            <strong>Apache Hive</strong> - 数据仓库工具
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="installHBase" name="installHBase">
+                                        <label class="form-check-label" for="installHBase">
+                                            <strong>Apache HBase</strong> - NoSQL数据库
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="installSpark" name="installSpark" checked>
+                                        <label class="form-check-label" for="installSpark">
+                                            <strong>Apache Spark</strong> - 内存计算引擎
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="installZooKeeper" name="installZooKeeper" checked>
+                                        <label class="form-check-label" for="installZooKeeper">
+                                            <strong>Apache ZooKeeper</strong> - 分布式协调服务
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="installKafka" name="installKafka">
+                                        <label class="form-check-label" for="installKafka">
+                                            <strong>Apache Kafka</strong> - 消息队列
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="installPig" name="installPig">
+                                        <label class="form-check-label" for="installPig">
+                                            <strong>Apache Pig</strong> - 数据流处理
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 高级配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-gear-wide-connected me-2"></i>高级配置</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="hadoopHome" class="form-label">Hadoop安装路径</label>
+                                        <input type="text" class="form-control" id="hadoopHome" name="hadoopHome" 
+                                               value="/opt/hadoop" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dataDir" class="form-label">数据存储路径</label>
+                                        <input type="text" class="form-control" id="dataDir" name="dataDir" 
+                                               value="/data/hadoop" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="additionalConfig" class="form-label">额外配置参数</label>
+                                <textarea class="form-control" id="additionalConfig" name="additionalConfig" rows="3" 
+                                          placeholder="每行一个配置项，格式：key=value"></textarea>
+                                <div class="form-text">可选：添加自定义的Hadoop配置参数</div>
+                            </div>
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="goBack()">
+                                <i class="bi bi-arrow-left me-2"></i>返回
+                            </button>
+                            <div>
+                                <button type="button" class="btn btn-info me-2" onclick="validateConfig()">
+                                    <i class="bi bi-check-circle me-2"></i>验证配置
+                                </button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-play-fill me-2"></i>开始部署
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function goBack() {
+    window.location.href = '/deploy/method';
+}
+
+function handleVersionChange() {
+    const versionSelect = document.getElementById('hadoopVersion');
+    const uploadSection = document.getElementById('uploadSection');
+    const uploadStatus = document.getElementById('uploadStatus');
+    
+    if (versionSelect.value === 'custom') {
+        uploadSection.style.display = 'block';
+        uploadStatus.textContent = '';
+        uploadStatus.className = 'form-text';
+    } else {
+        uploadSection.style.display = 'none';
+        uploadStatus.textContent = '';
+        uploadStatus.className = 'form-text';
+        // 清除之前的上传状态
+        sessionStorage.removeItem('hadoopUploaded');
+    }
+}
+
+function handleJavaVersionChange() {
+    const javaSelect = document.getElementById('javaVersion');
+    const javaUploadSection = document.getElementById('javaUploadSection');
+    const javaUploadStatus = document.getElementById('javaUploadStatus');
+    
+    if (javaSelect.value === 'custom') {
+        javaUploadSection.style.display = 'block';
+        javaUploadStatus.textContent = '';
+        javaUploadStatus.className = 'form-text';
+    } else {
+        javaUploadSection.style.display = 'none';
+        javaUploadStatus.textContent = '';
+        javaUploadStatus.className = 'form-text';
+        // 清除之前的上传状态
+        sessionStorage.removeItem('javaUploaded');
+    }
+}
+
+function validateConfig() {
+    const form = document.getElementById('semiAutoForm');
+    const formData = new FormData(form);
+    
+    // 基本验证
+    if (!formData.get('namenodeHost')) {
+        alert('请填写NameNode主机地址');
+        return;
+    }
+    
+    if (formData.get('datanodeCount') < 1) {
+        alert('DataNode数量必须大于0');
+        return;
+    }
+    
+    if (formData.get('replicationFactor') > formData.get('datanodeCount')) {
+        alert('副本因子不能大于DataNode数量');
+        return;
+    }
+    
+    // 显示验证成功消息
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success mt-3';
+    alertDiv.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>配置验证通过！';
+    
+    // 移除之前的验证消息
+    const existingAlert = document.querySelector('.alert-success');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+    
+    document.querySelector('.card-body').appendChild(alertDiv);
+    
+    // 3秒后自动移除
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+document.getElementById('semiAutoForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const config = {};
+    
+    // 收集表单数据
+    for (let [key, value] of formData.entries()) {
+        if (this.elements[key].type === 'checkbox') {
+            config[key] = this.elements[key].checked;
+        } else {
+            config[key] = value;
+        }
+    }
+    
+    // 合并服务器配置
+    const serverConfig = sessionStorage.getItem('serverConfig');
+    if (serverConfig) {
+        const serverData = JSON.parse(serverConfig);
+        Object.assign(config, serverData);
+    }
+    
+    // 保存配置并跳转到部署页面
+    sessionStorage.setItem('semiAutoConfig', JSON.stringify(config));
+    window.location.href = '/deploy/semi-auto/progress';
+});
+
+// 页面加载时检查配置
+document.addEventListener('DOMContentLoaded', function() {
+    const config = sessionStorage.getItem('serverConfig');
+    if (!config) {
+        alert('未找到服务器配置信息，请返回重新配置');
+        window.location.href = '/';
+    }
+    
+    // 加载之前保存的半自动配置
+    const savedConfig = sessionStorage.getItem('semiAutoConfig');
+    if (savedConfig) {
+        const config = JSON.parse(savedConfig);
+        for (let key in config) {
+            const element = document.getElementById(key);
+            if (element) {
+                if (element.type === 'checkbox') {
+                    element.checked = config[key];
+                } else {
+                    element.value = config[key];
+                }
+            }
+        }
+    }
+});
+
+function uploadHadoopPackage() {
+    const fileInput = document.getElementById('hadoopUpload');
+    const statusDiv = document.getElementById('uploadStatus');
+    
+    if (!fileInput.files.length) {
+        statusDiv.textContent = '请先选择文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    if (!file.name.endsWith('.tar.gz') && !file.name.endsWith('.tgz')) {
+        statusDiv.textContent = '请选择.tar.gz或.tgz格式的文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    statusDiv.textContent = '正在上传...';
+    statusDiv.className = 'form-text text-info';
+    
+    fetch('/api/upload/hadoop', {
+        method: 'POST',
+        body: formData
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            statusDiv.textContent = '上传成功！文件已保存';
+            statusDiv.className = 'form-text text-success';
+            sessionStorage.setItem('hadoopUploaded', '1');
+            sessionStorage.setItem('uploadedFileName', file.name);
+        } else {
+            statusDiv.textContent = data.msg || '上传失败';
+            statusDiv.className = 'form-text text-danger';
+        }
+    }).catch(() => {
+        statusDiv.textContent = '上传失败，请重试';
+        statusDiv.className = 'form-text text-danger';
+    });
+}
+
+function uploadJavaPackage() {
+    const fileInput = document.getElementById('javaUpload');
+    const statusDiv = document.getElementById('javaUploadStatus');
+    
+    if (!fileInput.files.length) {
+        statusDiv.textContent = '请先选择文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    if (!file.name.endsWith('.tar.gz') && !file.name.endsWith('.tgz') && !file.name.endsWith('.zip')) {
+        statusDiv.textContent = '请选择.tar.gz、.tgz或.zip格式的文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    statusDiv.textContent = '正在上传...';
+    statusDiv.className = 'form-text text-info';
+    
+    fetch('/api/upload/java', {
+        method: 'POST',
+        body: formData
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            statusDiv.textContent = '上传成功！文件已保存';
+            statusDiv.className = 'form-text text-success';
+            sessionStorage.setItem('javaUploaded', '1');
+            sessionStorage.setItem('uploadedFileName', file.name);
+        } else {
+            statusDiv.textContent = data.msg || '上传失败';
+            statusDiv.className = 'form-text text-danger';
+        }
+    }).catch(() => {
+        statusDiv.textContent = '上传失败，请重试';
+        statusDiv.className = 'form-text text-danger';
+    });
+}
+</script>
+{% endblock %} 

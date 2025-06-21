@@ -1,93 +1,545 @@
-# Hadoop 部署工具
+# Hadoop 集群部署系统
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python Version](https://img.shields.io/badge/python-3.6+-blue.svg)](https://python.org)
-[![Flask Version](https://img.shields.io/badge/flask-2.0+-blue.svg)](https://flask.palletsprojects.com)
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+[![Flask Version](https://img.shields.io/badge/flask-2.3+-blue.svg)](https://flask.palletsprojects.com)
 
-> 简化Hadoop集群部署与管理的专业工具
+> 专业的Hadoop集群自动化部署与管理工具，支持全自动、半自动和手动三种部署模式
 
-## 特性
+## ✨ 主要特性
 
-- 🚀 **一键部署**：快速搭建Hadoop集群环境
-- ⚙️ **灵活配置**：支持多种配置方案
-- 🔒 **安全可靠**：内置安全最佳实践
-- 📊 **可视化监控**：实时查看集群状态
+- 🚀 **三种部署模式**：全自动、半自动、手动配置，满足不同需求
+- 📦 **文件上传支持**：支持自定义上传Hadoop和Java安装包
+- 🌐 **Web可视化界面**：直观的配置界面和实时部署进度
+- 🔄 **多镜像源支持**：自动切换国内镜像源，提高下载成功率
+- 🛠️ **跨平台支持**：支持Linux和Windows系统
+- 📊 **实时监控**：部署过程实时日志和进度显示
+- 🔒 **安全可靠**：内置安全配置和最佳实践
 
-## 目录
+## 📋 目录
 
+- [系统要求](#系统要求)
 - [安装指南](#安装指南)
 - [快速开始](#快速开始)
-- [配置参考](#配置参考)
+- [项目结构](#项目结构)
+- [使用指南](#使用指南)
+- [配置说明](#配置说明)
+- [开发指南](#开发指南)
+- [故障排除](#故障排除)
 - [贡献指南](#贡献指南)
 - [许可证](#许可证)
 
-## 安装指南
+## 🖥️ 系统要求
 
-### 系统要求
+### 最低要求
+- **操作系统**：Windows 10/11 或 Linux (Ubuntu 18.04+, CentOS 7+)
+- **Python版本**：Python 3.8 或更高版本
+- **内存**：至少 4GB RAM
+- **磁盘空间**：至少 10GB 可用空间
+- **网络**：稳定的互联网连接
 
-- Linux 操作系统
-- Python 3.6+
-- 至少4GB内存
+### 推荐配置
+- **操作系统**：Ubuntu 20.04 LTS 或 Windows 11
+- **Python版本**：Python 3.9+
+- **内存**：8GB RAM 或更多
+- **磁盘空间**：50GB 可用空间
+- **网络**：高速互联网连接
 
-### 安装步骤
+## 📦 安装指南
 
+### 方法一：快速安装（推荐）
+
+#### Windows 系统
 ```bash
-# 克隆仓库
-git clone https://github.com/violet27-chf/Hadoop.git
-cd hadoop-deployer
+# 双击运行安装脚本
+setup.bat
 
-# 安装依赖
-pip install -r requirements.txt
-
-# 启动服务
-flask run
+# 或者命令行运行
+.\setup.bat
 ```
 
-## 快速开始
+#### Linux/macOS 系统
+```bash
+# 给脚本添加执行权限
+chmod +x setup.sh
 
-1. 访问Web界面：
-   ```bash
-   http://localhost:5000
-   ```
+# 运行安装脚本
+./setup.sh
+```
 
-2. 添加服务器节点：
-   ```yaml
-   nodes:
-     - host: node1.example.com
-       role: [namenode, datanode]
-     - host: node2.example.com
-       role: [datanode]
-   ```
+### 方法二：手动安装
 
-3. 开始部署：
-   ```bash
-   ./deploy.sh --config cluster-config.yaml
-   ```
+#### 1. 克隆项目
 
-## 配置参考
+```bash
+# 克隆项目到本地
+git clone https://github.com/violet27-chf/Hadoop.git
+cd Hadoop
+```
+
+#### 2. 创建虚拟环境
+
+#### Windows 系统
+```bash
+# 创建虚拟环境
+python -m venv venv
+
+# 激活虚拟环境
+venv\Scripts\activate
+
+# 验证虚拟环境
+python --version
+pip --version
+```
+
+#### Linux/macOS 系统
+```bash
+# 创建虚拟环境
+python3 -m venv venv
+
+# 激活虚拟环境
+source venv/bin/activate
+
+# 验证虚拟环境
+python --version
+pip --version
+```
+
+#### 3. 安装依赖
+
+```bash
+# 升级pip
+pip install --upgrade pip
+
+# 安装项目依赖
+pip install -r requirements.txt
+
+# 验证安装
+python -c "import flask, paramiko; print('依赖安装成功！')"
+```
+
+#### 4. 创建必要目录
+
+```bash
+# 创建上传文件目录
+mkdir -p uploads
+
+# 创建日志目录
+mkdir -p logs
+```
+
+## 🚀 快速开始
+
+### 方法一：使用启动脚本（推荐）
+
+#### Windows 系统
+```bash
+# 双击运行启动脚本
+start.bat
+
+# 或者命令行运行
+.\start.bat
+```
+
+#### Linux/macOS 系统
+```bash
+# 给脚本添加执行权限
+chmod +x start.sh
+
+# 运行启动脚本
+./start.sh
+```
+
+### 方法二：手动启动
+
+#### 1. 启动服务
+
+```bash
+# 确保虚拟环境已激活
+# Windows: venv\Scripts\activate
+# Linux: source venv/bin/activate
+
+# 启动Flask应用
+python app.py
+```
+
+#### 2. 访问Web界面
+
+打开浏览器访问：`http://localhost:5000`
+
+#### 3. 开始部署
+
+1. **选择部署模式**：全自动、半自动或手动
+2. **配置服务器信息**：主机地址、用户名、密码
+3. **选择软件版本**：Hadoop版本、Java版本
+4. **上传自定义包**（可选）：上传自己的Hadoop或Java安装包
+5. **开始部署**：系统将自动执行部署流程
+
+## 📁 项目结构
+
+### 目录结构
+
+```
+Hadoop/
+├── 📁 templates/                 # HTML模板文件
+│   ├── 📁 components/           # 组件模板
+│   │   ├── deploy-auto.html     # 全自动部署页面
+│   │   ├── deploy-semi-auto.html # 半自动配置页面
+│   │   ├── deploy-manual.html   # 手动配置页面
+│   │   ├── deploy-method.html   # 部署模式选择页面
+│   │   └── ...                  # 其他组件页面
+│   ├── base.html                # 基础模板
+│   ├── index.html               # 首页
+│   └── ...                      # 其他页面模板
+├── 📁 static/                   # 静态资源文件
+│   ├── 📁 css/                 # 样式文件
+│   ├── 📁 js/                  # JavaScript文件
+│   └── 📁 vendor/              # 第三方库
+├── 📁 scripts/                  # 部署脚本
+│   ├── hadoop_deploy.sh        # Linux部署脚本
+│   └── hadoop_deploy.ps1       # Windows部署脚本
+├── 📁 uploads/                  # 文件上传目录
+├── 📁 logs/                     # 日志文件目录
+├── app.py                       # 主应用文件
+├── requirements.txt             # Python依赖包
+├── setup.py                     # Python安装脚本
+├── setup.bat                    # Windows安装脚本
+├── setup.sh                     # Linux/macOS安装脚本
+├── start.bat                    # Windows启动脚本
+├── start.sh                     # Linux/macOS启动脚本
+├── test_upload.py               # 上传功能测试脚本
+├── test_mirrors.py              # 镜像源测试脚本
+├── README.md                    # 项目说明文档
+└── LICENSE                      # 许可证文件
+```
+
+### 核心文件说明
+
+#### 应用文件
+- **`app.py`**: Flask主应用文件，包含所有路由和API接口
+- **`requirements.txt`**: Python依赖包列表
+- **`config.ini`**: 应用配置文件（自动生成）
+
+#### 安装脚本
+- **`setup.py`**: Python安装脚本，跨平台
+- **`setup.bat`**: Windows快速安装脚本
+- **`setup.sh`**: Linux/macOS快速安装脚本
+
+#### 启动脚本
+- **`start.bat`**: Windows快速启动脚本
+- **`start.sh`**: Linux/macOS快速启动脚本
+
+#### 部署脚本
+- **`scripts/hadoop_deploy.sh`**: Linux系统Hadoop部署脚本
+- **`scripts/hadoop_deploy.ps1`**: Windows系统Hadoop部署脚本
+
+#### 模板文件
+- **`templates/base.html`**: 基础HTML模板
+- **`templates/components/`**: 组件模板目录
+  - `deploy-method.html`: 部署模式选择
+  - `deploy-auto.html`: 全自动部署
+  - `deploy-semi-auto.html`: 半自动配置
+  - `deploy-manual.html`: 手动配置
+
+#### 静态资源
+- **`static/css/`**: 样式文件
+- **`static/js/`**: JavaScript文件
+- **`static/vendor/`**: 第三方库（Bootstrap等）
+
+## 📖 使用指南
+
+### 部署模式说明
+
+#### 🔄 全自动模式
+- **适用场景**：快速部署标准Hadoop集群
+- **特点**：系统自动完成所有配置，无需人工干预
+- **推荐用户**：初学者或需要快速部署的用户
+
+#### ⚙️ 半自动模式
+- **适用场景**：需要自定义部分配置的部署
+- **特点**：系统完成基础配置，用户可自定义关键参数
+- **推荐用户**：有一定经验的用户
+
+#### 🛠️ 手动模式
+- **适用场景**：完全自定义的部署需求
+- **特点**：用户完全控制每个配置细节
+- **推荐用户**：高级用户和特殊需求场景
+
+### 文件上传功能
+
+#### 支持的格式
+- **Hadoop包**：`.tar.gz`, `.tgz`
+- **Java包**：`.tar.gz`, `.tgz`, `.zip`
+
+#### 上传步骤
+1. 在版本选择下拉框中选择"自定义上传"
+2. 点击"选择文件"按钮
+3. 选择要上传的安装包文件
+4. 点击"上传"按钮
+5. 等待上传完成确认
+
+#### 注意事项
+- 文件大小建议不超过2GB
+- 确保文件格式正确
+- 上传成功后会在部署时优先使用
+
+### 部署流程
+
+1. **环境检测**：检查系统环境、网络连接
+2. **依赖安装**：安装Java环境和其他依赖
+3. **软件下载**：下载Hadoop（或使用上传的包）
+4. **配置生成**：根据用户配置生成配置文件
+5. **服务启动**：启动Hadoop集群服务
+6. **验证测试**：验证集群运行状态
+
+## ⚙️ 配置说明
 
 ### 核心配置项
 
-| 配置项 | 描述 | 默认值 |
-|--------|------|--------|
-| `hadoop.version` | Hadoop版本 | 3.3.4 |
-| `hdfs.replication` | 数据副本数 | 3 |
-| `yarn.resourcemanager.host` | ResourceManager主机 | namenode |
+| 配置项 | 描述 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `hadoop.version` | Hadoop版本 | 3.3.6 | 支持的版本：2.10.2, 3.2.4, 3.3.5, 3.3.6 |
+| `java.version` | Java版本 | 8 | 支持的版本：8, 11, 17 |
+| `hdfs.replication` | HDFS副本数 | 3 | 建议设置为DataNode数量 |
+| `yarn.resourcemanager.host` | ResourceManager主机 | localhost | 集群主节点地址 |
 
-## 贡献指南
+### 性能调优参数
 
-欢迎贡献！请遵循以下步骤：
+```yaml
+# MapReduce内存配置
+mapreduce.map.memory.mb: 2048
+mapreduce.reduce.memory.mb: 4096
 
-1. Fork项目仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 提交Pull Request
+# YARN内存配置
+yarn.nodemanager.resource.memory-mb: 8192
+yarn.scheduler.maximum-allocation-mb: 4096
+```
 
-## 许可证
+## 🔧 开发指南
+
+### 添加新功能
+1. 在`app.py`中添加路由和API
+2. 在`templates/`中添加对应的HTML模板
+3. 在`static/js/`中添加JavaScript逻辑
+4. 在`static/css/`中添加样式
+
+### 修改部署脚本
+1. 修改`scripts/hadoop_deploy.sh`（Linux）
+2. 修改`scripts/hadoop_deploy.ps1`（Windows）
+3. 测试脚本功能
+
+### 添加新的依赖
+1. 在`requirements.txt`中添加包名和版本
+2. 更新安装脚本中的依赖检查
+3. 测试安装流程
+
+### 调试和测试
+
+#### 运行测试
+```bash
+# 测试文件上传功能
+python test_upload.py
+
+# 测试镜像源可用性
+python test_mirrors.py
+
+# 测试API接口
+curl http://localhost:5000/api/deploy/auto/status
+```
+
+#### 查看日志
+```bash
+# 应用日志
+tail -f logs/app.log
+
+# 部署日志
+tail -f logs/deploy.log
+```
+
+#### 调试模式
+```bash
+# 启动调试模式
+python app.py --debug
+```
+
+### 生产环境部署
+1. 修改`config.ini`中的配置
+2. 使用生产级Web服务器（如Gunicorn）
+3. 配置反向代理（如Nginx）
+4. 设置SSL证书
+
+### Docker部署
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+### 安全说明
+
+#### 文件上传安全
+- 限制文件类型和大小
+- 验证文件内容
+- 存储在安全目录
+
+#### 网络安全
+- 使用HTTPS
+- 配置防火墙
+- 限制访问IP
+
+#### 数据安全
+- 加密敏感信息
+- 定期备份数据
+- 日志审计
+
+## 🔧 故障排除
+
+### 常见问题
+
+#### 1. 虚拟环境激活失败
+```bash
+# Windows
+venv\Scripts\activate
+
+# Linux/macOS
+source venv/bin/activate
+```
+
+#### 2. 依赖安装失败
+```bash
+# 升级pip
+pip install --upgrade pip
+
+# 使用国内镜像源
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+```
+
+#### 3. 端口被占用
+```bash
+# 查看端口占用
+netstat -ano | findstr :5000
+
+# 修改端口（在app.py中）
+app.run(debug=True, host='0.0.0.0', port=5001)
+```
+
+#### 4. 文件上传失败
+- 检查文件格式是否正确
+- 确认文件大小不超过限制
+- 检查网络连接状态
+
+#### 5. 部署失败
+- 检查服务器连接
+- 确认服务器权限
+- 查看部署日志
+
+### 日志查看
+
+```bash
+# 查看应用日志
+tail -f logs/app.log
+
+# 查看部署日志
+tail -f logs/deploy.log
+```
+
+## 🧪 测试
+
+### 运行测试脚本
+
+```bash
+# 确保虚拟环境已激活
+python test_upload.py
+```
+
+### 测试内容
+- 文件上传功能测试
+- API接口测试
+- 部署流程测试
+
+### 镜像源测试
+
+```bash
+# 测试下载镜像源的可用性
+python test_mirrors.py
+```
+
+### 测试内容
+- Hadoop下载镜像源测试
+- Java下载镜像源测试
+- 网络连接测试
+
+## 🤝 贡献指南
+
+我们欢迎所有形式的贡献！
+
+### 贡献步骤
+
+1. **Fork项目**
+   ```bash
+   git clone https://github.com/violet27-chf/Hadoop.git
+   ```
+
+2. **创建特性分支**
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+
+3. **提交更改**
+   ```bash
+   git add .
+   git commit -m 'Add some AmazingFeature'
+   ```
+
+4. **推送到分支**
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+
+5. **提交Pull Request**
+
+### 开发环境设置
+
+```bash
+# 克隆项目
+git clone https://github.com/violet27-chf/Hadoop.git
+cd Hadoop
+
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# 或 venv\Scripts\activate  # Windows
+
+# 安装开发依赖
+pip install -r requirements.txt
+pip install pytest pytest-cov flake8
+
+# 运行测试
+pytest
+
+# 代码格式化
+black .
+flake8 .
+```
+
+## 📄 许可证
 
 本项目采用 [MIT](LICENSE) 许可证。
 
+## 📞 联系我们
+
+- **邮箱**：1494458927@qq.com
+- **项目地址**：https://github.com/violet27-chf/Hadoop
+- **问题反馈**：https://github.com/violet27-chf/Hadoop/issues
+
+## 🙏 致谢
+
+感谢所有为这个项目做出贡献的开发者和用户！
+
 ---
 
-📧 如有问题请联系：1494458927@qq.com
+⭐ 如果这个项目对您有帮助，请给我们一个星标！

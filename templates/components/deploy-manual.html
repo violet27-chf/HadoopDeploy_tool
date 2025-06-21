@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+
+{% block title %}手动Hadoop配置 - Hadoop部署系统{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-tools me-2"></i>手动Hadoop集群配置
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>手动模式：</strong>完全手动配置所有参数，适合高级用户和特殊需求。
+                    </div>
+                    
+                    <form id="manualForm">
+                        <!-- 系统环境配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-cpu me-2"></i>系统环境配置</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="hadoopVersion" class="form-label">Hadoop版本</label>
+                                        <select class="form-select" id="hadoopVersion" name="hadoopVersion" onchange="handleVersionChange()">
+                                            <option value="3.3.6">Hadoop 3.3.6 (推荐)</option>
+                                            <option value="3.3.5">Hadoop 3.3.5</option>
+                                            <option value="3.2.4">Hadoop 3.2.4</option>
+                                            <option value="2.10.2">Hadoop 2.10.2</option>
+                                            <option value="custom">自定义上传 (.tar.gz)</option>
+                                        </select>
+                                        <div id="uploadSection" class="mt-2" style="display: none;">
+                                            <input class="form-control" type="file" id="hadoopUpload" accept=".tar.gz,.tgz">
+                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadHadoopPackage()">上传</button>
+                                            <div id="uploadStatus" class="form-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="javaVersion" class="form-label">Java版本</label>
+                                        <select class="form-select" id="javaVersion" name="javaVersion" onchange="handleJavaVersionChange()">
+                                            <option value="8">Java 8 (推荐)</option>
+                                            <option value="11">Java 11</option>
+                                            <option value="17">Java 17</option>
+                                            <option value="custom">自定义上传 (.tar.gz/.zip)</option>
+                                        </select>
+                                        <div id="javaUploadSection" class="mt-2" style="display: none;">
+                                            <input class="form-control" type="file" id="javaUpload" accept=".tar.gz,.tgz,.zip">
+                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadJavaPackage()">上传</button>
+                                            <div id="javaUploadStatus" class="form-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="systemUser" class="form-label">系统用户</label>
+                                        <input type="text" class="form-control" id="systemUser" name="systemUser" 
+                                               value="hadoop" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="userGroup" class="form-label">用户组</label>
+                                        <input type="text" class="form-control" id="userGroup" name="userGroup" 
+                                               value="hadoop" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="javaHome" class="form-label">JAVA_HOME路径</label>
+                                        <input type="text" class="form-control" id="javaHome" name="javaHome" 
+                                               value="/usr/lib/jvm/java-8-openjdk" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="hadoopHome" class="form-label">HADOOP_HOME路径</label>
+                                        <input type="text" class="form-control" id="hadoopHome" name="hadoopHome" 
+                                               value="/opt/hadoop" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 核心配置文件 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-file-earmark-text me-2"></i>核心配置文件</h5>
+                            
+                            <!-- core-site.xml -->
+                            <div class="mb-3">
+                                <label for="coreSiteConfig" class="form-label">core-site.xml 配置</label>
+                                <textarea class="form-control" id="coreSiteConfig" name="coreSiteConfig" rows="8" required><?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/tmp/hadoop-${user.name}</value>
+    </property>
+</configuration></textarea>
+                            </div>
+
+                            <!-- hdfs-site.xml -->
+                            <div class="mb-3">
+                                <label for="hdfsSiteConfig" class="form-label">hdfs-site.xml 配置</label>
+                                <textarea class="form-control" id="hdfsSiteConfig" name="hdfsSiteConfig" rows="10" required><?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>3</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>/data/hadoop/hdfs/namenode</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/data/hadoop/hdfs/datanode</value>
+    </property>
+</configuration></textarea>
+                            </div>
+
+                            <!-- mapred-site.xml -->
+                            <div class="mb-3">
+                                <label for="mapredSiteConfig" class="form-label">mapred-site.xml 配置</label>
+                                <textarea class="form-control" id="mapredSiteConfig" name="mapredSiteConfig" rows="8" required><?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*</value>
+    </property>
+</configuration></textarea>
+                            </div>
+
+                            <!-- yarn-site.xml -->
+                            <div class="mb-3">
+                                <label for="yarnSiteConfig" class="form-label">yarn-site.xml 配置</label>
+                                <textarea class="form-control" id="yarnSiteConfig" name="yarnSiteConfig" rows="10" required><?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>localhost</value>
+    </property>
+</configuration></textarea>
+                            </div>
+                        </div>
+
+                        <!-- 环境变量配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-envira me-2"></i>环境变量配置</h5>
+                            <div class="mb-3">
+                                <label for="envConfig" class="form-label">环境变量配置</label>
+                                <textarea class="form-control" id="envConfig" name="envConfig" rows="6" required>export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+export HADOOP_HOME=/opt/hadoop
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"</textarea>
+                            </div>
+                        </div>
+
+                        <!-- 集群节点配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-diagram-3 me-2"></i>集群节点配置</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mastersFile" class="form-label">masters 文件内容</label>
+                                        <textarea class="form-control" id="mastersFile" name="mastersFile" rows="3" required>master.example.com</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workersFile" class="form-label">workers 文件内容</label>
+                                        <textarea class="form-control" id="workersFile" name="workersFile" rows="3" required>worker1.example.com
+worker2.example.com
+worker3.example.com</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 安全配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-shield-lock me-2"></i>安全配置</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="enableKerberos" name="enableKerberos">
+                                        <label class="form-check-label" for="enableKerberos">
+                                            启用Kerberos认证
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="enableSSL" name="enableSSL">
+                                        <label class="form-check-label" for="enableSSL">
+                                            启用SSL加密
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="enableACL" name="enableACL">
+                                        <label class="form-check-label" for="enableACL">
+                                            启用访问控制列表
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="enableAudit" name="enableAudit">
+                                        <label class="form-check-label" for="enableAudit">
+                                            启用审计日志
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 性能调优配置 -->
+                        <div class="mb-4">
+                            <h5><i class="bi bi-speedometer2 me-2"></i>性能调优配置</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="heapSize" class="form-label">JVM堆大小 (MB)</label>
+                                        <input type="number" class="form-control" id="heapSize" name="heapSize" 
+                                               min="512" max="8192" value="2048" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="gcThreads" class="form-label">GC线程数</label>
+                                        <input type="number" class="form-control" id="gcThreads" name="gcThreads" 
+                                               min="1" max="16" value="4" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="performanceConfig" class="form-label">性能调优参数</label>
+                                <textarea class="form-control" id="performanceConfig" name="performanceConfig" rows="4" 
+                                          placeholder="每行一个配置项，格式：key=value">mapreduce.map.memory.mb=2048
+mapreduce.reduce.memory.mb=4096
+yarn.nodemanager.resource.memory-mb=8192
+yarn.scheduler.maximum-allocation-mb=4096</textarea>
+                            </div>
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="goBack()">
+                                <i class="bi bi-arrow-left me-2"></i>返回
+                            </button>
+                            <div>
+                                <button type="button" class="btn btn-info me-2" onclick="validateManualConfig()">
+                                    <i class="bi bi-check-circle me-2"></i>验证配置
+                                </button>
+                                <button type="button" class="btn btn-warning me-2" onclick="generateScript()">
+                                    <i class="bi bi-file-earmark-code me-2"></i>生成脚本
+                                </button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-play-fill me-2"></i>开始部署
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function goBack() {
+    window.location.href = '/deploy/method';
+}
+
+function handleVersionChange() {
+    const versionSelect = document.getElementById('hadoopVersion');
+    const uploadSection = document.getElementById('uploadSection');
+    const uploadStatus = document.getElementById('uploadStatus');
+    
+    if (versionSelect.value === 'custom') {
+        uploadSection.style.display = 'block';
+        uploadStatus.textContent = '';
+        uploadStatus.className = 'form-text';
+    } else {
+        uploadSection.style.display = 'none';
+        uploadStatus.textContent = '';
+        uploadStatus.className = 'form-text';
+        // 清除之前的上传状态
+        sessionStorage.removeItem('hadoopUploaded');
+    }
+}
+
+function handleJavaVersionChange() {
+    const javaSelect = document.getElementById('javaVersion');
+    const javaUploadSection = document.getElementById('javaUploadSection');
+    const javaUploadStatus = document.getElementById('javaUploadStatus');
+    
+    if (javaSelect.value === 'custom') {
+        javaUploadSection.style.display = 'block';
+        javaUploadStatus.textContent = '';
+        javaUploadStatus.className = 'form-text';
+    } else {
+        javaUploadSection.style.display = 'none';
+        javaUploadStatus.textContent = '';
+        javaUploadStatus.className = 'form-text';
+        // 清除之前的上传状态
+        sessionStorage.removeItem('javaUploaded');
+    }
+}
+
+function validateManualConfig() {
+    const form = document.getElementById('manualForm');
+    const formData = new FormData(form);
+    
+    // 基本验证
+    if (!formData.get('systemUser') || !formData.get('hadoopHome')) {
+        alert('请填写必要的系统配置信息');
+        return;
+    }
+    
+    if (!formData.get('coreSiteConfig') || !formData.get('hdfsSiteConfig')) {
+        alert('请填写核心配置文件内容');
+        return;
+    }
+    
+    // 显示验证成功消息
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success mt-3';
+    alertDiv.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>手动配置验证通过！';
+    
+    // 移除之前的验证消息
+    const existingAlert = document.querySelector('.alert-success');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+    
+    document.querySelector('.card-body').appendChild(alertDiv);
+    
+    // 3秒后自动移除
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+function generateScript() {
+    const form = document.getElementById('manualForm');
+    const formData = new FormData(form);
+    
+    // 生成部署脚本
+    let script = `#!/bin/bash
+# Hadoop手动部署脚本
+# 生成时间: ${new Date().toLocaleString()}
+
+set -e
+
+echo "开始Hadoop手动部署..."
+
+# 创建系统用户
+sudo useradd -m -s /bin/bash ${formData.get('systemUser')}
+sudo usermod -aG sudo ${formData.get('systemUser')}
+
+# 设置环境变量
+cat >> /home/${formData.get('systemUser')}/.bashrc << 'EOF'
+${formData.get('envConfig')}
+EOF
+
+# 创建目录
+sudo mkdir -p ${formData.get('hadoopHome')}
+sudo chown ${formData.get('systemUser')}:${formData.get('userGroup')} ${formData.get('hadoopHome')}
+
+# 下载并解压Hadoop
+cd /tmp
+wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
+sudo tar -xzf hadoop-3.3.6.tar.gz -C /opt/
+sudo ln -sf /opt/hadoop-3.3.6 ${formData.get('hadoopHome')}
+
+# 配置Hadoop
+sudo -u ${formData.get('systemUser')} mkdir -p ${formData.get('hadoopHome')}/etc/hadoop
+
+# 写入配置文件
+sudo -u ${formData.get('systemUser')} tee ${formData.get('hadoopHome')}/etc/hadoop/core-site.xml > /dev/null << 'EOF'
+${formData.get('coreSiteConfig')}
+EOF
+
+sudo -u ${formData.get('systemUser')} tee ${formData.get('hadoopHome')}/etc/hadoop/hdfs-site.xml > /dev/null << 'EOF'
+${formData.get('hdfsSiteConfig')}
+EOF
+
+sudo -u ${formData.get('systemUser')} tee ${formData.get('hadoopHome')}/etc/hadoop/mapred-site.xml > /dev/null << 'EOF'
+${formData.get('mapredSiteConfig')}
+EOF
+
+sudo -u ${formData.get('systemUser')} tee ${formData.get('hadoopHome')}/etc/hadoop/yarn-site.xml > /dev/null << 'EOF'
+${formData.get('yarnSiteConfig')}
+EOF
+
+# 格式化NameNode
+sudo -u ${formData.get('systemUser')} ${formData.get('hadoopHome')}/bin/hdfs namenode -format
+
+# 启动Hadoop服务
+sudo -u ${formData.get('systemUser')} ${formData.get('hadoopHome')}/sbin/start-dfs.sh
+sudo -u ${formData.get('systemUser')} ${formData.get('hadoopHome')}/sbin/start-yarn.sh
+
+echo "Hadoop部署完成！"
+`;
+
+    // 创建下载链接
+    const blob = new Blob([script], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hadoop-manual-deploy.sh';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    alert('部署脚本已生成并下载！');
+}
+
+function uploadHadoopPackage() {
+    const fileInput = document.getElementById('hadoopUpload');
+    const statusDiv = document.getElementById('uploadStatus');
+    
+    if (!fileInput.files.length) {
+        statusDiv.textContent = '请先选择文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    if (!file.name.endsWith('.tar.gz') && !file.name.endsWith('.tgz')) {
+        statusDiv.textContent = '请选择.tar.gz或.tgz格式的文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    statusDiv.textContent = '正在上传...';
+    statusDiv.className = 'form-text text-info';
+    
+    fetch('/api/upload/hadoop', {
+        method: 'POST',
+        body: formData
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            statusDiv.textContent = '上传成功！文件已保存';
+            statusDiv.className = 'form-text text-success';
+            sessionStorage.setItem('hadoopUploaded', '1');
+            sessionStorage.setItem('uploadedFileName', file.name);
+        } else {
+            statusDiv.textContent = data.msg || '上传失败';
+            statusDiv.className = 'form-text text-danger';
+        }
+    }).catch(() => {
+        statusDiv.textContent = '上传失败，请重试';
+        statusDiv.className = 'form-text text-danger';
+    });
+}
+
+function uploadJavaPackage() {
+    const fileInput = document.getElementById('javaUpload');
+    const statusDiv = document.getElementById('javaUploadStatus');
+    
+    if (!fileInput.files.length) {
+        statusDiv.textContent = '请先选择文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    if (!file.name.endsWith('.tar.gz') && !file.name.endsWith('.tgz') && !file.name.endsWith('.zip')) {
+        statusDiv.textContent = '请选择.tar.gz、.tgz或.zip格式的文件';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    statusDiv.textContent = '正在上传...';
+    statusDiv.className = 'form-text text-info';
+    
+    fetch('/api/upload/java', {
+        method: 'POST',
+        body: formData
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            statusDiv.textContent = '上传成功！文件已保存';
+            statusDiv.className = 'form-text text-success';
+            sessionStorage.setItem('javaUploaded', '1');
+            sessionStorage.setItem('uploadedFileName', file.name);
+        } else {
+            statusDiv.textContent = data.msg || '上传失败';
+            statusDiv.className = 'form-text text-danger';
+        }
+    }).catch(() => {
+        statusDiv.textContent = '上传失败，请重试';
+        statusDiv.className = 'form-text text-danger';
+    });
+}
+
+document.getElementById('manualForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const config = {};
+    
+    // 收集表单数据
+    for (let [key, value] of formData.entries()) {
+        if (this.elements[key].type === 'checkbox') {
+            config[key] = this.elements[key].checked;
+        } else {
+            config[key] = value;
+        }
+    }
+    
+    // 合并服务器配置
+    const serverConfig = sessionStorage.getItem('serverConfig');
+    if (serverConfig) {
+        const serverData = JSON.parse(serverConfig);
+        Object.assign(config, serverData);
+    }
+    
+    // 保存配置并跳转到部署页面
+    sessionStorage.setItem('manualConfig', JSON.stringify(config));
+    window.location.href = '/deploy/manual/progress';
+});
+
+// 页面加载时检查配置
+document.addEventListener('DOMContentLoaded', function() {
+    const config = sessionStorage.getItem('serverConfig');
+    if (!config) {
+        alert('未找到服务器配置信息，请返回重新配置');
+        window.location.href = '/';
+    }
+    
+    // 加载之前保存的手动配置
+    const savedConfig = sessionStorage.getItem('manualConfig');
+    if (savedConfig) {
+        const config = JSON.parse(savedConfig);
+        for (let key in config) {
+            const element = document.getElementById(key);
+            if (element) {
+                if (element.type === 'checkbox') {
+                    element.checked = config[key];
+                } else {
+                    element.value = config[key];
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

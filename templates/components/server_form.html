@@ -25,7 +25,7 @@
             <button type="button" class="btn btn-secondary mb-3" onclick="addServer()">
                 <i class="bi bi-plus-circle"></i> 添加服务器
             </button>
-            <button type="submit" class="btn btn-primary d-block">
+            <button type="button" class="btn btn-primary d-block" onclick="saveAndRedirect()">
                 <i class="bi bi-play-fill"></i> 开始部署
             </button>
         </form>
@@ -34,6 +34,34 @@
 
 <script>
     let serverCount = 1;
+    
+    function saveAndRedirect() {
+        // 收集表单数据
+        const form = document.getElementById('serverForm');
+        if (!form.checkValidity()) {
+            alert('请填写所有必填字段');
+            return;
+        }
+        const formData = new FormData(form);
+        const servers = [];
+        
+        // 将表单数据转换为对象数组
+        const hostnames = formData.getAll('hostname[]');
+        const usernames = formData.getAll('username[]');
+        const passwords = formData.getAll('password[]');
+        
+        for (let i = 0; i < hostnames.length; i++) {
+            servers.push({
+                hostname: hostnames[i],
+                username: usernames[i],
+                password: passwords[i]
+            });
+        }
+        
+        // 存储数据并跳转
+        sessionStorage.setItem('serverConfig', JSON.stringify(servers));
+        window.location.href = '/deploy/method';
+    }
     
     function addServer() {
         serverCount++;
