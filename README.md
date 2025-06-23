@@ -1,6 +1,5 @@
 # Hadoop 集群部署系统
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 [![Flask Version](https://img.shields.io/badge/flask-2.3+-blue.svg)](https://flask.palletsprojects.com)
 
@@ -27,7 +26,6 @@
 - [开发指南](#开发指南)
 - [故障排除](#故障排除)
 - [贡献指南](#贡献指南)
-- [许可证](#许可证)
 
 ## 🖥️ 系统要求
 
@@ -475,71 +473,9 @@ python test_mirrors.py
 
 ## 🤝 贡献指南
 
-我们欢迎所有形式的贡献！
+欢迎提交PR、Issue，或参与文档完善与功能建议。
 
-### 贡献步骤
+## 📬 联系方式
 
-1. **Fork项目**
-   ```bash
-   git clone https://github.com/violet27-chf/Hadoop.git
-   ```
-
-2. **创建特性分支**
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```
-
-3. **提交更改**
-   ```bash
-   git add .
-   git commit -m 'Add some AmazingFeature'
-   ```
-
-4. **推送到分支**
-   ```bash
-   git push origin feature/AmazingFeature
-   ```
-
-5. **提交Pull Request**
-
-### 开发环境设置
-
-```bash
-# 克隆项目
-git clone https://github.com/violet27-chf/Hadoop.git
-cd Hadoop
-
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Linux/macOS
-# 或 venv\Scripts\activate  # Windows
-
-# 安装开发依赖
-pip install -r requirements.txt
-pip install pytest pytest-cov flake8
-
-# 运行测试
-pytest
-
-# 代码格式化
-black .
-flake8 .
-```
-
-## 📄 许可证
-
-本项目采用 [MIT](LICENSE) 许可证。
-
-## 📞 联系我们
-
-- **邮箱**：1494458927@qq.com
-- **项目地址**：https://github.com/violet27-chf/Hadoop
-- **问题反馈**：https://github.com/violet27-chf/Hadoop/issues
-
-## 🙏 致谢
-
-感谢所有为这个项目做出贡献的开发者和用户！
-
----
-
-⭐ 如果这个项目对您有帮助，请给我们一个星标！
+- 项目主页：[https://github.com/violet27-chf/Hadoop.git](https://github.com/violet27-chf/Hadoop.git)
+- 邮箱：violet@kami666.xyz
