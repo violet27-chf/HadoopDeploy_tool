@@ -1,79 +1,92 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">选择Hadoop集群配置方式</h2>
-    <div class="row">
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-2"><i class="bi bi-gear-wide-connected me-2"></i>选择 Hadoop 集群配置方式</h2>
+        <p class="text-muted">请选择最适合您需求的部署模式，系统将为您提供最佳体验</p>
+    </div>
+    <div class="row justify-content-center">
         <!-- 全自动配置 -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">全自动配置</h5>
-                    <p class="card-text">
-                        系统将自动完成所有配置步骤，包括：
-                        <ul>
-                            <li>自动检测服务器环境</li>
-                            <li>自动安装所需组件</li>
-                            <li>自动优化配置参数</li>
-                        </ul>
-                        适合快速部署标准集群。
-                    </p>
+            <div class="card h-100 shadow-lg border-0 method-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-lightning-charge-fill text-primary fs-1 mb-3"></i>
+                    <h5 class="card-title fw-bold">全自动配置</h5>
+                    <ul class="text-start mb-3">
+                        <li>自动检测服务器环境</li>
+                        <li>自动安装所需组件</li>
+                        <li>自动优化配置参数</li>
+                    </ul>
+                    <p class="text-muted small">适合快速部署标准集群</p>
                 </div>
-                <div class="card-footer bg-transparent">
-                    <button class="btn btn-primary w-100" onclick="selectMethod('auto')">
-                        选择全自动配置
+                <div class="card-footer bg-transparent border-0">
+                    <button class="btn btn-primary w-100 btn-lg method-btn" onclick="selectMethod('auto')">
+                        <i class="bi bi-rocket-takeoff me-1"></i> 选择全自动配置
                     </button>
                 </div>
             </div>
         </div>
-
         <!-- 半自动配置 -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">半自动配置</h5>
-                    <p class="card-text">
-                        系统将完成基础配置，但允许您：
-                        <ul>
-                            <li>自定义关键参数</li>
-                            <li>选择安装组件</li>
-                            <li>调整性能设置</li>
-                        </ul>
-                        适合有一定经验的用户。
-                    </p>
+            <div class="card h-100 shadow-lg border-0 method-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-sliders2-vertical text-success fs-1 mb-3"></i>
+                    <h5 class="card-title fw-bold">半自动配置</h5>
+                    <ul class="text-start mb-3">
+                        <li>自定义关键参数</li>
+                        <li>选择安装组件</li>
+                        <li>调整性能设置</li>
+                    </ul>
+                    <p class="text-muted small">适合有一定经验的用户</p>
                 </div>
-                <div class="card-footer bg-transparent">
-                    <button class="btn btn-primary w-100" onclick="selectMethod('semi-auto')">
-                        选择半自动配置
+                <div class="card-footer bg-transparent border-0">
+                    <button class="btn btn-success w-100 btn-lg method-btn" onclick="selectMethod('semi-auto')">
+                        <i class="bi bi-toggles2 me-1"></i> 选择半自动配置
                     </button>
                 </div>
             </div>
         </div>
-
         <!-- 纯手动配置 -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">纯手动配置</h5>
-                    <p class="card-text">
-                        完全手动配置所有参数：
-                        <ul>
-                            <li>逐项设置配置参数</li>
-                            <li>手动安装组件</li>
-                            <li>完全控制每个细节</li>
-                        </ul>
-                        适合高级用户和特殊需求。
-                    </p>
+            <div class="card h-100 shadow-lg border-0 method-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-tools text-warning fs-1 mb-3"></i>
+                    <h5 class="card-title fw-bold">纯手动配置</h5>
+                    <ul class="text-start mb-3">
+                        <li>逐项设置配置参数</li>
+                        <li>手动安装组件</li>
+                        <li>完全控制每个细节</li>
+                    </ul>
+                    <p class="text-muted small">适合高级用户和特殊需求</p>
                 </div>
-                <div class="card-footer bg-transparent">
-                    <button class="btn btn-primary w-100" onclick="selectMethod('manual')">
-                        选择纯手动配置
+                <div class="card-footer bg-transparent border-0">
+                    <button class="btn btn-warning w-100 btn-lg text-white method-btn" onclick="selectMethod('manual')">
+                        <i class="bi bi-pencil-square me-1"></i> 选择纯手动配置
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.method-card {
+    transition: transform 0.18s, box-shadow 0.18s;
+    border-radius: 1.2rem !important;
+}
+.method-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(13,110,253,0.10);
+    z-index: 2;
+}
+.method-btn {
+    border-radius: 2rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+</style>
 
 <script>
     // 检查是否有服务器配置数据
@@ -84,16 +97,12 @@
             window.location.href = '/';
         }
     });
-
     function selectMethod(method) {
-        // 获取存储的服务器配置
         const config = sessionStorage.getItem('serverConfig');
-        
         if (!config) {
             alert('未找到服务器配置信息，请返回重新配置');
             return;
         }
-
         let route;
         if (method === 'manual') {
             route = '/deploy/manualConfig';
@@ -104,7 +113,6 @@
         else if (method === 'auto') {
             route = '/deploy/auto';
         }
-        
         window.location.href = `${route}?method=${method}&config=${encodeURIComponent(config)}`;
     }
 </script>

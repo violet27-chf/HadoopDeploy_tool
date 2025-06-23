@@ -4,6 +4,27 @@
     --secondary-color: #6c757d;
 }
 
+.home-hero {
+    background: linear-gradient(90deg, #e3f0ff 0%, #f8fafc 100%);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    margin-bottom: 2rem;
+}
+.home-hero h1 {
+    color: var(--primary-color);
+    font-size: 2.8rem;
+    letter-spacing: 1px;
+}
+.home-hero p.lead {
+    color: #4b5e6b;
+    font-size: 1.25rem;
+}
+.home-hero .btn-lg {
+    padding: 0.75rem 2.5rem;
+    font-size: 1.15rem;
+    border-radius: 2rem;
+}
+
 /* 服务器表单样式 */
 .server-form {
     max-width: 800px;
@@ -12,7 +33,7 @@
 
 .server-item {
     background-color: #fff;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     margin-bottom: 1.5rem;
     padding: 1.25rem;
@@ -31,7 +52,7 @@
 /* 结果区域样式 */
 #results {
     background-color: #fff;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
     padding: 1.25rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
@@ -40,5 +61,8 @@
 @media (max-width: 768px) {
     .server-form {
         padding: 0 15px;
+    }
+    .home-hero h1 {
+        font-size: 2rem;
     }
 }

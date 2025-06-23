@@ -1,7 +1,20 @@
-/* 基础样式 */
+/* 全局字体与主色调 */
 body {
     padding-top: 56px;
     background-color: #f8f9fa;
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Roboto', Arial, sans-serif;
+    background: #f6f8fa;
+    color: #222;
+}
+:root {
+    --primary: #0d6efd;
+    --secondary: #6c757d;
+    --success: #198754;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #0dcaf0;
+    --card-radius: 1rem;
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.06);
 }
 
 /* 导航栏样式 */
@@ -14,4 +27,242 @@ footer {
     background-color: #f8f9fa;
     padding: 1rem 0;
     margin-top: 2rem;
+}
+
+/* 文档页面美化样式 */
+.doc-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.doc-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  margin: 2rem auto 2rem auto;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  max-width: 900px;
+}
+.doc-content main {
+  width: 100%;
+}
+.doc-content h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #2a4d7a;
+}
+.card.shadow-sm {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06)!important;
+}
+.alert {
+  border-radius: 8px;
+}
+.btn-primary {
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* 标题美化 */
+h1, .h1, h2, .h2, h3, .h3 {
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 1px;
+}
+h1, .h1 { font-size: 2.2rem; }
+h2, .h2 { font-size: 1.5rem; }
+h3, .h3 { font-size: 1.2rem; }
+
+/* 卡片样式 */
+.card, .doc-content, .server-item, #results, .modal-content {
+  border-radius: var(--card-radius) !important;
+  box-shadow: var(--card-shadow);
+  background: #fff;
+}
+
+/* 按钮美化 */
+.btn, .btn-primary, .btn-secondary, .btn-outline-secondary {
+  border-radius: 2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: #1769c2;
+  border-color: #1769c2;
+  box-shadow: 0 2px 8px rgba(13,110,253,0.15);
+}
+.btn-outline-secondary:hover, .btn-outline-secondary:focus {
+  background: var(--secondary);
+  color: #fff;
+}
+
+/* 表单美化 */
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  border: 1px solid #d0d7de;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(13,110,253,0.1);
+}
+
+/* alert、modal、进度条美化 */
+.alert {
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.modal-content {
+  border-radius: 1.2rem;
+}
+.progress {
+  border-radius: 1rem;
+  height: 1.2rem;
+}
+
+/* 分隔线 */
+hr {
+  border-top: 2px solid #e3e8ee;
+  margin: 2rem 0;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .doc-content, .card, .server-form {
+    padding: 1rem !important;
+  }
+  h1, .h1 { font-size: 1.5rem; }
+  h2, .h2 { font-size: 1.1rem; }
+}
+
+/* 代码块美化 */
+pre, code, .doc-content pre code, .card pre code {
+  background: #f4f6fa;
+  color: #2a4d7a;
+  border-radius: 0.6rem;
+  padding: 1rem 1.2rem;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 1.2rem;
+}
+
+/* FAQ手风琴美化 */
+.accordion-item {
+  border-radius: 1rem !important;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border: none;
+}
+.accordion-button {
+  border-radius: 1rem !important;
+  font-weight: 600;
+  font-size: 1.08rem;
+}
+.accordion-button:not(.collapsed) {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* 时间线美化 */
+.timeline {
+  border-left: 3px solid var(--primary);
+  padding-left: 1.5rem;
+  position: relative;
+}
+.timeline li {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-left: 1.2rem;
+}
+.timeline li:before {
+  content: '';
+  position: absolute;
+  left: -1.1rem;
+  top: 0.3rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(13,110,253,0.12);
+}
+
+/* 头像美化 */
+.rounded-circle {
+  border: 3px solid #e3e8ee;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: transform 0.2s;
+}
+.rounded-circle:hover {
+  transform: scale(1.08);
+  border-color: var(--primary);
+}
+
+/* 表格美化 */
+table {
+  border-radius: 0.7rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+th, td {
+  padding: 0.75rem 1.2rem;
+  border-bottom: 1px solid #e3e8ee;
+}
+tr:nth-child(even) {
+  background: #f8fafc;
+}
+tr:hover {
+  background: #e3f0ff;
+}
+
+/* 进度条美化 */
+.progress {
+  background: #e3e8ee;
+  height: 1.2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.progress-bar {
+  border-radius: 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* 卡片和内容区块间距优化 */
+.card, .doc-content, .server-item, #results, .modal-content {
+  margin-bottom: 2rem;
+}
+
+/* 分隔线加粗 */
+hr {
+  border-top: 2.5px solid #e3e8ee;
+  margin: 2.5rem 0;
+}
+
+/* 响应式优化补充 */
+@media (max-width: 768px) {
+  .doc-content, .card, .server-form {
+    padding: 0.7rem !important;
+  }
+  h1, .h1 { font-size: 1.2rem; }
+  h2, .h2 { font-size: 1rem; }
+  .timeline {
+    padding-left: 0.7rem;
+  }
+  th, td {
+    padding: 0.5rem 0.5rem;
+  }
 }

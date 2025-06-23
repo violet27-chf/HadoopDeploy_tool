@@ -1,103 +1,361 @@
-<div class="card">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">服务器配置</h5>
+<div class="card shadow-lg border-0" style="border-radius:1.5rem;">
+    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between" style="border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem;">
+        <div>
+            <i class="bi bi-hdd-network me-2 fs-4"></i>
+            <h5 class="mb-0 d-inline">服务器配置</h5>
+        </div>
+        <button type="button" class="btn btn-gradient-scan px-4 py-2 fw-bold shadow-sm border-0 d-flex align-items-center gap-2" style="border-radius:2rem;font-size:1.1rem;transition:all .18s;box-shadow:0 2px 12px #4f8cff33;" onmouseover="this.classList.add('scan-btn-hover')" onmouseout="this.classList.remove('scan-btn-hover')" onclick="showScanModal()">
+            <i class="bi bi-broadcast-pin me-1 fs-5"></i> 扫描网段主机
+        </button>
     </div>
-    <div class="card-body">
-        <form action="/deploy" method="post" id="serverForm">
-            <div id="serverList">
-                <div class="server-item mb-4 p-3 border rounded">
-                    <h5>服务器 #1</h5>
-                    <div class="mb-3">
-                        <label class="form-label">服务器地址</label>
-                        <input type="text" class="form-control" name="hostname[]" required>
+    <div class="card-body p-4 bg-light" style="border-bottom-left-radius:1.5rem;border-bottom-right-radius:1.5rem;">
+        <!-- nmap扫描弹窗 -->
+        <div class="modal fade" id="scanModal" tabindex="-1" aria-labelledby="scanModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content scan-modal-content">
+                    <div class="modal-header border-0 pb-2 scan-modal-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="scan-modal-icon d-flex align-items-center justify-content-center me-2"><i class="bi bi-broadcast-pin fs-2"></i></span>
+                            <h5 class="modal-title fw-bold text-primary mb-0" id="scanModalLabel">网段主机扫描</h5>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">用户名</label>
-                        <input type="text" class="form-control" name="username[]" required>
+                    <div class="modal-body pt-3 pb-1 scan-modal-body">
+                        <div class="mb-3 position-relative scan-input-area">
+                            <label class="form-label fw-semibold">请输入网段（如 192.168.1.0/24）</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light"><i class="bi bi-diagram-3"></i></span>
+                                <input type="text" class="form-control" id="subnetInput" placeholder="192.168.1.0/24" style="border-radius:.7rem;">
+                            </div>
+                        </div>
+                        <div id="scanResult" class="mt-4 scan-result-area"></div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">密码</label>
-                        <input type="password" class="form-control" name="password[]" required>
+                    <div class="modal-footer border-0 pt-0 pb-4 scan-modal-footer">
+                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary px-4 position-relative" id="scanBtn" onclick="scanSubnet()">
+                            <span id="scanBtnText"><i class="bi bi-search me-1"></i>开始扫描</span>
+                            <span id="scanBtnLoading" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </div>
             </div>
-            
-            <button type="button" class="btn btn-secondary mb-3" onclick="addServer()">
-                <i class="bi bi-plus-circle"></i> 添加服务器
-            </button>
-            <button type="button" class="btn btn-primary d-block" onclick="saveAndRedirect()">
-                <i class="bi bi-play-fill"></i> 开始部署
-            </button>
+        </div>
+        <form action="/deploy" method="post" id="serverForm">
+            <div id="serverList">
+                <div class="server-item mb-4 p-4 border-0 shadow-sm bg-white position-relative" style="border-radius:1.2rem;">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-cpu-fill text-primary fs-5 me-2"></i>
+                        <h5 class="mb-0">服务器 #1</h5>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">服务器地址</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-pc-display"></i></span>
+                            <input type="text" class="form-control form-control-lg" name="hostname[]" placeholder="如 192.168.1.100" required style="border-radius:.5rem;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">用户名</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control form-control-lg" name="username[]" placeholder="root" required style="border-radius:.5rem;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">密码</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                            <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4" style="opacity:.12;">
+            <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mt-2">
+                <button type="button" class="btn btn-gradient-blue btn-lg px-4 shadow-sm" style="border-radius:2rem;transition:all .15s;" onmouseover="this.classList.add('btn-primary','text-white')" onmouseout="this.classList.remove('btn-primary','text-white')" onclick="addServer()">
+                    <i class="bi bi-plus-circle me-1"></i> 添加服务器
+                </button>
+                <button type="button" class="btn btn-gradient-green btn-lg px-5 shadow-sm" style="border-radius:2rem;transition:all .15s;" onmouseover="this.classList.add('btn-success','text-white')" onmouseout="this.classList.remove('btn-success','text-white')" onclick="saveAndRedirect()">
+                    <i class="bi bi-play-fill me-1"></i> 开始部署
+                </button>
+            </div>
         </form>
+        <div id="formTip" class="alert alert-danger mt-3 d-none" role="alert" style="border-radius:.8rem;">
+            请填写所有必填字段！
+        </div>
     </div>
 </div>
 
 <script>
     let serverCount = 1;
-    
     function saveAndRedirect() {
-        // 收集表单数据
         const form = document.getElementById('serverForm');
         if (!form.checkValidity()) {
-            alert('请填写所有必填字段');
+            document.getElementById('formTip').classList.remove('d-none');
             return;
         }
+        document.getElementById('formTip').classList.add('d-none');
         const formData = new FormData(form);
         const servers = [];
-        
-        // 将表单数据转换为对象数组
         const hostnames = formData.getAll('hostname[]');
         const usernames = formData.getAll('username[]');
         const passwords = formData.getAll('password[]');
-        
         for (let i = 0; i < hostnames.length; i++) {
-            servers.push({
-                hostname: hostnames[i],
-                username: usernames[i],
-                password: passwords[i]
-            });
+            servers.push({ hostname: hostnames[i], username: usernames[i], password: passwords[i] });
         }
-        
-        // 存储数据并跳转
         sessionStorage.setItem('serverConfig', JSON.stringify(servers));
         window.location.href = '/deploy/method';
     }
-    
     function addServer() {
         serverCount++;
         const serverList = document.getElementById('serverList');
         const newServer = document.createElement('div');
-        newServer.className = 'server-item mb-4 p-3 border rounded';
+        newServer.className = 'server-item mb-4 p-4 border-0 shadow-sm bg-white position-relative';
+        newServer.style.borderRadius = '1.2rem';
         newServer.innerHTML = `
-            <h5>服务器 #${serverCount}</h5>
-            <div class="mb-3">
-                <label class="form-label">服务器地址</label>
-                <input type="text" class="form-control" name="hostname[]" required>
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-cpu-fill text-primary fs-5 me-2"></i>
+                <h5 class="mb-0">服务器 #${serverCount}</h5>
             </div>
             <div class="mb-3">
-                <label class="form-label">用户名</label>
-                <input type="text" class="form-control" name="username[]" required>
+                <label class="form-label fw-semibold">服务器地址</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-pc-display"></i></span>
+                    <input type="text" class="form-control form-control-lg" name="hostname[]" placeholder="如 192.168.1.100" required style="border-radius:.5rem;">
+                </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">密码</label>
-                <input type="password" class="form-control" name="password[]" required>
+                <label class="form-label fw-semibold">用户名</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control form-control-lg" name="username[]" placeholder="root" required style="border-radius:.5rem;">
+                </div>
             </div>
-            <button type="button" class="btn btn-sm btn-danger" onclick="removeServer(this)">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">密码</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                    <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger px-3 position-absolute top-0 end-0 mt-3 me-3 shadow-sm" style="border-radius:1.2rem;transition:all .15s;z-index:2;" onmouseover="this.classList.add('btn-outline-danger','bg-white','text-danger')" onmouseout="this.classList.remove('btn-outline-danger','bg-white','text-danger')" onclick="removeServer(this)">
                 <i class="bi bi-trash"></i> 移除
             </button>
         `;
         serverList.appendChild(newServer);
     }
-    
     function removeServer(button) {
         if (serverCount > 1) {
             button.closest('.server-item').remove();
             serverCount--;
-            // 重新编号
             const items = document.querySelectorAll('.server-item');
             items.forEach((item, index) => {
                 item.querySelector('h5').textContent = `服务器 #${index + 1}`;
             });
         }
     }
+    // nmap扫描相关
+    function showScanModal() {
+        document.getElementById('subnetInput').value = '';
+        document.getElementById('scanResult').innerHTML = '';
+        document.getElementById('scanBtnText').classList.remove('d-none');
+        document.getElementById('scanBtnLoading').classList.add('d-none');
+        var modal = new bootstrap.Modal(document.getElementById('scanModal'));
+        modal.show();
+    }
+    function scanSubnet() {
+        const subnet = document.getElementById('subnetInput').value.trim();
+        if (!subnet) {
+            document.getElementById('scanResult').innerHTML = '<div class="alert alert-warning">请输入网段</div>';
+            return;
+        }
+        document.getElementById('scanBtnText').classList.add('d-none');
+        document.getElementById('scanBtnLoading').classList.remove('d-none');
+        document.getElementById('scanResult').innerHTML = '<div class="text-info"><i class=\'bi bi-arrow-repeat me-2\'></i>正在扫描，请稍候...</div>';
+        fetch('/api/scan_hosts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subnet })
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('scanBtnText').classList.remove('d-none');
+            document.getElementById('scanBtnLoading').classList.add('d-none');
+            if (data.success) {
+                if (data.hosts.length === 0) {
+                    document.getElementById('scanResult').innerHTML = '<div class="alert alert-info">未发现开放22端口的主机</div>';
+                } else {
+                    let html = '<div class="alert alert-success border-0 shadow-sm">发现主机：<div class=\'row g-3 mt-2\'>';
+                    data.hosts.forEach(ip => {
+                        html += `<div class='col-12 col-md-6'>
+                            <div class='scan-host-card card border-0 shadow-sm mb-2 p-0' style='border-radius:1.2rem;transition:box-shadow .18s,transform .18s;'>
+                                <div class='card-body d-flex justify-content-between align-items-center py-3 px-4' style='background:linear-gradient(90deg,#e3f0ff 0,#fafdff 100%);border-radius:1.2rem;'>
+                                    <span class='fw-bold text-primary d-flex align-items-center gap-2' style='font-size:1.22rem;letter-spacing:.5px;'>
+                                        <i class='bi bi-pc-display fs-3 text-info'></i>${ip}
+                                        <button type='button' class='scan-host-add-btn btn btn-gradient-scan btn-sm d-flex align-items-center justify-content-center ms-2' style='border-radius:50%;width:2.2rem;height:2.2rem;padding:0;box-shadow:0 2px 8px #4f8cff33;font-size:1.2rem;' title='添加' onclick='addScannedHost("${ip}")'>
+                                            <i class='bi bi-plus-lg'></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div></div>';
+                    document.getElementById('scanResult').innerHTML = html;
+                }
+            } else {
+                document.getElementById('scanResult').innerHTML = `<div class='alert alert-danger'>扫描失败：${data.msg || data.stderr}</div>`;
+            }
+        })
+        .catch(err => {
+            document.getElementById('scanBtnText').classList.remove('d-none');
+            document.getElementById('scanBtnLoading').classList.add('d-none');
+            document.getElementById('scanResult').innerHTML = `<div class='alert alert-danger'>请求失败：${err}</div>`;
+        });
+    }
+    function addScannedHost(ip) {
+        addServer();
+        const items = document.querySelectorAll('.server-item');
+        const last = items[items.length - 1];
+        last.querySelector('input[name="hostname[]"]').value = ip;
+        last.querySelector('input[name="username[]"]').focus();
+    }
 </script>
+
+<style>
+/* 扫描弹窗美化 */
+.scan-modal-content {
+    border-radius: 1.7rem;
+    box-shadow: 0 12px 48px 0 #4f8cff22, 0 2px 12px #6fd6ff22;
+    background: linear-gradient(135deg,#f8fbff 60%,#e3f0ff 100%);
+    border: none;
+    animation: scanModalFadeIn .4s cubic-bezier(.4,1.4,.6,1) 1;
+    padding: 0 0.5rem;
+}
+@keyframes scanModalFadeIn {
+    from { opacity: 0; transform: translateY(40px) scale(.98); }
+    to   { opacity: 1; transform: none; }
+}
+.scan-modal-header {
+    border-top-left-radius: 1.7rem;
+    border-top-right-radius: 1.7rem;
+    background: linear-gradient(90deg,#e3f0ff 0,#f8f9fa 100%);
+    box-shadow: 0 2px 16px #4f8cff11;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+}
+.scan-modal-icon {
+    width: 3.2rem;
+    height: 3.2rem;
+    background: linear-gradient(135deg,#6fd6ff 0,#4f8cff 100%);
+    color: #fff;
+    border-radius: 1.3rem;
+    box-shadow: 0 2px 12px #4f8cff33;
+    font-size: 2rem;
+}
+.scan-modal-body {
+    background: #fafdff;
+    border-radius: 1.2rem;
+    box-shadow: 0 1px 12px #4f8cff11 inset;
+    padding-bottom: 1.5rem !important;
+    padding-top: 1.2rem !important;
+}
+.scan-input-area {
+    background: #f4f8fb;
+    border-radius: 1rem;
+    box-shadow: 0 1px 6px #4f8cff11 inset;
+    padding: 1.2rem 1.2rem .7rem 1.2rem;
+    border: 2px solid #e3f0ff;
+    transition: box-shadow .18s, border-color .18s;
+}
+.scan-input-area:focus-within {
+    box-shadow: 0 2px 16px #4f8cff33;
+    border-color: #4f8cff;
+}
+.scan-result-area > .alert, .scan-result-area > .card {
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 16px #4f8cff11;
+    border: none;
+}
+.scan-result-area .card {
+    background: linear-gradient(90deg,#fafdff 60%,#e3f0ff 100%);
+}
+.scan-modal-footer {
+    border-bottom-left-radius: 1.7rem;
+    border-bottom-right-radius: 1.7rem;
+    background: #f8fbff;
+    box-shadow: 0 -2px 16px #4f8cff11;
+    padding-bottom: 1.2rem !important;
+    padding-top: 1.2rem !important;
+}
+/* 渐变按钮美化 */
+.btn-gradient-blue {
+    background: linear-gradient(90deg,#4f8cff 0,#6fd6ff 100%);
+    color: #fff;
+    border: none;
+}
+.btn-gradient-blue:hover,.btn-gradient-blue:focus {
+    background: linear-gradient(90deg,#3576e0 0,#3ec6e0 100%);
+    color: #fff;
+}
+.btn-gradient-green {
+    background: linear-gradient(90deg,#34e89e 0,#0f3443 100%);
+    color: #fff;
+    border: none;
+}
+.btn-gradient-green:hover,.btn-gradient-green:focus {
+    background: linear-gradient(90deg,#11998e 0,#38ef7d 100%);
+    color: #fff;
+}
+.server-item { transition: box-shadow .18s, transform .18s; }
+.server-item:hover { box-shadow: 0 8px 32px rgba(13,110,253,0.10); transform: translateY(-2px) scale(1.01); }
+.btn-danger { transition:all .15s; }
+.btn-danger:hover,.btn-danger:focus { box-shadow:0 2px 8px #ffb3b3; }
+.btn-gradient-scan {
+    background: linear-gradient(90deg,#6fd6ff 0,#4f8cff 100%);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border: none;
+    outline: none;
+    box-shadow: 0 2px 12px #4f8cff33;
+}
+.btn-gradient-scan:active {
+    box-shadow: 0 1px 4px #4f8cff33;
+    transform: scale(0.97);
+}
+.scan-btn-hover, .btn-gradient-scan:hover, .btn-gradient-scan:focus {
+    background: linear-gradient(90deg,#4f8cff 0,#6fd6ff 100%);
+    color: #fff;
+    box-shadow: 0 4px 18px #4f8cff44;
+    filter: brightness(1.08);
+    text-shadow: 0 1px 4px #fff3;
+}
+.scan-host-card {
+    background: linear-gradient(90deg,#e3f0ff 0,#fafdff 100%) !important;
+    border-radius: 1.2rem !important;
+    box-shadow: 0 2px 16px #4f8cff11 !important;
+    margin-bottom: 0.9rem !important;
+    transition: box-shadow .18s, transform .18s;
+}
+.scan-host-card:hover {
+    box-shadow: 0 12px 40px #4f8cff22 !important;
+    transform: translateY(-2px) scale(1.03);
+    z-index: 2;
+}
+.scan-host-add-btn {
+    background: linear-gradient(90deg,#6fd6ff 0,#4f8cff 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 1px 8px #4f8cff22 !important;
+    font-size: 1.2rem !important;
+    transition: box-shadow .15s, filter .15s, background .15s;
+}
+.scan-host-add-btn:hover, .scan-host-add-btn:focus {
+    background: linear-gradient(90deg,#4f8cff 0,#6fd6ff 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 16px #4f8cff33 !important;
+    filter: brightness(1.10);
+}
+</style>

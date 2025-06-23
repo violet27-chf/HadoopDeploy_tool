@@ -3,30 +3,29 @@
 {% block title %}手动Hadoop配置 - Hadoop部署系统{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-danger text-white">
-                    <h3 class="mb-0">
-                        <i class="bi bi-tools me-2"></i>手动Hadoop集群配置
-                    </h3>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white d-flex align-items-center" style="border-top-left-radius: 1.2rem; border-top-right-radius: 1.2rem;">
+                    <i class="bi bi-tools me-2 fs-3"></i>
+                    <h3 class="mb-0">手动Hadoop集群配置</h3>
                 </div>
-                <div class="card-body">
-                    <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <strong>手动模式：</strong>完全手动配置所有参数，适合高级用户和特殊需求。
+                <div class="card-body p-4">
+                    <div class="alert alert-danger d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+                        <div><strong>手动模式：</strong>完全手动配置所有参数，适合高级用户和特殊需求。</div>
                     </div>
-                    
+                    <hr>
                     <form id="manualForm">
                         <!-- 系统环境配置 -->
                         <div class="mb-4">
-                            <h5><i class="bi bi-cpu me-2"></i>系统环境配置</h5>
-                            <div class="row">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-cpu me-2"></i>系统环境配置</h5>
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="hadoopVersion" class="form-label">Hadoop版本</label>
-                                        <select class="form-select" id="hadoopVersion" name="hadoopVersion" onchange="handleVersionChange()">
+                                        <select class="form-select form-select-lg" id="hadoopVersion" name="hadoopVersion" onchange="handleVersionChange()">
                                             <option value="3.3.6">Hadoop 3.3.6 (推荐)</option>
                                             <option value="3.3.5">Hadoop 3.3.5</option>
                                             <option value="3.2.4">Hadoop 3.2.4</option>
@@ -35,7 +34,9 @@
                                         </select>
                                         <div id="uploadSection" class="mt-2" style="display: none;">
                                             <input class="form-control" type="file" id="hadoopUpload" accept=".tar.gz,.tgz">
-                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadHadoopPackage()">上传</button>
+                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadHadoopPackage()">
+                                                <i class="bi bi-upload me-1"></i>上传
+                                            </button>
                                             <div id="uploadStatus" class="form-text"></div>
                                         </div>
                                     </div>
@@ -43,7 +44,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="javaVersion" class="form-label">Java版本</label>
-                                        <select class="form-select" id="javaVersion" name="javaVersion" onchange="handleJavaVersionChange()">
+                                        <select class="form-select form-select-lg" id="javaVersion" name="javaVersion" onchange="handleJavaVersionChange()">
                                             <option value="8">Java 8 (推荐)</option>
                                             <option value="11">Java 11</option>
                                             <option value="17">Java 17</option>
@@ -51,237 +52,96 @@
                                         </select>
                                         <div id="javaUploadSection" class="mt-2" style="display: none;">
                                             <input class="form-control" type="file" id="javaUpload" accept=".tar.gz,.tgz,.zip">
-                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadJavaPackage()">上传</button>
+                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadJavaPackage()">
+                                                <i class="bi bi-upload me-1"></i>上传
+                                            </button>
                                             <div id="javaUploadStatus" class="form-text"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="systemUser" class="form-label">系统用户</label>
-                                        <input type="text" class="form-control" id="systemUser" name="systemUser" 
-                                               value="hadoop" required>
+                                        <input type="text" class="form-control form-control-lg" id="systemUser" name="systemUser" value="hadoop" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="userGroup" class="form-label">用户组</label>
-                                        <input type="text" class="form-control" id="userGroup" name="userGroup" 
-                                               value="hadoop" required>
+                                        <input type="text" class="form-control form-control-lg" id="userGroup" name="userGroup" value="hadoop" required>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="javaHome" class="form-label">JAVA_HOME路径</label>
-                                        <input type="text" class="form-control" id="javaHome" name="javaHome" 
-                                               value="/usr/lib/jvm/java-8-openjdk" required>
+                                        <input type="text" class="form-control form-control-lg" id="javaHome" name="javaHome" value="/usr/lib/jvm/java-8-openjdk" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="hadoopHome" class="form-label">HADOOP_HOME路径</label>
-                                        <input type="text" class="form-control" id="hadoopHome" name="hadoopHome" 
-                                               value="/opt/hadoop" required>
+                                        <input type="text" class="form-control form-control-lg" id="hadoopHome" name="hadoopHome" value="/opt/hadoop" required>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <!-- 核心配置文件 -->
                         <div class="mb-4">
-                            <h5><i class="bi bi-file-earmark-text me-2"></i>核心配置文件</h5>
-                            
-                            <!-- core-site.xml -->
+                            <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-text me-2"></i>核心配置文件</h5>
                             <div class="mb-3">
                                 <label for="coreSiteConfig" class="form-label">core-site.xml 配置</label>
-                                <textarea class="form-control" id="coreSiteConfig" name="coreSiteConfig" rows="8" required><?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-    <property>
-        <name>fs.defaultFS</name>
-        <value>hdfs://localhost:9000</value>
-    </property>
-    <property>
-        <name>hadoop.tmp.dir</name>
-        <value>/tmp/hadoop-${user.name}</value>
-    </property>
-</configuration></textarea>
+                                <textarea class="form-control" id="coreSiteConfig" name="coreSiteConfig" rows="8" required></textarea>
                             </div>
-
-                            <!-- hdfs-site.xml -->
                             <div class="mb-3">
                                 <label for="hdfsSiteConfig" class="form-label">hdfs-site.xml 配置</label>
-                                <textarea class="form-control" id="hdfsSiteConfig" name="hdfsSiteConfig" rows="10" required><?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-    <property>
-        <name>dfs.replication</name>
-        <value>3</value>
-    </property>
-    <property>
-        <name>dfs.namenode.name.dir</name>
-        <value>/data/hadoop/hdfs/namenode</value>
-    </property>
-    <property>
-        <name>dfs.datanode.data.dir</name>
-        <value>/data/hadoop/hdfs/datanode</value>
-    </property>
-</configuration></textarea>
+                                <textarea class="form-control" id="hdfsSiteConfig" name="hdfsSiteConfig" rows="10" required></textarea>
                             </div>
-
-                            <!-- mapred-site.xml -->
                             <div class="mb-3">
                                 <label for="mapredSiteConfig" class="form-label">mapred-site.xml 配置</label>
-                                <textarea class="form-control" id="mapredSiteConfig" name="mapredSiteConfig" rows="8" required><?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-    <property>
-        <name>mapreduce.framework.name</name>
-        <value>yarn</value>
-    </property>
-    <property>
-        <name>mapreduce.application.classpath</name>
-        <value>$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*</value>
-    </property>
-</configuration></textarea>
+                                <textarea class="form-control" id="mapredSiteConfig" name="mapredSiteConfig" rows="8" required></textarea>
                             </div>
-
-                            <!-- yarn-site.xml -->
                             <div class="mb-3">
                                 <label for="yarnSiteConfig" class="form-label">yarn-site.xml 配置</label>
-                                <textarea class="form-control" id="yarnSiteConfig" name="yarnSiteConfig" rows="10" required><?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-    <property>
-        <name>yarn.nodemanager.aux-services</name>
-        <value>mapreduce_shuffle</value>
-    </property>
-    <property>
-        <name>yarn.resourcemanager.hostname</name>
-        <value>localhost</value>
-    </property>
-</configuration></textarea>
+                                <textarea class="form-control" id="yarnSiteConfig" name="yarnSiteConfig" rows="10" required></textarea>
                             </div>
                         </div>
-
                         <!-- 环境变量配置 -->
                         <div class="mb-4">
-                            <h5><i class="bi bi-envira me-2"></i>环境变量配置</h5>
+                            <h5 class="fw-bold mb-3"><i class="bi bi-envira me-2"></i>环境变量配置</h5>
                             <div class="mb-3">
                                 <label for="envConfig" class="form-label">环境变量配置</label>
-                                <textarea class="form-control" id="envConfig" name="envConfig" rows="6" required>export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
-export HADOOP_HOME=/opt/hadoop
-export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
-export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
-export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"</textarea>
+                                <textarea class="form-control" id="envConfig" name="envConfig" rows="6" required></textarea>
                             </div>
                         </div>
-
                         <!-- 集群节点配置 -->
                         <div class="mb-4">
-                            <h5><i class="bi bi-diagram-3 me-2"></i>集群节点配置</h5>
-                            <div class="row">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-diagram-3 me-2"></i>集群节点配置</h5>
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="mastersFile" class="form-label">masters 文件内容</label>
-                                        <textarea class="form-control" id="mastersFile" name="mastersFile" rows="3" required>master.example.com</textarea>
+                                        <textarea class="form-control" id="mastersFile" name="mastersFile" rows="3" required></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="workersFile" class="form-label">workers 文件内容</label>
-                                        <textarea class="form-control" id="workersFile" name="workersFile" rows="3" required>worker1.example.com
-worker2.example.com
-worker3.example.com</textarea>
+                                        <textarea class="form-control" id="workersFile" name="workersFile" rows="3" required></textarea>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- 安全配置 -->
-                        <div class="mb-4">
-                            <h5><i class="bi bi-shield-lock me-2"></i>安全配置</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="enableKerberos" name="enableKerberos">
-                                        <label class="form-check-label" for="enableKerberos">
-                                            启用Kerberos认证
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="enableSSL" name="enableSSL">
-                                        <label class="form-check-label" for="enableSSL">
-                                            启用SSL加密
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="enableACL" name="enableACL">
-                                        <label class="form-check-label" for="enableACL">
-                                            启用访问控制列表
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="enableAudit" name="enableAudit">
-                                        <label class="form-check-label" for="enableAudit">
-                                            启用审计日志
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 性能调优配置 -->
-                        <div class="mb-4">
-                            <h5><i class="bi bi-speedometer2 me-2"></i>性能调优配置</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="heapSize" class="form-label">JVM堆大小 (MB)</label>
-                                        <input type="number" class="form-control" id="heapSize" name="heapSize" 
-                                               min="512" max="8192" value="2048" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="gcThreads" class="form-label">GC线程数</label>
-                                        <input type="number" class="form-control" id="gcThreads" name="gcThreads" 
-                                               min="1" max="16" value="4" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="performanceConfig" class="form-label">性能调优参数</label>
-                                <textarea class="form-control" id="performanceConfig" name="performanceConfig" rows="4" 
-                                          placeholder="每行一个配置项，格式：key=value">mapreduce.map.memory.mb=2048
-mapreduce.reduce.memory.mb=4096
-yarn.nodemanager.resource.memory-mb=8192
-yarn.scheduler.maximum-allocation-mb=4096</textarea>
-                            </div>
-                        </div>
-
-                        <!-- 操作按钮 -->
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-secondary" onclick="goBack()">
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goBack()">
                                 <i class="bi bi-arrow-left me-2"></i>返回
                             </button>
-                            <div>
-                                <button type="button" class="btn btn-info me-2" onclick="validateManualConfig()">
-                                    <i class="bi bi-check-circle me-2"></i>验证配置
-                                </button>
-                                <button type="button" class="btn btn-warning me-2" onclick="generateScript()">
-                                    <i class="bi bi-file-earmark-code me-2"></i>生成脚本
-                                </button>
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="bi bi-play-fill me-2"></i>开始部署
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-danger btn-lg px-5">
+                                <i class="bi bi-play-fill me-2"></i>开始手动部署
+                            </button>
                         </div>
                     </form>
                 </div>

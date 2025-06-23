@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, jsonify, send_from_directory
+from flask import Flask, render_template, request, flash, jsonify, send_from_directory, abort
 import paramiko
 import os
 import subprocess
@@ -7,6 +7,7 @@ from io import StringIO
 import threading
 import time
 import json
+from jinja2 import TemplateNotFound
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -569,6 +570,28 @@ def upload_java_package():
     save_path = os.path.join(UPLOAD_FOLDER, f'java-uploaded{file_ext}')
     file.save(save_path)
     return jsonify({'success': True, 'msg': '上传成功', 'path': save_path})
+
+@app.route('/api/scan_hosts', methods=['POST'])
+def scan_hosts():
+    data = request.get_json()
+    subnet = data.get('subnet')
+    if not subnet:
+        return jsonify({'success': False, 'msg': '缺少网段参数'}), 400
+    try:
+        # 只扫描22端口开放的主机，-n加速，-T4提速
+        cmd = f"nmap -p 22 --open -n -T4 {subnet}"
+        code, stdout, stderr = execute_local_command(cmd, timeout=30)
+        if code != 0:
+            return jsonify({'success': False, 'msg': 'nmap 执行失败', 'stderr': stderr}), 500
+        # 解析nmap输出，提取主机IP
+        hosts = []
+        for line in stdout.splitlines():
+            if line.startswith('Nmap scan report for '):
+                ip = line.split()[-1]
+                hosts.append(ip)
+        return jsonify({'success': True, 'hosts': hosts})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')

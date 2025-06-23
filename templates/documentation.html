@@ -3,123 +3,109 @@
 {% block title %}文档中心{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <!-- 侧边栏导航 -->
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-            <div class="position-sticky pt-3">
-                <h5 class="sidebar-heading px-3">文档目录</h5>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#section1">
-                            快速入门
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section2">
-                            安装指南
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section3">
-                            配置参考
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section4">
-                            API文档
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section5">
-                            常见问题
-                        </a>
-                    </li>
-                </ul>
-
-                <h6 class="sidebar-heading px-3 mt-4">版本</h6>
-                <select class="form-select form-select-sm">
-                    <option>v2.1.0 (最新)</option>
-                    <option>v2.0.3</option>
-                    <option>v1.4.2</option>
-                </select>
-            </div>
-        </nav>
-
-        <!-- 主内容区 -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">文档中心</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                </div>
-            </div>
-
-            <!-- 文档内容部分 -->
-            <section id="section1" class="mb-5">
-                <h2>快速入门</h2>
-                <p>本节将引导您快速了解基本功能和使用方法。</p>
-                
-                <div class="card mb-3">
-                    <div class="card-header bg-primary text-white">
-                        基本示例
-                    </div>
-                    <div class="card-body">
-                        <pre><code class="language-python">from hadoop_deployer import Deployer
-d = Deployer(config='path/to/config.yaml')
-d.install()</code></pre>
-                    </div>
-                </div>
-
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle-fill"></i> 提示：首次使用时建议参考完整安装指南。
-                </div>
-            </section>
-
-            <section id="section2" class="mb-5">
-                <h2>安装指南</h2>
-                <p>详细安装步骤和系统要求。</p>
-                
-                <div class="accordion" id="installAccordion">
-                    <div class="accordion-item">
-                        <h3 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                                系统要求
-                            </button>
-                        </h3>
-                        <div id="collapseOne" class="accordion-collapse collapse show">
-                            <div class="accordion-body">
-                                <ul>
-                                    <li>Linux 操作系统</li>
-                                    <li>Python 3.8+</li>
-                                    <li>至少4GB内存</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <div class="alert alert-warning mt-4">
-                <i class="bi bi-exclamation-triangle-fill"></i> 注意：生产环境部署前请务必阅读安全配置章节。
-            </div>
-        </main>
-    </div>
+<link rel="stylesheet" href="/static/css/main.css">
+<h1 class="doc-title">文档中心</h1>
+<hr>
+<div class="doc-content">
+    <main>
+        <!-- 项目简介与特性 -->
+        <section class="mb-5">
+            <h2>项目简介</h2>
+            <p>Hadoop 集群部署系统是一款专业的自动化部署与管理工具，支持全自动、半自动和手动三种部署模式，适用于企业、科研和个人用户。</p>
+            <ul>
+                <li>三种部署模式：全自动、半自动、手动配置，满足不同需求</li>
+                <li>文件上传支持：自定义上传 Hadoop 和 Java 安装包</li>
+                <li>Web 可视化界面，实时日志与进度显示</li>
+                <li>多镜像源支持，跨平台（Linux/Windows）</li>
+                <li>内置安全配置与最佳实践</li>
+            </ul>
+        </section>
+        <!-- 系统要求 -->
+        <section class="mb-5">
+            <h2>系统要求</h2>
+            <ul>
+                <li>操作系统：Windows 10/11 或 Linux (Ubuntu 18.04+, CentOS 7+)</li>
+                <li>Python 版本：3.8 及以上</li>
+                <li>内存：至少 4GB（推荐 8GB+）</li>
+                <li>磁盘空间：10GB 以上</li>
+                <li>网络：稳定的互联网连接</li>
+            </ul>
+        </section>
+        <!-- 安装与快速开始 -->
+        <section class="mb-5">
+            <h2>安装与快速开始</h2>
+            <ol>
+                <li>克隆仓库：<code>git clone https://github.com/violet27-chf/Hadoop.git</code></li>
+                <li>进入目录并创建虚拟环境：<code>cd Hadoop && python3 -m venv venv && source venv/bin/activate</code></li>
+                <li>安装依赖：<code>pip install -r requirements.txt</code></li>
+                <li>（可选）运行安装脚本：<code>./setup.sh</code> 或 <code>setup.bat</code></li>
+                <li>创建必要目录：<code>mkdir -p uploads logs</code></li>
+                <li>启动服务：<code>python app.py</code> 或 <code>./start.sh</code></li>
+                <li>浏览器访问 <code>http://localhost:5000</code>，开始部署</li>
+            </ol>
+        </section>
+        <!-- 使用指南 -->
+        <section class="mb-5">
+            <h2>使用指南</h2>
+            <ul>
+                <li>选择部署模式：全自动、半自动或手动</li>
+                <li>配置服务器信息、选择软件版本、上传自定义包（可选）</li>
+                <li>点击"开始部署"，系统自动执行部署流程</li>
+                <li>支持实时日志、进度监控和部署结果反馈</li>
+            </ul>
+        </section>
+        <!-- 配置说明 -->
+        <section class="mb-5">
+            <h2>配置说明</h2>
+            <p>所有部署参数均可在 <code>config.yaml</code> 文件中自定义，包括集群节点、端口、Hadoop/Java 版本、副本数等。详细字段说明请参考文档注释。</p>
+            <pre><code class="language-yaml">hadoop:
+  version: 3.3.6
+  nodes:
+    - host: 192.168.1.101
+      role: namenode
+    - host: 192.168.1.102
+      role: datanode
+java:
+  version: 8
+hdfs:
+  replication: 3
+</code></pre>
+        </section>
+        <!-- 故障排除 -->
+        <section class="mb-5">
+            <h2>故障排除</h2>
+            <ul>
+                <li><b>虚拟环境激活失败：</b> 检查命令和 Python 版本</li>
+                <li><b>依赖安装失败：</b> 升级 pip，或使用国内镜像源</li>
+                <li><b>端口被占用：</b> 修改 app.py 中的端口号</li>
+                <li><b>文件上传失败：</b> 检查格式、大小和网络</li>
+                <li><b>部署失败：</b> 检查服务器连接、权限和日志</li>
+            </ul>
+        </section>
+        <!-- 贡献指南 -->
+        <section class="mb-5">
+            <h2>贡献指南</h2>
+            <ol>
+                <li>Fork 项目并创建特性分支</li>
+                <li>提交更改并推送到分支</li>
+                <li>提交 Pull Request</li>
+                <li>欢迎代码、文档、测试等各类贡献</li>
+            </ol>
+        </section>
+        <!-- 联系我们 -->
+        <section class="mb-5">
+            <h2>联系我们</h2>
+            <ul>
+                <li>项目负责人：violet</li>
+                <li>邮箱：<a href="mailto:violet@kami666.xyz">violet@kami666.xyz</a></li>
+                <li>GitHub 仓库：<a href="https://github.com/violet27-chf/Hadoop.git" target="_blank">https://github.com/violet27-chf/Hadoop.git</a></li>
+                <li>问题反馈：<a href="https://github.com/violet27-chf/Hadoop.git/issues" target="_blank">提交 Issue</a></li>
+            </ul>
+        </section>
+        <div class="alert alert-warning mt-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> 注意：生产环境部署前请务必阅读安全配置章节。
+        </div>
+    </main>
 </div>
-
-<!-- 添加文档专用样式 -->
-<style>
-    #sidebar {
-        position: fixed;
-        height: calc(100vh - 56px);
-        overflow-y: auto;
-    }
-    pre code {
-        border-radius: 5px;
-        padding: 1rem;
-    }
-    section {
-        scroll-margin-top: 80px;
-    }
-</style>
-
+<a href="/" class="btn btn-primary mt-4">返回首页</a>
 {% endblock %}
