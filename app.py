@@ -8,6 +8,7 @@ import threading
 import time
 import json
 from jinja2 import TemplateNotFound
+import ast
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -26,7 +27,8 @@ auto_deploy_status = {
     'total_steps': 6,
     'progress': 0,
     'message': '',
-    'log': []
+    'log': [],
+    'cluster_links': {}
 }
 
 def execute_ssh_command(ssh, command):
@@ -178,6 +180,16 @@ def download_hadoop():
                         file_size = os.path.getsize(hadoop_file)
                         if file_size > 100 * 1024 * 1024:  # 检查文件大小是否合理（>100MB）
                             auto_deploy_status['log'].append(f"Hadoop下载成功 (源: {source_url})")
+                            # 自动解压步骤
+                            # 使用绝对路径解压
+                            abs_hadoop_file = os.path.abspath(hadoop_file)
+                            abs_download_dir = os.path.abspath(download_dir)
+                            extract_cmd = f"tar -xzf '{abs_hadoop_file}' -C '{abs_download_dir}'"
+                            code2, stdout2, stderr2 = execute_local_command(extract_cmd, timeout=120)
+                            if code2 == 0:
+                                auto_deploy_status['log'].append(f"自动解压完成: {abs_download_dir}")
+                            else:
+                                auto_deploy_status['log'].append(f"自动解压失败: {stderr2}")
                             return hadoop_file
                         else:
                             auto_deploy_status['log'].append("下载的文件大小异常，可能下载失败")
@@ -203,6 +215,16 @@ def download_hadoop():
                         file_size = os.path.getsize(hadoop_file)
                         if file_size > 100 * 1024 * 1024:  # 检查文件大小是否合理（>100MB）
                             auto_deploy_status['log'].append(f"Hadoop下载成功 (源: {source_url})")
+                            # 自动解压步骤
+                            # 使用绝对路径解压
+                            abs_hadoop_file = os.path.abspath(hadoop_file)
+                            abs_download_dir = os.path.abspath(download_dir)
+                            extract_cmd = f"tar -xzf '{abs_hadoop_file}' -C '{abs_download_dir}'"
+                            code2, stdout2, stderr2 = execute_local_command(extract_cmd, timeout=120)
+                            if code2 == 0:
+                                auto_deploy_status['log'].append(f"自动解压完成: {abs_download_dir}")
+                            else:
+                                auto_deploy_status['log'].append(f"自动解压失败: {stderr2}")
                             return hadoop_file
                         else:
                             auto_deploy_status['log'].append("下载的文件大小异常，可能下载失败")
@@ -222,226 +244,190 @@ def download_hadoop():
     auto_deploy_status['log'].append("所有下载源都失败，无法下载Hadoop")
     return None
 
-def configure_hadoop(hadoop_file):
-    """配置Hadoop"""
-    auto_deploy_status['log'].append("开始配置Hadoop...")
-    
-    # 解压Hadoop
-    install_dir = "/opt/hadoop"
-    if platform.system() == "Windows":
-        install_dir = "C:\\hadoop"
-    
+def execute_ssh_command_with_log(ssh, command, log_prefix=None):
+    stdin, stdout, stderr = ssh.exec_command(command)
+    out = stdout.read().decode()
+    err = stderr.read().decode()
+    # 只在出错时写入关键信息
+    if log_prefix and err.strip():
+        auto_deploy_status['log'].append(f"{log_prefix} 失败: {err.strip()}")
+    return out, err
+
+def configure_hadoop_remote(ssh, hadoop_file_path, install_dir="/opt/hadoop", hadoop_version="3.3.6", master_ip="localhost", resourcemanager_ip="localhost", servers=None, replication=2):
+    auto_deploy_status['log'].append(f"[远程] 开始配置Hadoop...（安装路径：{install_dir}）")
     # 创建安装目录
-    os.makedirs(install_dir, exist_ok=True)
-    
-    # 解压文件
-    if platform.system() == "Windows":
-        # Windows解压
-        code, stdout, stderr = execute_local_command(f'tar -xzf "{hadoop_file}" -C "{install_dir}"')
-    else:
-        # Linux解压
-        code, stdout, stderr = execute_local_command(f"sudo tar -xzf {hadoop_file} -C {install_dir}", timeout=300)
-    
-    if code != 0:
-        auto_deploy_status['log'].append(f"Hadoop解压失败: {stderr}")
+    execute_ssh_command_with_log(ssh, f"mkdir -p {install_dir}", "[远程] 创建目录")
+    # 解压Hadoop
+    cmd = f"tar -xzf {hadoop_file_path} -C {install_dir}"
+    out, err = execute_ssh_command_with_log(ssh, cmd, "[远程] 解压Hadoop")
+    if err:
+        auto_deploy_status['log'].append(f"[远程] Hadoop解压失败: {err}")
         return False
-    
     # 创建符号链接
-    hadoop_home = os.path.join(install_dir, f"hadoop-3.3.6")
-    if platform.system() != "Windows":
-        code, stdout, stderr = execute_local_command(f"sudo ln -sf {hadoop_home} {install_dir}/current")
-    
-    # 设置环境变量
-    auto_deploy_status['log'].append("设置环境变量...")
-    
-    # 创建配置文件
-    config_content = f"""export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+    hadoop_home = f"{install_dir}/hadoop-{hadoop_version}"
+    execute_ssh_command_with_log(ssh, f"ln -sf {hadoop_home} {install_dir}/current", "[远程] 创建符号链接")
+    # 检查实际Java路径
+    out, err = execute_ssh_command_with_log(ssh, "ls -d /usr/lib/jvm/java-1.8.0-openjdk* 2>/dev/null | head -1", "[远程] 检查Java安装路径")
+    java_home = out.strip() if out.strip() else "/usr/lib/jvm/java-1.8.0-openjdk"
+    # 写入环境变量
+    env_content = f"""export JAVA_HOME={java_home}
 export HADOOP_HOME={hadoop_home}
 export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
-export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"
-"""
-    
-    config_file = os.path.join(os.path.expanduser("~"), ".hadoop_env")
-    with open(config_file, 'w') as f:
-        f.write(config_content)
-    
-    auto_deploy_status['log'].append("Hadoop配置完成")
+export HADOOP_OPTS=\"-Djava.library.path=$HADOOP_HOME/lib/native\"\n"""
+    execute_ssh_command_with_log(ssh, f"echo '{env_content}' > ~/.hadoop_env", "[远程] 写入环境变量")
+    # 生成并写入关键配置文件
+    hadoop_conf_dir = f"{hadoop_home}/etc/hadoop"
+    core_site = generate_core_site(master_ip)
+    hdfs_site = generate_hdfs_site(replication)
+    yarn_site = generate_yarn_site(resourcemanager_ip)
+    workers_txt = generate_workers(servers or [])
+    write_remote_file(ssh, f"{hadoop_conf_dir}/core-site.xml", core_site)
+    write_remote_file(ssh, f"{hadoop_conf_dir}/hdfs-site.xml", hdfs_site)
+    write_remote_file(ssh, f"{hadoop_conf_dir}/yarn-site.xml", yarn_site)
+    write_remote_file(ssh, f"{hadoop_conf_dir}/workers", workers_txt)
+    auto_deploy_status['log'].append(f"[远程] 已写入关键配置文件到: {hadoop_conf_dir}")
+    # 配置 JAVA_HOME 到 hadoop-env.sh
+    hadoop_env_path = f"{hadoop_home}/etc/hadoop/hadoop-env.sh"
+    java_home_line = f'export JAVA_HOME={java_home}'
+    cmd = f"grep -q '^export JAVA_HOME=' {hadoop_env_path} && sed -i 's|^export JAVA_HOME=.*|{java_home_line}|' {hadoop_env_path} || echo '{java_home_line}' >> {hadoop_env_path}"
+    execute_ssh_command_with_log(ssh, cmd, "[远程] 配置JAVA_HOME到hadoop-env.sh")
+    # 允许root用户启动Hadoop服务（仅测试环境建议）
+    for env_file in [f'{hadoop_home}/etc/hadoop/hadoop-env.sh', f'{hadoop_home}/etc/hadoop/yarn-env.sh']:
+        for var in [
+            'export HDFS_NAMENODE_USER=root',
+            'export HDFS_DATANODE_USER=root',
+            'export HDFS_SECONDARYNAMENODE_USER=root',
+            'export YARN_RESOURCEMANAGER_USER=root',
+            'export YARN_NODEMANAGER_USER=root'
+        ]:
+            cmd = f"grep -q \"^{var}\" {env_file} || echo '{var}' >> {env_file}"
+            execute_ssh_command_with_log(ssh, cmd, f"[远程] 配置{var}到{os.path.basename(env_file)}")
+    auto_deploy_status['log'].append("[远程] Hadoop配置完成")
     return True
 
-def start_hadoop_cluster():
-    """启动Hadoop集群"""
-    auto_deploy_status['log'].append("启动Hadoop集群...")
-    
-    # 格式化NameNode
-    auto_deploy_status['log'].append("格式化NameNode...")
-    code, stdout, stderr = execute_local_command("hdfs namenode -format")
-    if code != 0:
-        auto_deploy_status['log'].append(f"NameNode格式化失败: {stderr}")
-        return False
-    
-    # 启动HDFS
-    auto_deploy_status['log'].append("启动HDFS...")
-    code, stdout, stderr = execute_local_command("start-dfs.sh")
-    if code != 0:
-        auto_deploy_status['log'].append(f"HDFS启动失败: {stderr}")
-        return False
-    
-    # 启动YARN
-    auto_deploy_status['log'].append("启动YARN...")
-    code, stdout, stderr = execute_local_command("start-yarn.sh")
-    if code != 0:
-        auto_deploy_status['log'].append(f"YARN启动失败: {stderr}")
-        return False
-    
-    auto_deploy_status['log'].append("Hadoop集群启动成功")
-    return True
+def generate_core_site(master_ip):
+    return f"""<?xml version=\"1.0\"?>\n<configuration>\n    <property>\n        <name>fs.defaultFS</name>\n        <value>hdfs://{master_ip}:9000</value>\n    </property>\n</configuration>\n"""
 
-def verify_deployment():
-    """验证部署"""
-    auto_deploy_status['log'].append("验证部署结果...")
-    
-    # 检查HDFS状态
-    code, stdout, stderr = execute_local_command("hdfs dfsadmin -report")
-    if code == 0:
-        auto_deploy_status['log'].append("HDFS状态正常")
-    else:
-        auto_deploy_status['log'].append(f"HDFS状态异常: {stderr}")
-        return False
-    
-    # 检查YARN状态
-    code, stdout, stderr = execute_local_command("yarn node -list")
-    if code == 0:
-        auto_deploy_status['log'].append("YARN状态正常")
-    else:
-        auto_deploy_status['log'].append(f"YARN状态异常: {stderr}")
-        return False
-    
-    # 测试HDFS写入
-    test_file = "/test_hadoop_deployment.txt"
-    code, stdout, stderr = execute_local_command(f"echo 'Hadoop部署测试' | hdfs dfs -put - {test_file}")
-    if code == 0:
-        auto_deploy_status['log'].append("HDFS写入测试成功")
-        # 清理测试文件
-        execute_local_command(f"hdfs dfs -rm {test_file}")
-    else:
-        auto_deploy_status['log'].append(f"HDFS写入测试失败: {stderr}")
-        return False
-    
-    auto_deploy_status['log'].append("部署验证完成")
-    return True
+def generate_hdfs_site(replication=2):
+    return f"""<?xml version=\"1.0\"?>\n<configuration>\n    <property>\n        <name>dfs.replication</name>\n        <value>{replication}</value>\n    </property>\n    <property>\n        <name>dfs.namenode.name.dir</name>\n        <value>file:/opt/hadoop/data/dfs/namenode</value>\n    </property>\n    <property>\n        <name>dfs.datanode.data.dir</name>\n        <value>file:/opt/hadoop/data/dfs/datanode</value>\n    </property>\n</configuration>\n"""
 
-# 全自动部署任务线程
+def generate_yarn_site(resourcemanager_ip):
+    return f"""<?xml version=\"1.0\"?>\n<configuration>\n    <property>\n        <name>yarn.resourcemanager.hostname</name>\n        <value>{resourcemanager_ip}</value>\n    </property>\n    <property>\n        <name>yarn.nodemanager.aux-services</name>\n        <value>mapreduce_shuffle</value>\n    </property>\n</configuration>\n"""
+
+def generate_workers(servers):
+    return '\n'.join([s['hostname'] for s in servers]) + '\n'
+
+def write_remote_file(ssh, remote_path, content):
+    sftp = ssh.open_sftp()
+    with sftp.file(remote_path, 'w') as f:
+        f.write(content)
+    sftp.close()
+
+def setup_ssh_key_auth(ssh, servers, username):
+    # 1. 检查并生成密钥对
+    execute_ssh_command_with_log(ssh, "test -f ~/.ssh/id_rsa || ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa", "[远程] 检查/生成SSH密钥对")
+    # 2. 读取公钥
+    stdin, stdout, stderr = ssh.exec_command("cat ~/.ssh/id_rsa.pub")
+    pubkey = stdout.read().decode().strip()
+    # 3. 分发公钥到所有节点
+    for server in servers:
+        host = server['hostname']
+        user = server['username']
+        pwd = server['password']
+        if host == ssh.get_transport().getpeername()[0] and user == username:
+            # 本机直接追加
+            execute_ssh_command_with_log(ssh, f"mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '{pubkey}' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys", f"[远程] 配置本机免密")
+        else:
+            ssh2 = paramiko.SSHClient()
+            ssh2.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh2.connect(host, username=user, password=pwd)
+            execute_ssh_command_with_log(ssh2, f"mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '{pubkey}' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys", f"[远程] 配置{host}免密")
+            ssh2.close()
+
 def auto_deploy_task(config):
     try:
         auto_deploy_status['status'] = 'running'
         auto_deploy_status['log'] = []
-        
-        # 检查是否有部署脚本
-        if platform.system() == "Windows":
-            script_path = os.path.join(os.getcwd(), 'scripts', 'hadoop_deploy.ps1')
-            if os.path.exists(script_path):
-                auto_deploy_status['log'].append("发现Windows部署脚本，使用PowerShell脚本部署")
-                execute_powershell_deploy(script_path)
-            else:
-                auto_deploy_status['log'].append("未找到Windows部署脚本，使用Python部署")
-                execute_python_deploy()
+        if isinstance(config, str):
+            config = ast.literal_eval(config)
+        servers = config if isinstance(config, list) else [config]
+        master_ip = servers[0]['hostname']
+        resourcemanager_ip = master_ip
+        replication = 2
+        install_dir = "/opt/hadoop"
+        hadoop_version = "3.3.6"
+        hadoop_home = f"{install_dir}/hadoop-{hadoop_version}"
+        auto_deploy_status['total_steps'] = 6
+        # 步骤1：环境检测
+        auto_deploy_status['step'] = 1
+        auto_deploy_status['progress'] = 10
+        auto_deploy_status['log'].append("环境检测中...")
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(master_ip, username=servers[0]['username'], password=servers[0]['password'])
+        execute_ssh_command_with_log(ssh, 'systemctl stop firewalld && systemctl disable firewalld', None)
+        setup_ssh_key_auth(ssh, servers, servers[0]['username'])
+        out, err = execute_ssh_command_with_log(ssh, "yum repolist", None)
+        if 'failed' in (err or '').lower() or 'error' in (err or '').lower() or '0 repo' in (out or '').lower():
+            execute_ssh_command_with_log(ssh, "rm -f /etc/yum.repos.d/*.repo", None)
+            execute_ssh_command_with_log(ssh, "curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo", None)
+            execute_ssh_command_with_log(ssh, "yum clean all", None)
+            execute_ssh_command_with_log(ssh, "yum makecache -y", None)
+        # 步骤2：安装Java环境
+        auto_deploy_status['step'] = 2
+        auto_deploy_status['progress'] = 25
+        auto_deploy_status['log'].append("正在安装Java环境...")
+        out, err = execute_ssh_command_with_log(ssh, 'java -version', None)
+        if 'version' not in (out or '') and 'version' not in (err or ''):
+            execute_ssh_command_with_log(ssh, 'yum install -y java-1.8.0-openjdk*', None)
+            execute_ssh_command_with_log(ssh, 'bash -c "source ~/.hadoop_env"', None)
+        # 步骤3：下载Hadoop
+        auto_deploy_status['step'] = 3
+        auto_deploy_status['progress'] = 40
+        auto_deploy_status['log'].append("正在下载并解压Hadoop...")
+        hadoop_file = f"/tmp/hadoop-{hadoop_version}.tar.gz"
+        ali_url = f"https://mirrors.aliyun.com/apache/hadoop/common/hadoop-{hadoop_version}/hadoop-{hadoop_version}.tar.gz"
+        out, err = execute_ssh_command_with_log(ssh, "which wget", None)
+        if out.strip():
+            execute_ssh_command_with_log(ssh, f"wget -O {hadoop_file} {ali_url}", None)
         else:
-            script_path = os.path.join(os.getcwd(), 'scripts', 'hadoop_deploy.sh')
-            if os.path.exists(script_path):
-                auto_deploy_status['log'].append("发现Linux部署脚本，使用bash脚本部署")
-                execute_script_deploy(script_path)
-            else:
-                auto_deploy_status['log'].append("未找到Linux部署脚本，使用Python部署")
-                execute_python_deploy()
-        
+            out2, err2 = execute_ssh_command_with_log(ssh, "which curl", None)
+            if out2.strip():
+                execute_ssh_command_with_log(ssh, f"curl -L -o {hadoop_file} {ali_url}", None)
+        if not configure_hadoop_remote(ssh, hadoop_file, install_dir, hadoop_version, master_ip, resourcemanager_ip, servers, replication):
+            auto_deploy_status['status'] = 'error'
+            auto_deploy_status['log'].append('Hadoop配置失败')
+            return
+        # 步骤4：配置Hadoop
+        auto_deploy_status['step'] = 4
+        auto_deploy_status['progress'] = 60
+        auto_deploy_status['log'].append("正在自动配置Hadoop核心参数...")
+        # 步骤5：启动集群
+        auto_deploy_status['step'] = 5
+        auto_deploy_status['progress'] = 80
+        auto_deploy_status['log'].append("正在启动Hadoop集群服务...")
+        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs namenode -format -force', None)
+        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-dfs.sh', None)
+        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-yarn.sh', None)
+        # 步骤6：验证部署
+        auto_deploy_status['step'] = 6
+        auto_deploy_status['progress'] = 100
+        auto_deploy_status['log'].append("正在验证集群运行状态...")
+        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs dfsadmin -report', None)
+        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/yarn node -list', None)
+        auto_deploy_status['status'] = 'done'
+        auto_deploy_status['log'].append('部署完成')
+        nn_url = f'http://{master_ip}:9870'
+        rm_url = f'http://{master_ip}:8088'
+        auto_deploy_status['cluster_links'] = {
+            'NameNode': nn_url,
+            'ResourceManager': rm_url
+        }
+        ssh.close()
     except Exception as e:
         auto_deploy_status['status'] = 'error'
-        auto_deploy_status['message'] = f'部署过程中发生错误: {str(e)}'
         auto_deploy_status['log'].append(f'错误: {str(e)}')
-
-def execute_powershell_deploy(script_path):
-    """执行PowerShell部署脚本"""
-    auto_deploy_status['log'].append("开始执行PowerShell部署脚本...")
-    
-    # 执行PowerShell脚本
-    command = f'powershell -ExecutionPolicy Bypass -File "{script_path}"'
-    code, stdout, stderr = execute_local_command(command, timeout=300)
-    
-    if code == 0:
-        auto_deploy_status['status'] = 'done'
-        auto_deploy_status['progress'] = 100
-        auto_deploy_status['message'] = '部署完成'
-        auto_deploy_status['log'].append('PowerShell脚本部署成功！')
-        auto_deploy_status['log'].append(stdout)
-    else:
-        auto_deploy_status['status'] = 'error'
-        auto_deploy_status['message'] = 'PowerShell脚本部署失败'
-        auto_deploy_status['log'].append(f'PowerShell脚本执行失败: {stderr}')
-
-def execute_script_deploy(script_path):
-    """执行bash部署脚本"""
-    auto_deploy_status['log'].append("开始执行bash部署脚本...")
-    
-    # 设置脚本执行权限
-    os.chmod(script_path, 0o755)
-    
-    # 执行脚本
-    code, stdout, stderr = execute_local_command(f"sudo {script_path}", timeout=300)
-    
-    if code == 0:
-        auto_deploy_status['status'] = 'done'
-        auto_deploy_status['progress'] = 100
-        auto_deploy_status['message'] = '部署完成'
-        auto_deploy_status['log'].append('bash脚本部署成功！')
-        auto_deploy_status['log'].append(stdout)
-    else:
-        auto_deploy_status['status'] = 'error'
-        auto_deploy_status['message'] = 'bash脚本部署失败'
-        auto_deploy_status['log'].append(f'bash脚本执行失败: {stderr}')
-
-def execute_python_deploy():
-    """使用Python执行部署步骤"""
-    steps = [
-        ('环境检测', check_system_environment),
-        ('安装Java环境', install_java),
-        ('下载Hadoop', download_hadoop),
-        ('配置Hadoop', lambda: configure_hadoop(auto_deploy_status.get('hadoop_file'))),
-        ('启动集群', start_hadoop_cluster),
-        ('验证部署', verify_deployment)
-    ]
-    progress_map = [10, 30, 50, 70, 90, 100]
-    for i, (step_name, step_func) in enumerate(steps, 1):
-        auto_deploy_status['step'] = i
-        auto_deploy_status['progress'] = progress_map[i-1]
-        auto_deploy_status['message'] = f'正在执行：{step_name}'
-        auto_deploy_status['log'].append(f"开始执行步骤 {i}: {step_name}")
-        # 执行实际步骤
-        if step_name == '下载Hadoop':
-            hadoop_file = step_func()
-            if hadoop_file:
-                auto_deploy_status['hadoop_file'] = hadoop_file
-                auto_deploy_status['log'].append(f"步骤 {i} 完成: {step_name}")
-            else:
-                auto_deploy_status['status'] = 'error'
-                auto_deploy_status['progress'] = progress_map[i-1]
-                auto_deploy_status['message'] = f'步骤 {i} 失败: {step_name}'
-                auto_deploy_status['log'].append(f"步骤 {i} 失败: {step_name}")
-                return
-        else:
-            if step_func():
-                auto_deploy_status['log'].append(f"步骤 {i} 完成: {step_name}")
-            else:
-                auto_deploy_status['status'] = 'error'
-                auto_deploy_status['progress'] = progress_map[i-1]
-                auto_deploy_status['message'] = f'步骤 {i} 失败: {step_name}'
-                auto_deploy_status['log'].append(f"步骤 {i} 失败: {step_name}")
-                return
-        time.sleep(1)  # 短暂延迟，让前端有时间更新
-    auto_deploy_status['status'] = 'done'
-    auto_deploy_status['progress'] = 100
-    auto_deploy_status['message'] = '部署完成'
-    auto_deploy_status['log'].append('所有步骤执行完成，部署成功！')
 
 @app.route('/api/deploy/auto/start', methods=['POST'])
 def api_deploy_auto_start():
