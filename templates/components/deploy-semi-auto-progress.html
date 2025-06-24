@@ -151,8 +151,6 @@
 {% block extra_js %}
 <script>
 let deployInProgress = false;
-let currentStep = 0;
-let waitingForConfirmation = false;
 
 function goBack() {
     window.location.href = '/deploy/semiAutoConfig';
@@ -171,180 +169,95 @@ function loadConfigSummary() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    loadConfigSummary();
+});
+
+function updateSteps(steps) {
+    for (let i = 0; i < steps.length; i++) {
+        const stepDiv = document.getElementById('step' + (i + 1));
+        if (!stepDiv) continue;
+        let status = steps[i].status;
+        let statusText = '';
+        let statusClass = '';
+        if (status === 'pending') {
+            statusText = '等待中...';
+            statusClass = '';
+        } else if (status === 'doing') {
+            statusText = '进行中...';
+            statusClass = 'active border-warning';
+        } else if (status === 'done') {
+            statusText = '已完成';
+            statusClass = 'list-group-item-success';
+        } else if (status === 'error') {
+            statusText = '失败';
+            statusClass = 'list-group-item-danger';
+        }
+        stepDiv.querySelector('small').textContent = statusText;
+        stepDiv.className = 'list-group-item list-group-item-action ' + statusClass;
+    }
+}
+
 function startSemiAutoDeploy() {
     if (deployInProgress) return;
-    
     deployInProgress = true;
     document.getElementById('startDeploy').disabled = true;
     document.getElementById('startDeploy').innerHTML = '<i class="bi bi-hourglass-split me-2"></i>部署中...';
-    
     // 获取配置
     const config = sessionStorage.getItem('semiAutoConfig');
     if (!config) {
         alert('未找到配置信息');
         return;
     }
-    
-    // 开始部署过程
-    simulateSemiAutoDeploy();
+    fetch('/api/deploy/semi-auto/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: JSON.parse(config) })
+    }).then(res => res.json()).then(data => {
+        pollSemiAutoStatus();
+    }).catch(err => {
+        alert('启动部署失败: ' + err.message);
+    });
 }
 
-function simulateSemiAutoDeploy() {
-    const steps = [
-        { 
-            id: 'step1', 
-            name: '验证配置', 
-            duration: 2000,
-            needsConfirmation: false
-        },
-        { 
-            id: 'step2', 
-            name: '环境准备', 
-            duration: 3000,
-            needsConfirmation: false
-        },
-        { 
-            id: 'step3', 
-            name: '安装组件', 
-            duration: 5000,
-            needsConfirmation: true,
-            confirmationMessage: '检测到需要安装Apache Hive和Spark组件，是否继续？'
-        },
-        { 
-            id: 'step4', 
-            name: '应用配置', 
-            duration: 3000,
-            needsConfirmation: false
-        },
-        { 
-            id: 'step5', 
-            name: '启动服务', 
-            duration: 4000,
-            needsConfirmation: false
-        },
-        { 
-            id: 'step6', 
-            name: '验证部署', 
-            duration: 2000,
-            needsConfirmation: false
-        }
-    ];
-    
-    function executeStep() {
-        if (currentStep >= steps.length) {
-            completeDeploy();
-            return;
-        }
-        
-        const step = steps[currentStep];
-        const stepElement = document.getElementById(step.id);
-        
-        // 更新步骤状态
-        stepElement.classList.remove('list-group-item-action');
-        stepElement.classList.add('list-group-item-warning');
-        stepElement.querySelector('small').textContent = '进行中...';
-        stepElement.querySelector('small').className = 'text-warning';
-        
-        // 更新进度条
-        const progress = ((currentStep + 1) / steps.length) * 100;
-        const progressBar = document.getElementById('progressBar');
-        progressBar.style.width = progress + '%';
-        progressBar.textContent = Math.round(progress) + '%';
-        
-        // 更新进度文本
-        document.getElementById('progressText').textContent = `正在执行：${step.name}`;
-        
-        if (step.needsConfirmation) {
-            // 需要用户确认
-            waitingForConfirmation = true;
-            document.getElementById('confirmationMessage').textContent = step.confirmationMessage;
-            document.getElementById('userConfirmation').style.display = 'block';
-            return;
-        }
-        
-        // 继续执行
-        setTimeout(() => {
-            // 标记步骤完成
-            stepElement.querySelector('small').textContent = '已完成';
-            stepElement.querySelector('small').className = 'text-success';
-            stepElement.classList.remove('list-group-item-warning');
-            stepElement.classList.add('list-group-item-success');
-            currentStep++;
-            executeStep();
-        }, step.duration);
-    }
-    
-    executeStep();
+function pollSemiAutoStatus() {
+    fetch('/api/deploy/semi-auto/status')
+        .then(res => res.json())
+        .then(data => {
+            // 更新进度条
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = (data.progress || 0) + '%';
+            progressBar.textContent = (data.progress || 0) + '%';
+            document.getElementById('progressText').textContent = data.log && data.log.length > 0 ? data.log[data.log.length - 1] : '准备开始部署...';
+            // 更新步骤
+            if (data.steps) {
+                updateSteps(data.steps);
+            }
+            // 更新日志（可选：如有日志区域可补充）
+            // 部署完成后显示集群链接
+            if (data.status === 'done' && data.cluster_links) {
+                let html = '<div class="alert alert-success">集群部署完成！<br>Web UI 入口：';
+                if (data.cluster_links.NameNode) {
+                    html += `<br><a href="${data.cluster_links.NameNode}" target="_blank">NameNode管理界面</a>`;
+                }
+                if (data.cluster_links.ResourceManager) {
+                    html += `<br><a href="${data.cluster_links.ResourceManager}" target="_blank">YARN ResourceManager</a>`;
+                }
+                html += '</div>';
+                document.getElementById('progressText').innerHTML += html;
+                document.getElementById('startDeploy').innerHTML = '<i class="bi bi-check-circle me-2"></i>部署完成';
+                document.getElementById('startDeploy').classList.remove('btn-warning');
+                document.getElementById('startDeploy').classList.add('btn-secondary');
+            } else if (data.status === 'error') {
+                document.getElementById('startDeploy').innerHTML = '<i class="bi bi-x-circle me-2"></i>部署失败';
+                document.getElementById('startDeploy').classList.remove('btn-warning');
+                document.getElementById('startDeploy').classList.add('btn-danger');
+            }
+            // 继续轮询
+            if (data.status === 'running' || data.status === 'idle') {
+                setTimeout(pollSemiAutoStatus, 1500);
+            }
+        });
 }
-
-function confirmAction() {
-    if (!waitingForConfirmation) return;
-    
-    waitingForConfirmation = false;
-    document.getElementById('userConfirmation').style.display = 'none';
-    
-    // 继续执行当前步骤
-    const stepElement = document.getElementById(`step${currentStep + 1}`);
-    setTimeout(() => {
-        stepElement.querySelector('small').textContent = '已完成';
-        stepElement.querySelector('small').className = 'text-success';
-        stepElement.classList.remove('list-group-item-warning');
-        stepElement.classList.add('list-group-item-success');
-        currentStep++;
-        simulateSemiAutoDeploy();
-    }, 1000);
-}
-
-function cancelAction() {
-    if (!waitingForConfirmation) return;
-    
-    waitingForConfirmation = false;
-    document.getElementById('userConfirmation').style.display = 'none';
-    
-    // 标记步骤失败
-    const stepElement = document.getElementById(`step${currentStep + 1}`);
-    stepElement.querySelector('small').textContent = '已取消';
-    stepElement.querySelector('small').className = 'text-danger';
-    stepElement.classList.remove('list-group-item-warning');
-    stepElement.classList.add('list-group-item-danger');
-    
-    // 停止部署
-    deployInProgress = false;
-    document.getElementById('startDeploy').disabled = false;
-    document.getElementById('startDeploy').innerHTML = '<i class="bi bi-play-fill me-2"></i>重新开始';
-    
-    document.getElementById('progressText').textContent = '部署已取消';
-}
-
-function completeDeploy() {
-    document.getElementById('progressText').textContent = '部署完成！';
-    document.getElementById('progressBar').classList.remove('progress-bar-animated');
-    document.getElementById('progressBar').classList.add('bg-success');
-    
-    // 显示成功消息
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-success mt-3';
-    alertDiv.innerHTML = `
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <strong>半自动部署成功！</strong> Hadoop集群已根据您的配置成功部署。
-        <div class="mt-2">
-            <a href="/cluster/status" class="btn btn-sm btn-outline-success me-2">查看集群状态</a>
-            <a href="/cluster/manage" class="btn btn-sm btn-outline-primary">集群管理</a>
-            <a href="/cluster/config" class="btn btn-sm btn-outline-info">查看配置</a>
-        </div>
-    `;
-    document.querySelector('.card-body').appendChild(alertDiv);
-}
-
-// 页面加载时检查配置
-document.addEventListener('DOMContentLoaded', function() {
-    const config = sessionStorage.getItem('semiAutoConfig');
-    if (!config) {
-        alert('未找到配置信息，请返回重新配置');
-        window.location.href = '/deploy/semiAutoConfig';
-    }
-    
-    loadConfigSummary();
-});
 </script>
 {% endblock %} 

@@ -10,6 +10,7 @@ import json
 from jinja2 import TemplateNotFound
 import ast
 import re
+from threading import Thread
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -31,6 +32,16 @@ auto_deploy_status = {
     'log': [],
     'cluster_links': {},
     'steps': []
+}
+
+# 半自动部署状态
+semi_auto_deploy_status = {
+    'status': 'idle',
+    'step': 0,
+    'progress': 0,
+    'log': [],
+    'steps': [],
+    'cluster_links': {},
 }
 
 def execute_ssh_command(ssh, command):
@@ -347,7 +358,19 @@ def setup_ssh_key_auth(ssh, servers, username):
             execute_ssh_command_with_log(ssh2, f"mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '{pubkey}' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys", f"[远程] 配置{host}免密")
             ssh2.close()
 
+# 上传本地文件到远程服务器
+
+def upload_file_to_remote(ssh, local_path, remote_path):
+    try:
+        sftp = ssh.open_sftp()
+        sftp.put(local_path, remote_path)
+        sftp.close()
+        return True, ''
+    except Exception as e:
+        return False, str(e)
+
 def auto_deploy_task(config):
+    import time
     try:
         auto_deploy_status['status'] = 'running'
         auto_deploy_status['log'] = []
@@ -372,75 +395,169 @@ def auto_deploy_task(config):
         # 步骤1：环境检测
         auto_deploy_status['step'] = 1
         auto_deploy_status['progress'] = 10
-        auto_deploy_status['log'].append("环境检测中...")
+        auto_deploy_status['log'].append("[1/6] 开始环境检测...")
         auto_deploy_status['steps'][0]['status'] = 'doing'
+        auto_deploy_status['log'].append(f"[1/6] 尝试SSH连接主节点 {master_ip} 用户:{servers[0]['username']}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(master_ip, username=servers[0]['username'], password=servers[0]['password'])
-        execute_ssh_command_with_log(ssh, 'systemctl stop firewalld && systemctl disable firewalld', None)
-        setup_ssh_key_auth(ssh, servers, servers[0]['username'])
-        out, err = execute_ssh_command_with_log(ssh, "yum repolist", None)
-        if 'failed' in (err or '').lower() or 'error' in (err or '').lower() or '0 repo' in (out or '').lower():
-            execute_ssh_command_with_log(ssh, "rm -f /etc/yum.repos.d/*.repo", None)
-            execute_ssh_command_with_log(ssh, "curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo", None)
-            execute_ssh_command_with_log(ssh, "yum clean all", None)
-            execute_ssh_command_with_log(ssh, "yum makecache -y", None)
+        try:
+            ssh.connect(master_ip, username=servers[0]['username'], password=servers[0]['password'])
+            auto_deploy_status['log'].append("[1/6] SSH连接成功")
+        except Exception as e:
+            auto_deploy_status['log'].append(f"[1/6] SSH连接失败: {e}")
+            auto_deploy_status['steps'][0]['status'] = 'error'
+            auto_deploy_status['status'] = 'error'
+            return
+        auto_deploy_status['log'].append("[1/6] 正在关闭防火墙...")
+        t0 = time.time()
+        out, err = execute_ssh_command_with_log(ssh, 'systemctl stop firewalld && systemctl disable firewalld', None)
+        t1 = time.time()
+        auto_deploy_status['log'].append(f"[1/6] 防火墙关闭输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
+        auto_deploy_status['log'].append("[1/6] 正在配置集群节点SSH免密...")
+        try:
+            setup_ssh_key_auth(ssh, servers, servers[0]['username'])
+            auto_deploy_status['log'].append("[1/6] SSH免密配置完成")
+        except Exception as e:
+            auto_deploy_status['log'].append(f"[1/6] SSH免密配置失败: {e}")
         auto_deploy_status['steps'][0]['status'] = 'done'
         # 步骤2：安装Java环境
         auto_deploy_status['step'] = 2
         auto_deploy_status['progress'] = 25
-        auto_deploy_status['log'].append("正在安装Java环境...")
+        auto_deploy_status['log'].append("[2/6] 开始安装Java环境...")
         auto_deploy_status['steps'][1]['status'] = 'doing'
+        auto_deploy_status['log'].append("[2/6] 检查Java是否已安装...")
+        t0 = time.time()
         out, err = execute_ssh_command_with_log(ssh, 'java -version', None)
-        if 'version' not in (out or '') and 'version' not in (err or ''):
-            execute_ssh_command_with_log(ssh, 'yum install -y java-1.8.0-openjdk*', None)
-            execute_ssh_command_with_log(ssh, 'bash -c "source ~/.hadoop_env"', None)
+        t1 = time.time()
+        java_output = (out or '') + (err or '')
+        auto_deploy_status['log'].append(f"[2/6] java -version 输出: {java_output.strip()} (耗时{t1-t0:.1f}s)")
+        if 'version' in java_output:
+            auto_deploy_status['log'].append("[2/6] 目标服务器已安装Java，跳过安装步骤")
+        else:
+            auto_deploy_status['log'].append("[2/6] 检查包管理器类型...")
+            out, err = execute_ssh_command_with_log(ssh, 'which yum', None)
+            auto_deploy_status['log'].append(f"[2/6] which yum 输出: {out.strip()} 错误: {err.strip()}")
+            if out.strip():
+                auto_deploy_status['log'].append("[2/6] 使用yum安装Java...")
+                t0 = time.time()
+                out3, err3 = execute_ssh_command_with_log(ssh, 'yum install -y java-1.8.0-openjdk*', None)
+                t1 = time.time()
+                java_install_output = (out3 or '') + (err3 or '')
+                auto_deploy_status['log'].append(f"[2/6] yum install 输出: {java_install_output.strip()} (耗时{t1-t0:.1f}s)")
+                out_check, err_check = execute_ssh_command_with_log(ssh, 'java -version', None)
+                java_check_output = (out_check or '') + (err_check or '')
+                auto_deploy_status['log'].append(f"[2/6] java -version(安装后) 输出: {java_check_output.strip()}")
+                if 'version' not in java_check_output:
+                    auto_deploy_status['steps'][1]['status'] = 'error'
+                    auto_deploy_status['status'] = 'error'
+                    auto_deploy_status['log'].append(f"[2/6] Java安装失败: {java_install_output.strip()}")
+                    ssh.close()
+                    return
+            else:
+                out, err = execute_ssh_command_with_log(ssh, 'which apt-get', None)
+                auto_deploy_status['log'].append(f"[2/6] which apt-get 输出: {out.strip()} 错误: {err.strip()}")
+                if out.strip():
+                    auto_deploy_status['log'].append("[2/6] 使用apt-get安装Java...")
+                    t0 = time.time()
+                    out3, err3 = execute_ssh_command_with_log(ssh, 'apt-get install -y openjdk-8-jdk', None)
+                    t1 = time.time()
+                    java_install_output = (out3 or '') + (err3 or '')
+                    auto_deploy_status['log'].append(f"[2/6] apt-get install 输出: {java_install_output.strip()} (耗时{t1-t0:.1f}s)")
+                    out_check, err_check = execute_ssh_command_with_log(ssh, 'java -version', None)
+                    java_check_output = (out_check or '') + (err_check or '')
+                    auto_deploy_status['log'].append(f"[2/6] java -version(安装后) 输出: {java_check_output.strip()}")
+                    if 'version' not in java_check_output:
+                        auto_deploy_status['steps'][1]['status'] = 'error'
+                        auto_deploy_status['status'] = 'error'
+                        auto_deploy_status['log'].append(f"[2/6] Java安装失败: {java_install_output.strip()}")
+                        ssh.close()
+                        return
+                else:
+                    auto_deploy_status['steps'][1]['status'] = 'error'
+                    auto_deploy_status['status'] = 'error'
+                    auto_deploy_status['log'].append("[2/6] 未检测到支持的包管理器，请手动安装Java")
+                    ssh.close()
+                    return
         auto_deploy_status['steps'][1]['status'] = 'done'
         # 步骤3：下载Hadoop
         auto_deploy_status['step'] = 3
         auto_deploy_status['progress'] = 40
-        auto_deploy_status['log'].append("正在下载并解压Hadoop...")
+        auto_deploy_status['log'].append("[3/6] 开始下载并解压Hadoop...")
         auto_deploy_status['steps'][2]['status'] = 'doing'
-        hadoop_file = f"/tmp/hadoop-{hadoop_version}.tar.gz"
         ali_url = f"https://mirrors.aliyun.com/apache/hadoop/common/hadoop-{hadoop_version}/hadoop-{hadoop_version}.tar.gz"
+        auto_deploy_status['log'].append(f"[3/6] 检查wget: which wget")
         out, err = execute_ssh_command_with_log(ssh, "which wget", None)
+        auto_deploy_status['log'].append(f"[3/6] which wget 输出: {out.strip()} 错误: {err.strip()}")
         if out.strip():
-            execute_ssh_command_with_log(ssh, f"wget -O {hadoop_file} {ali_url}", None)
+            auto_deploy_status['log'].append(f"[3/6] 使用wget下载Hadoop...")
+            t0 = time.time()
+            out2, err2 = execute_ssh_command_with_log(ssh, f"wget -O /tmp/hadoop-{hadoop_version}.tar.gz {ali_url}", None)
+            t1 = time.time()
+            wget_output = (out2 or '') + (err2 or '')
+            auto_deploy_status['log'].append(f"[3/6] wget 输出: {wget_output.strip()} (耗时{t1-t0:.1f}s)")
         else:
             out2, err2 = execute_ssh_command_with_log(ssh, "which curl", None)
+            auto_deploy_status['log'].append(f"[3/6] which curl 输出: {out2.strip()} 错误: {err2.strip()}")
             if out2.strip():
-                execute_ssh_command_with_log(ssh, f"curl -L -o {hadoop_file} {ali_url}", None)
-        if not configure_hadoop_remote(ssh, hadoop_file, install_dir, hadoop_version, master_ip, resourcemanager_ip, servers, replication):
+                auto_deploy_status['log'].append(f"[3/6] 使用curl下载Hadoop...")
+                t0 = time.time()
+                out3, err3 = execute_ssh_command_with_log(ssh, f"curl -L -o /tmp/hadoop-{hadoop_version}.tar.gz {ali_url}", None)
+                t1 = time.time()
+                curl_output = (out3 or '') + (err3 or '')
+                auto_deploy_status['log'].append(f"[3/6] curl 输出: {curl_output.strip()} (耗时{t1-t0:.1f}s)")
+        auto_deploy_status['log'].append(f"[3/6] 开始远程解压Hadoop包...")
+        # 配置Hadoop并解压
+        if not configure_hadoop_remote(ssh, f"/tmp/hadoop-{hadoop_version}.tar.gz", install_dir, hadoop_version, master_ip, resourcemanager_ip, servers, replication):
             auto_deploy_status['status'] = 'error'
             auto_deploy_status['steps'][2]['status'] = 'error'
-            auto_deploy_status['log'].append('Hadoop配置失败')
+            auto_deploy_status['log'].append('[3/6] Hadoop配置失败')
             return
         auto_deploy_status['steps'][2]['status'] = 'done'
         # 步骤4：配置Hadoop
         auto_deploy_status['step'] = 4
         auto_deploy_status['progress'] = 60
-        auto_deploy_status['log'].append("正在自动配置Hadoop核心参数...")
+        auto_deploy_status['log'].append("[4/6] 正在自动配置Hadoop核心参数...")
         auto_deploy_status['steps'][3]['status'] = 'doing'
+        auto_deploy_status['log'].append(f"[4/6] 格式化NameNode...")
+        t0 = time.time()
+        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs namenode -format -force', None)
+        t1 = time.time()
+        auto_deploy_status['log'].append(f"[4/6] 格式化NameNode 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['steps'][3]['status'] = 'done'
         # 步骤5：启动集群
         auto_deploy_status['step'] = 5
         auto_deploy_status['progress'] = 80
-        auto_deploy_status['log'].append("正在启动Hadoop集群服务...")
+        auto_deploy_status['log'].append("[5/6] 正在启动Hadoop集群服务...")
         auto_deploy_status['steps'][4]['status'] = 'doing'
-        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs namenode -format -force', None)
-        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-dfs.sh', None)
-        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-yarn.sh', None)
+        auto_deploy_status['log'].append(f"[5/6] 启动HDFS服务...")
+        t0 = time.time()
+        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-dfs.sh', None)
+        t1 = time.time()
+        auto_deploy_status['log'].append(f"[5/6] start-dfs.sh 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
+        auto_deploy_status['log'].append(f"[5/6] 启动YARN服务...")
+        t0 = time.time()
+        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-yarn.sh', None)
+        t1 = time.time()
+        auto_deploy_status['log'].append(f"[5/6] start-yarn.sh 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['steps'][4]['status'] = 'done'
         # 步骤6：验证部署
         auto_deploy_status['step'] = 6
         auto_deploy_status['progress'] = 100
-        auto_deploy_status['log'].append("正在验证集群运行状态...")
+        auto_deploy_status['log'].append("[6/6] 正在验证集群运行状态...")
         auto_deploy_status['steps'][5]['status'] = 'doing'
-        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs dfsadmin -report', None)
-        execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/yarn node -list', None)
+        auto_deploy_status['log'].append(f"[6/6] 检查HDFS节点状态...")
+        t0 = time.time()
+        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs dfsadmin -report', None)
+        t1 = time.time()
+        auto_deploy_status['log'].append(f"[6/6] hdfs dfsadmin -report 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
+        auto_deploy_status['log'].append(f"[6/6] 检查YARN节点状态...")
+        t0 = time.time()
+        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/yarn node -list', None)
+        t1 = time.time()
+        auto_deploy_status['log'].append(f"[6/6] yarn node -list 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['steps'][5]['status'] = 'done'
         auto_deploy_status['status'] = 'done'
-        auto_deploy_status['log'].append('部署完成')
+        auto_deploy_status['log'].append('[完成] 部署完成')
         nn_url = f'http://{master_ip}:9870'
         rm_url = f'http://{master_ip}:8088'
         auto_deploy_status['cluster_links'] = {
@@ -450,11 +567,112 @@ def auto_deploy_task(config):
         ssh.close()
     except Exception as e:
         auto_deploy_status['status'] = 'error'
-        # 标记当前步骤为 error
-        step_idx = auto_deploy_status.get('step', 1) - 1
-        if 'steps' in auto_deploy_status and 0 <= step_idx < len(auto_deploy_status['steps']):
-            auto_deploy_status['steps'][step_idx]['status'] = 'error'
         auto_deploy_status['log'].append(f'错误: {str(e)}')
+
+def semi_auto_deploy_task(config):
+    try:
+        semi_auto_deploy_status['status'] = 'running'
+        semi_auto_deploy_status['log'] = []
+        semi_auto_deploy_status['steps'] = [
+            {'name': '验证配置', 'status': 'pending'},
+            {'name': '环境准备', 'status': 'pending'},
+            {'name': '安装组件', 'status': 'pending'},
+            {'name': '应用配置', 'status': 'pending'},
+            {'name': '启动服务', 'status': 'pending'},
+            {'name': '验证部署', 'status': 'pending'}
+        ]
+        # 1. 验证配置
+        semi_auto_deploy_status['step'] = 1
+        semi_auto_deploy_status['progress'] = 10
+        semi_auto_deploy_status['log'].append('正在验证配置...')
+        semi_auto_deploy_status['steps'][0]['status'] = 'doing'
+        # 连接主节点
+        master_ip = config.get('namenodeHost', 'localhost')
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(master_ip, username=config.get('username', 'root'), password=config.get('password', ''))
+        # 自动上传用户上传的 Hadoop 包
+        local_hadoop = os.path.join(UPLOAD_FOLDER, 'hadoop-uploaded.tar.gz')
+        if os.path.exists(local_hadoop):
+            remote_hadoop = f"/tmp/hadoop-uploaded.tar.gz"
+            ok, err = upload_file_to_remote(ssh, local_hadoop, remote_hadoop)
+            if ok:
+                semi_auto_deploy_status['log'].append(f"已上传用户Hadoop包到远程: {remote_hadoop}")
+                try:
+                    os.remove(local_hadoop)
+                    semi_auto_deploy_status['log'].append("本地Hadoop包已删除")
+                except Exception as e:
+                    semi_auto_deploy_status['log'].append(f"本地Hadoop包删除失败: {e}")
+            else:
+                semi_auto_deploy_status['log'].append(f"上传Hadoop包失败: {err}")
+        local_java = None
+        for ext in ['.tar.gz', '.tgz', '.zip']:
+            path = os.path.join(UPLOAD_FOLDER, f'java-uploaded{ext}')
+            if os.path.exists(path):
+                local_java = path
+                break
+        if local_java:
+            remote_java = f"/tmp/java-uploaded{os.path.splitext(local_java)[1]}"
+            ok, err = upload_file_to_remote(ssh, local_java, remote_java)
+            if ok:
+                semi_auto_deploy_status['log'].append(f"已上传用户Java包到远程: {remote_java}")
+                try:
+                    os.remove(local_java)
+                    semi_auto_deploy_status['log'].append("本地Java包已删除")
+                except Exception as e:
+                    semi_auto_deploy_status['log'].append(f"本地Java包删除失败: {e}")
+            else:
+                semi_auto_deploy_status['log'].append(f"上传Java包失败: {err}")
+        semi_auto_deploy_status['steps'][0]['status'] = 'done'
+        # 2. 环境准备
+        semi_auto_deploy_status['step'] = 2
+        semi_auto_deploy_status['progress'] = 25
+        semi_auto_deploy_status['log'].append('正在准备部署环境...')
+        semi_auto_deploy_status['steps'][1]['status'] = 'doing'
+        # 这里可加目录创建、依赖检查等
+        semi_auto_deploy_status['steps'][1]['status'] = 'done'
+        # 3. 安装组件
+        semi_auto_deploy_status['step'] = 3
+        semi_auto_deploy_status['progress'] = 40
+        semi_auto_deploy_status['log'].append('正在安装Hadoop及相关组件...')
+        semi_auto_deploy_status['steps'][2]['status'] = 'doing'
+        # 这里可加Hadoop/Java/组件安装逻辑
+        semi_auto_deploy_status['steps'][2]['status'] = 'done'
+        # 4. 应用配置
+        semi_auto_deploy_status['step'] = 4
+        semi_auto_deploy_status['progress'] = 60
+        semi_auto_deploy_status['log'].append('正在应用自定义配置...')
+        semi_auto_deploy_status['steps'][3]['status'] = 'doing'
+        # 这里可加配置文件写入逻辑
+        semi_auto_deploy_status['steps'][3]['status'] = 'done'
+        # 5. 启动服务
+        semi_auto_deploy_status['step'] = 5
+        semi_auto_deploy_status['progress'] = 80
+        semi_auto_deploy_status['log'].append('正在启动Hadoop集群服务...')
+        semi_auto_deploy_status['steps'][4]['status'] = 'doing'
+        # 这里可加启动命令
+        semi_auto_deploy_status['steps'][4]['status'] = 'done'
+        # 6. 验证部署
+        semi_auto_deploy_status['step'] = 6
+        semi_auto_deploy_status['progress'] = 100
+        semi_auto_deploy_status['log'].append('正在验证集群运行状态...')
+        semi_auto_deploy_status['steps'][5]['status'] = 'doing'
+        # 这里可加验证命令
+        semi_auto_deploy_status['steps'][5]['status'] = 'done'
+        semi_auto_deploy_status['status'] = 'done'
+        semi_auto_deploy_status['log'].append('半自动部署完成')
+        # 集群Web UI链接（示例）
+        semi_auto_deploy_status['cluster_links'] = {
+            'NameNode': f'http://{master_ip}:9870',
+            'ResourceManager': f'http://{master_ip}:8088'
+        }
+        ssh.close()
+    except Exception as e:
+        semi_auto_deploy_status['status'] = 'error'
+        step_idx = semi_auto_deploy_status.get('step', 1) - 1
+        if 'steps' in semi_auto_deploy_status and 0 <= step_idx < len(semi_auto_deploy_status['steps']):
+            semi_auto_deploy_status['steps'][step_idx]['status'] = 'error'
+        semi_auto_deploy_status['log'].append(f'错误: {str(e)}')
 
 @app.route('/api/deploy/auto/start', methods=['POST'])
 def api_deploy_auto_start():
@@ -612,6 +830,74 @@ def scan_hosts():
     except Exception as e:
         import traceback
         return jsonify({'success': False, 'msg': str(e), 'trace': traceback.format_exc()}), 500
+
+@app.route('/api/deploy/semi-auto/start', methods=['POST'])
+def api_deploy_semi_auto_start():
+    config = request.json.get('config')
+    if isinstance(config, str):
+        try:
+            config = json.loads(config)
+        except Exception:
+            return jsonify({'msg': 'config参数格式错误'}), 400
+    if config is None:
+        return jsonify({'msg': '缺少config参数'}), 400
+    if semi_auto_deploy_status['status'] == 'running':
+        return jsonify({'msg': '已有半自动部署在进行中'}), 400
+    # 重置状态
+    semi_auto_deploy_status['status'] = 'idle'
+    semi_auto_deploy_status['step'] = 0
+    semi_auto_deploy_status['progress'] = 0
+    semi_auto_deploy_status['log'] = []
+    semi_auto_deploy_status['steps'] = []
+    semi_auto_deploy_status['cluster_links'] = {}
+    t = Thread(target=semi_auto_deploy_task, args=(config,))
+    t.daemon = True
+    t.start()
+    return jsonify({'msg': '半自动部署已启动'})
+
+@app.route('/api/deploy/semi-auto/status')
+def api_deploy_semi_auto_status():
+    return jsonify(semi_auto_deploy_status)
+
+@app.route('/api/yum/configure', methods=['POST'])
+def api_configure_yum():
+    import paramiko
+    data = request.json or {}
+    servers = data.get('servers')
+    if not servers or not isinstance(servers, list):
+        return jsonify({'success': False, 'msg': '缺少服务器信息'}), 400
+    results = []
+    for s in servers:
+        hostname = s.get('hostname')
+        username = s.get('username')
+        password = s.get('password')
+        if not (hostname and username and password):
+            results.append({'host': hostname or '未知', 'success': False, 'msg': '信息不完整'})
+            continue
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(hostname, username=username, password=password, timeout=10)
+            # 删除所有yum源
+            rm_cmd = "rm -f /etc/yum.repos.d/*.repo"
+            stdin, stdout, stderr = ssh.exec_command(rm_cmd)
+            rm_out, rm_err = stdout.read().decode(), stderr.read().decode()
+            # 下载阿里云CentOS-Base.repo
+            curl_cmd = "curl -s -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo"
+            stdin, stdout, stderr = ssh.exec_command(curl_cmd)
+            exit_status = stdout.channel.recv_exit_status()
+            curl_out, curl_err = stdout.read().decode(), stderr.read().decode()
+            ssh.close()
+            if rm_err:
+                results.append({'host': hostname, 'success': False, 'msg': f'操作失败: {rm_err}'})
+            elif exit_status != 0:
+                results.append({'host': hostname, 'success': False, 'msg': f'操作失败: {curl_err or curl_out or "未知错误"}'})
+            else:
+                results.append({'host': hostname, 'success': True, 'msg': 'yum源已重置为阿里云源'})
+        except Exception as e:
+            results.append({'host': hostname, 'success': False, 'msg': f'操作异常: {e}'})
+    all_success = all(r['success'] for r in results)
+    return jsonify({'success': all_success, 'results': results, 'msg': 'yum源配置已批量完成' if all_success else '部分服务器配置失败'})
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')

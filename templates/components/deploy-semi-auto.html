@@ -211,39 +211,13 @@ function goBack() {
 }
 
 function handleVersionChange() {
-    const versionSelect = document.getElementById('hadoopVersion');
-    const uploadSection = document.getElementById('uploadSection');
-    const uploadStatus = document.getElementById('uploadStatus');
-    
-    if (versionSelect.value === 'custom') {
-        uploadSection.style.display = 'block';
-        uploadStatus.textContent = '';
-        uploadStatus.className = 'form-text';
-    } else {
-        uploadSection.style.display = 'none';
-        uploadStatus.textContent = '';
-        uploadStatus.className = 'form-text';
-        // 清除之前的上传状态
-        sessionStorage.removeItem('hadoopUploaded');
-    }
+    const v = document.getElementById('hadoopVersion').value;
+    document.getElementById('uploadSection').style.display = (v === 'custom') ? '' : 'none';
 }
 
 function handleJavaVersionChange() {
-    const javaSelect = document.getElementById('javaVersion');
-    const javaUploadSection = document.getElementById('javaUploadSection');
-    const javaUploadStatus = document.getElementById('javaUploadStatus');
-    
-    if (javaSelect.value === 'custom') {
-        javaUploadSection.style.display = 'block';
-        javaUploadStatus.textContent = '';
-        javaUploadStatus.className = 'form-text';
-    } else {
-        javaUploadSection.style.display = 'none';
-        javaUploadStatus.textContent = '';
-        javaUploadStatus.className = 'form-text';
-        // 清除之前的上传状态
-        sessionStorage.removeItem('javaUploaded');
-    }
+    const v = document.getElementById('javaVersion').value;
+    document.getElementById('javaUploadSection').style.display = (v === 'custom') ? '' : 'none';
 }
 
 function validateConfig() {
@@ -287,27 +261,28 @@ function validateConfig() {
 
 document.getElementById('semiAutoForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    const formData = new FormData(this);
-    const config = {};
-    
     // 收集表单数据
-    for (let [key, value] of formData.entries()) {
-        if (this.elements[key].type === 'checkbox') {
-            config[key] = this.elements[key].checked;
-        } else {
-            config[key] = value;
-        }
-    }
-    
-    // 合并服务器配置
-    const serverConfig = sessionStorage.getItem('serverConfig');
-    if (serverConfig) {
-        const serverData = JSON.parse(serverConfig);
-        Object.assign(config, serverData);
-    }
-    
-    // 保存配置并跳转到部署页面
+    const form = e.target;
+    const config = {
+        hadoopVersion: form.hadoopVersion.value,
+        javaVersion: form.javaVersion.value,
+        namenodeHost: form.namenodeHost.value,
+        datanodeCount: form.datanodeCount.value,
+        replicationFactor: form.replicationFactor.value,
+        mapReduceMemory: form.mapReduceMemory.value,
+        yarnMemory: form.yarnMemory.value,
+        mapReduceCores: form.mapReduceCores.value,
+        yarnCores: form.yarnCores.value,
+        installHive: form.installHive.checked,
+        installHBase: form.installHBase.checked,
+        installSpark: form.installSpark.checked,
+        installZooKeeper: form.installZooKeeper.checked,
+        installKafka: form.installKafka.checked,
+        installPig: form.installPig.checked,
+        hadoopHome: form.hadoopHome.value,
+        dataDir: form.dataDir.value,
+        additionalConfig: form.additionalConfig.value
+    };
     sessionStorage.setItem('semiAutoConfig', JSON.stringify(config));
     window.location.href = '/deploy/semi-auto/progress';
 });
