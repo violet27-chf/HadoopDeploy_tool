@@ -566,8 +566,8 @@ def scan_hosts():
     if not subnet:
         return jsonify({'success': False, 'msg': '缺少网段参数'}), 400
     try:
-        # 只扫描22端口开放的主机，-n加速，-T4提速
-        cmd = f"nmap -p 22 --open -n -T4 {subnet}"
+        # 扫描主机，-n加速，-T4提速
+        cmd = f"nmap -n -T4 {subnet}"
         code, stdout, stderr = execute_local_command(cmd, timeout=30)
         if code != 0:
             return jsonify({'success': False, 'msg': 'nmap 执行失败', 'stderr': stderr}), 500
