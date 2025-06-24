@@ -11,23 +11,24 @@
         <!-- 项目简介与特性 -->
         <section class="mb-5">
             <h2>项目简介</h2>
-            <p>Hadoop 集群部署系统是一款专业的自动化部署与管理工具，支持全自动、半自动和手动三种部署模式，适用于企业、科研和个人用户。</p>
+            <p>HadoopDeploy_tool 是一款开源的 Hadoop 集群自动部署与管理平台，支持全自动、半自动、手动三种部署模式，集成 SSH 免密、Web 可视化、进度与日志同步、集群 Web UI 直达等特性。</p>
             <ul>
-                <li>三种部署模式：全自动、半自动、手动配置，满足不同需求</li>
-                <li>文件上传支持：自定义上传 Hadoop 和 Java 安装包</li>
-                <li>Web 可视化界面，实时日志与进度显示</li>
-                <li>多镜像源支持，跨平台（Linux/Windows）</li>
-                <li>内置安全配置与最佳实践</li>
+                <li>全自动部署与一键配置</li>
+                <li>SSH 免密互信自动分发</li>
+                <li>Web 可视化界面与实时进度</li>
+                <li>自定义 Hadoop/Java 包上传</li>
+                <li>多模式灵活切换</li>
+                <li>部署日志与步骤同步高亮</li>
             </ul>
         </section>
         <!-- 系统要求 -->
         <section class="mb-5">
             <h2>系统要求</h2>
             <ul>
-                <li>操作系统：Windows 10/11 或 Linux (Ubuntu 18.04+, CentOS 7+)</li>
+                <li>操作系统：Linux (推荐 CentOS 7+/Ubuntu 18.04+)</li>
                 <li>Python 版本：3.8 及以上</li>
-                <li>内存：至少 4GB（推荐 8GB+）</li>
-                <li>磁盘空间：10GB 以上</li>
+                <li>内存：4GB 及以上（推荐 8GB+）</li>
+                <li>磁盘空间：10GB 及以上</li>
                 <li>网络：稳定的互联网连接</li>
             </ul>
         </section>
@@ -35,12 +36,10 @@
         <section class="mb-5">
             <h2>安装与快速开始</h2>
             <ol>
-                <li>克隆仓库：<code>git clone https://github.com/violet27-chf/Hadoop.git</code></li>
-                <li>进入目录并创建虚拟环境：<code>cd Hadoop && python3 -m venv venv && source venv/bin/activate</code></li>
+                <li>克隆仓库：<code>git clone https://github.com/violet27-chf/HadoopDeploy_tool.git</code></li>
+                <li>进入目录并创建虚拟环境：<code>cd HadoopDeploy_tool && python3 -m venv toolsvenv && source toolsvenv/bin/activate</code></li>
                 <li>安装依赖：<code>pip install -r requirements.txt</code></li>
-                <li>（可选）运行安装脚本：<code>./setup.sh</code> 或 <code>setup.bat</code></li>
-                <li>创建必要目录：<code>mkdir -p uploads logs</code></li>
-                <li>启动服务：<code>python app.py</code> 或 <code>./start.sh</code></li>
+                <li>启动服务：<code>python app.py</code></li>
                 <li>浏览器访问 <code>http://localhost:5000</code>，开始部署</li>
             </ol>
         </section>
@@ -48,34 +47,23 @@
         <section class="mb-5">
             <h2>使用指南</h2>
             <ul>
-                <li>选择部署模式：全自动、半自动或手动</li>
-                <li>配置服务器信息、选择软件版本、上传自定义包（可选）</li>
-                <li>点击"开始部署"，系统自动执行部署流程</li>
-                <li>支持实时日志、进度监控和部署结果反馈</li>
+                <li>选择部署模式（全自动/半自动/手动）</li>
+                <li>填写服务器信息，支持多节点</li>
+                <li>（可选）上传 Hadoop/Java 安装包</li>
+                <li>点击"开始部署"，实时查看进度与日志</li>
+                <li>部署完成后，页面下方显示 Hadoop 集群 Web UI 入口</li>
             </ul>
         </section>
         <!-- 配置说明 -->
         <section class="mb-5">
             <h2>配置说明</h2>
-            <p>所有部署参数均可在 <code>config.yaml</code> 文件中自定义，包括集群节点、端口、Hadoop/Java 版本、副本数等。详细字段说明请参考文档注释。</p>
-            <pre><code class="language-yaml">hadoop:
-  version: 3.3.6
-  nodes:
-    - host: 192.168.1.101
-      role: namenode
-    - host: 192.168.1.102
-      role: datanode
-java:
-  version: 8
-hdfs:
-  replication: 3
-</code></pre>
+            <p>所有部署参数可在 Web 界面填写，支持多节点、端口、Hadoop/Java 版本、副本数等。无需手动编辑配置文件。</p>
         </section>
-        <!-- 故障排除 -->
+        <!-- 常见问题 -->
         <section class="mb-5">
-            <h2>故障排除</h2>
+            <h2>常见问题</h2>
             <ul>
-                <li><b>虚拟环境激活失败：</b> 检查命令和 Python 版本</li>
+                <li><b>虚拟环境激活失败：</b> 检查 Python 版本与命令</li>
                 <li><b>依赖安装失败：</b> 升级 pip，或使用国内镜像源</li>
                 <li><b>端口被占用：</b> 修改 app.py 中的端口号</li>
                 <li><b>文件上传失败：</b> 检查格式、大小和网络</li>
@@ -96,10 +84,9 @@ hdfs:
         <section class="mb-5">
             <h2>联系我们</h2>
             <ul>
-                <li>项目负责人：violet</li>
-                <li>邮箱：<a href="mailto:violet@kami666.xyz">violet@kami666.xyz</a></li>
-                <li>GitHub 仓库：<a href="https://github.com/violet27-chf/Hadoop.git" target="_blank">https://github.com/violet27-chf/Hadoop.git</a></li>
-                <li>问题反馈：<a href="https://github.com/violet27-chf/Hadoop.git/issues" target="_blank">提交 Issue</a></li>
+                <li>项目成员：violet</li>
+                <li>GitHub 仓库：<a href="https://github.com/violet27-chf/HadoopDeploy_tool" target="_blank">https://github.com/violet27-chf/HadoopDeploy_tool</a></li>
+                <li>问题反馈：<a href="https://github.com/violet27-chf/HadoopDeploy_tool/issues" target="_blank">提交 Issue</a></li>
             </ul>
         </section>
         <div class="alert alert-warning mt-4">

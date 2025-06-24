@@ -9,6 +9,7 @@ import time
 import json
 from jinja2 import TemplateNotFound
 import ast
+import re
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -28,7 +29,8 @@ auto_deploy_status = {
     'progress': 0,
     'message': '',
     'log': [],
-    'cluster_links': {}
+    'cluster_links': {},
+    'steps': []
 }
 
 def execute_ssh_command(ssh, command):
@@ -349,6 +351,14 @@ def auto_deploy_task(config):
     try:
         auto_deploy_status['status'] = 'running'
         auto_deploy_status['log'] = []
+        auto_deploy_status['steps'] = [
+            {'name': '环境检测', 'status': 'pending'},
+            {'name': '安装Java环境', 'status': 'pending'},
+            {'name': '下载并解压Hadoop', 'status': 'pending'},
+            {'name': '自动配置Hadoop核心参数', 'status': 'pending'},
+            {'name': '启动Hadoop集群服务', 'status': 'pending'},
+            {'name': '验证集群运行状态', 'status': 'pending'}
+        ]
         if isinstance(config, str):
             config = ast.literal_eval(config)
         servers = config if isinstance(config, list) else [config]
@@ -363,6 +373,7 @@ def auto_deploy_task(config):
         auto_deploy_status['step'] = 1
         auto_deploy_status['progress'] = 10
         auto_deploy_status['log'].append("环境检测中...")
+        auto_deploy_status['steps'][0]['status'] = 'doing'
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(master_ip, username=servers[0]['username'], password=servers[0]['password'])
@@ -374,18 +385,22 @@ def auto_deploy_task(config):
             execute_ssh_command_with_log(ssh, "curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo", None)
             execute_ssh_command_with_log(ssh, "yum clean all", None)
             execute_ssh_command_with_log(ssh, "yum makecache -y", None)
+        auto_deploy_status['steps'][0]['status'] = 'done'
         # 步骤2：安装Java环境
         auto_deploy_status['step'] = 2
         auto_deploy_status['progress'] = 25
         auto_deploy_status['log'].append("正在安装Java环境...")
+        auto_deploy_status['steps'][1]['status'] = 'doing'
         out, err = execute_ssh_command_with_log(ssh, 'java -version', None)
         if 'version' not in (out or '') and 'version' not in (err or ''):
             execute_ssh_command_with_log(ssh, 'yum install -y java-1.8.0-openjdk*', None)
             execute_ssh_command_with_log(ssh, 'bash -c "source ~/.hadoop_env"', None)
+        auto_deploy_status['steps'][1]['status'] = 'done'
         # 步骤3：下载Hadoop
         auto_deploy_status['step'] = 3
         auto_deploy_status['progress'] = 40
         auto_deploy_status['log'].append("正在下载并解压Hadoop...")
+        auto_deploy_status['steps'][2]['status'] = 'doing'
         hadoop_file = f"/tmp/hadoop-{hadoop_version}.tar.gz"
         ali_url = f"https://mirrors.aliyun.com/apache/hadoop/common/hadoop-{hadoop_version}/hadoop-{hadoop_version}.tar.gz"
         out, err = execute_ssh_command_with_log(ssh, "which wget", None)
@@ -397,25 +412,33 @@ def auto_deploy_task(config):
                 execute_ssh_command_with_log(ssh, f"curl -L -o {hadoop_file} {ali_url}", None)
         if not configure_hadoop_remote(ssh, hadoop_file, install_dir, hadoop_version, master_ip, resourcemanager_ip, servers, replication):
             auto_deploy_status['status'] = 'error'
+            auto_deploy_status['steps'][2]['status'] = 'error'
             auto_deploy_status['log'].append('Hadoop配置失败')
             return
+        auto_deploy_status['steps'][2]['status'] = 'done'
         # 步骤4：配置Hadoop
         auto_deploy_status['step'] = 4
         auto_deploy_status['progress'] = 60
         auto_deploy_status['log'].append("正在自动配置Hadoop核心参数...")
+        auto_deploy_status['steps'][3]['status'] = 'doing'
+        auto_deploy_status['steps'][3]['status'] = 'done'
         # 步骤5：启动集群
         auto_deploy_status['step'] = 5
         auto_deploy_status['progress'] = 80
         auto_deploy_status['log'].append("正在启动Hadoop集群服务...")
+        auto_deploy_status['steps'][4]['status'] = 'doing'
         execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs namenode -format -force', None)
         execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-dfs.sh', None)
         execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-yarn.sh', None)
+        auto_deploy_status['steps'][4]['status'] = 'done'
         # 步骤6：验证部署
         auto_deploy_status['step'] = 6
         auto_deploy_status['progress'] = 100
         auto_deploy_status['log'].append("正在验证集群运行状态...")
+        auto_deploy_status['steps'][5]['status'] = 'doing'
         execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs dfsadmin -report', None)
         execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/yarn node -list', None)
+        auto_deploy_status['steps'][5]['status'] = 'done'
         auto_deploy_status['status'] = 'done'
         auto_deploy_status['log'].append('部署完成')
         nn_url = f'http://{master_ip}:9870'
@@ -427,6 +450,10 @@ def auto_deploy_task(config):
         ssh.close()
     except Exception as e:
         auto_deploy_status['status'] = 'error'
+        # 标记当前步骤为 error
+        step_idx = auto_deploy_status.get('step', 1) - 1
+        if 'steps' in auto_deploy_status and 0 <= step_idx < len(auto_deploy_status['steps']):
+            auto_deploy_status['steps'][step_idx]['status'] = 'error'
         auto_deploy_status['log'].append(f'错误: {str(e)}')
 
 @app.route('/api/deploy/auto/start', methods=['POST'])
@@ -561,25 +588,30 @@ def upload_java_package():
 
 @app.route('/api/scan_hosts', methods=['POST'])
 def scan_hosts():
+    import os
+    # 修复环境变量，确保常用命令可用
+    os.environ['PATH'] = '/usr/bin:/bin:/usr/sbin:/sbin:' + os.environ.get('PATH', '')
     data = request.get_json()
     subnet = data.get('subnet')
     if not subnet:
         return jsonify({'success': False, 'msg': '缺少网段参数'}), 400
     try:
-        # 扫描主机，-n加速，-T4提速
-        cmd = f"nmap -n -T4 {subnet}"
+        # 扫描主机，-n加速
+        cmd = f"nmap -sn {subnet}"
         code, stdout, stderr = execute_local_command(cmd, timeout=30)
         if code != 0:
             return jsonify({'success': False, 'msg': 'nmap 执行失败', 'stderr': stderr}), 500
-        # 解析nmap输出，提取主机IP
+        # 解析nmap输出，只提取IP地址
         hosts = []
         for line in stdout.splitlines():
             if line.startswith('Nmap scan report for '):
-                ip = line.split()[-1]
-                hosts.append(ip)
+                match = re.search(r'(\d+\.\d+\.\d+\.\d+)$', line)
+                if match:
+                    hosts.append(match.group(1))
         return jsonify({'success': True, 'hosts': hosts})
     except Exception as e:
-        return jsonify({'success': False, 'msg': str(e)}), 500
+        import traceback
+        return jsonify({'success': False, 'msg': str(e), 'trace': traceback.format_exc()}), 500
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')

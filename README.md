@@ -1,19 +1,19 @@
-# Hadoop 集群部署系统
+# HadoopDeploy_tool
 
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 [![Flask Version](https://img.shields.io/badge/flask-2.3+-blue.svg)](https://flask.palletsprojects.com)
 
-> 专业的Hadoop集群自动化部署与管理工具，支持全自动、半自动和手动三种部署模式
+> 一站式 Hadoop 集群自动部署与管理平台，支持全自动、半自动、手动三种模式，Web 可视化、SSH 免密、进度与日志实时同步。
 
 ## ✨ 主要特性
 
-- 🚀 **三种部署模式**：全自动、半自动、手动配置，满足不同需求
-- 📦 **文件上传支持**：支持自定义上传Hadoop和Java安装包
-- 🌐 **Web可视化界面**：直观的配置界面和实时部署进度
-- 🔄 **多镜像源支持**：自动切换国内镜像源，提高下载成功率
-- 🛠️ **跨平台支持**：支持Linux和Windows系统
-- 📊 **实时监控**：部署过程实时日志和进度显示
-- 🔒 **安全可靠**：内置安全配置和最佳实践
+- 🚀 **全自动部署**：一键完成 Hadoop 集群环境搭建与配置
+- 🔒 **SSH 免密互信**：自动分发密钥，节点间无密码通信
+- 🌐 **Web 可视化**：全流程进度、日志、集群 Web UI 直达
+- 🛠️ **多模式支持**：全自动、半自动、手动部署灵活切换
+- 📦 **自定义包上传**：支持 Hadoop/Java 安装包自定义上传
+- 📊 **实时监控**：部署步骤与日志同步，异常高亮提示
+- 🧩 **模块化设计**：易于扩展和二次开发
 
 ## 📋 目录
 
@@ -71,8 +71,8 @@ chmod +x setup.sh
 
 ```bash
 # 克隆项目到本地
-git clone https://github.com/violet27-chf/Hadoop.git
-cd Hadoop
+git clone https://github.com/violet27-chf/HadoopDeploy_tool.git
+cd HadoopDeploy_tool
 ```
 
 #### 2. 创建虚拟环境
@@ -176,75 +176,27 @@ python app.py
 ## 📁 项目结构
 
 ```
-Hadoop/
-├── app.py                  # Flask主应用
-├── README.md               # 项目说明文档
+HadoopDeploy_tool/
+├── app.py                  # 主程序（Flask）
 ├── requirements.txt        # 依赖列表
-├── .gitignore              # Git忽略文件
-├── setup.sh / .bat         # 安装脚本（Linux/Win）
-├── start.sh / .bat         # 启动脚本（Linux/Win）
-├── make_zip.bat            # 打包脚本
-├── setup.py                # 安装辅助脚本
-├── toolsvenv/              # Python虚拟环境目录
-├── uploads/                # 文件上传目录
-├── logs/                   # 日志目录
+├── README.md               # 项目说明文档
 ├── scripts/                # 部署脚本
-│   ├── hadoop_deploy.sh    # Linux部署脚本
-│   └── hadoop_deploy.ps1   # Windows部署脚本
+│   ├── hadoop_deploy.ps1   # Windows 部署脚本
+│   └── hadoop_deploy.sh.bak# Linux 部署脚本
 ├── static/                 # 静态资源
-│   ├── css/                # 样式文件（main.css, home.css）
-│   ├── js/                 # JS文件（home.js, common.js）
-│   └── vendor/             # 第三方库（bootstrap, bootstrap-icons）
-├── templates/              # HTML模板
+│   ├── css/                # 样式文件
+│   ├── js/                 # JS 文件
+│   └── vendor/             # 第三方库
+├── templates/              # HTML 模板
+│   ├── components/         # 页面组件
 │   ├── base.html           # 基础模板
-│   ├── index.html          # 首页
-│   ├── about.html          # 关于页面
 │   ├── documentation.html  # 文档中心
-│   ├── privacy-policy.html # 隐私政策
-│   ├── terms-of-service.html # 服务条款
-│   └── components/         # 组件模板
-│       ├── server_form.html            # 服务器配置表单
-│       ├── deploy-method.html          # 部署方式选择
-│       ├── deploy-auto.html            # 全自动部署
-│       ├── deploy-semi-auto.html       # 半自动部署
-│       ├── deploy-manual.html          # 手动部署
-│       ├── deploy-semi-auto-progress.html # 半自动进度
-│       ├── deploy-manual-progress.html    # 手动进度
-│       ├── header.html / footer.html   # 公共头/尾
+│   └── about.html          # 关于页面
+├── downloads/              # Hadoop 安装包下载目录
+├── uploads/                # 上传文件目录
+├── toolsvenv/              # Python 虚拟环境
+└── ...                     # 其它文件
 ```
-
-### 核心文件说明
-
-#### 应用文件
-- **`app.py`**: Flask主应用文件，包含所有路由和API接口
-- **`requirements.txt`**: Python依赖包列表
-- **`config.ini`**: 应用配置文件（自动生成）
-
-#### 安装脚本
-- **`setup.py`**: Python安装脚本，跨平台
-- **`setup.bat`**: Windows快速安装脚本
-- **`setup.sh`**: Linux/macOS快速安装脚本
-
-#### 启动脚本
-- **`start.bat`**: Windows快速启动脚本
-- **`start.sh`**: Linux/macOS快速启动脚本
-
-#### 部署脚本
-- **`scripts/hadoop_deploy.sh`**: Linux系统Hadoop部署脚本
-- **`scripts/hadoop_deploy.ps1`**: Windows系统Hadoop部署脚本
-
-#### 模板文件
-- **`templates/base.html`**: 基础HTML模板
-- **`templates/components/`**: 组件模板目录
-  - `deploy-method.html`: 部署模式选择
-  - `deploy-auto.html`: 全自动部署
-  - `deploy-semi-auto.html`: 半自动配置
-  - `deploy-manual.html`: 手动配置
-
-#### 静态资源
-- **`static/css/`**: 样式文件
-- **`static/js/`**: JavaScript文件
-- **`static/vendor/`**: 第三方库（Bootstrap等）
 
 ## 📖 使用指南
 
@@ -479,5 +431,9 @@ python test_mirrors.py
 
 ## 📬 联系方式
 
-- 项目主页：[https://github.com/violet27-chf/Hadoop.git](https://github.com/violet27-chf/Hadoop.git)
+- 项目主页：[https://github.com/violet27-chf/HadoopDeploy_tool](https://github.com/violet27-chf/HadoopDeploy_tool)
 - 邮箱：violet@kami666.xyz
+
+## 📄 License
+
+本项目基于 MIT License 开源，详见 LICENSE 文件。

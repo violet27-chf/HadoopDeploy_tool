@@ -138,6 +138,33 @@
 <script>
 let deployInProgress = false;
 
+function updateSteps(steps) {
+    for (let i = 0; i < steps.length; i++) {
+        const stepDiv = document.getElementById('step' + (i + 1));
+        if (!stepDiv) continue;
+        let status = steps[i].status;
+        let statusText = '';
+        let statusClass = '';
+        if (status === 'pending') {
+            statusText = '等待中...';
+            statusClass = '';
+        } else if (status === 'doing') {
+            statusText = '进行中...';
+            statusClass = 'active border-primary';
+        } else if (status === 'done') {
+            statusText = '已完成';
+            statusClass = 'list-group-item-success';
+        } else if (status === 'error') {
+            statusText = '失败';
+            statusClass = 'list-group-item-danger';
+        }
+        // 设置状态文本
+        stepDiv.querySelector('small').textContent = statusText;
+        // 设置高亮样式
+        stepDiv.className = 'list-group-item list-group-item-action py-3 px-4 ' + statusClass;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 自动从URL参数写入sessionStorage，兼容URL跳转
     const urlParams = new URLSearchParams(window.location.search);
@@ -207,58 +234,41 @@ function pollDeployStatus() {
         .then(data => {
             // 更新进度条
             const progressBar = document.getElementById('progressBar');
-            progressBar.style.width = data.progress + '%';
-            progressBar.textContent = data.progress + '%';
-            document.getElementById('progressText').textContent = data.message;
+            progressBar.style.width = (data.progress || 0) + '%';
+            progressBar.textContent = (data.progress || 0) + '%';
+            // 更新进度文本
+            document.getElementById('progressText').textContent = data.log && data.log.length > 0 ? data.log[data.log.length - 1] : '准备开始部署...';
             // 更新日志
-            if (data.log && data.log.length > 0) {
-                const logElement = document.getElementById('logContent');
-                logElement.textContent = data.log.join('\n');
-                logElement.scrollTop = logElement.scrollHeight;
+            if (data.log) {
+                document.getElementById('logContent').textContent = data.log.map((msg, idx) => `[${idx+1}] ${msg}`).join('\n');
+                document.getElementById('logContent').scrollTop = document.getElementById('logContent').scrollHeight;
             }
-            // 步骤高亮
-            const totalSteps = data.total_steps || 6;
-            for (let i = 1; i <= totalSteps; i++) {
-                const stepEl = document.getElementById('step' + i);
-                if (!stepEl) continue;
-                if (data.status === 'done') {
-                    stepEl.className = 'list-group-item list-group-item-success';
-                    stepEl.querySelector('small').textContent = '已完成';
-                } else if (i < data.step) {
-                    stepEl.className = 'list-group-item list-group-item-success';
-                    stepEl.querySelector('small').textContent = '已完成';
-                } else if (i === data.step && data.status === 'running') {
-                    stepEl.className = 'list-group-item list-group-item-primary';
-                    stepEl.querySelector('small').textContent = '进行中...';
-                } else {
-                    stepEl.className = 'list-group-item list-group-item-action';
-                    stepEl.querySelector('small').textContent = '等待中...';
-                }
+            // 更新步骤
+            if (data.steps) {
+                updateSteps(data.steps);
             }
-            // 部署完成时切换按钮和显示集群链接
-            if (data.status === 'done') {
-                document.getElementById('progressText').textContent = '部署完成！';
-                progressBar.classList.remove('progress-bar-animated');
-                const btn = document.getElementById('startDeploy');
-                btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>部署完成';
-                btn.disabled = true;
-                // 显示Hadoop集群访问链接
-                if (data.cluster_links) {
-                    let html = '<div class="alert alert-success mt-3"><b>Hadoop集群访问链接：</b><br>';
-                    if (data.cluster_links.NameNode) html += `<a href="${data.cluster_links.NameNode}" target="_blank">NameNode管理界面</a><br>`;
-                    if (data.cluster_links.ResourceManager) html += `<a href="${data.cluster_links.ResourceManager}" target="_blank">ResourceManager管理界面</a>`;
-                    html += '</div>';
-                    document.getElementById('clusterLinks').innerHTML = html;
+            // 部署完成后显示集群链接
+            if (data.status === 'done' && data.cluster_links) {
+                let html = '<div class="alert alert-success">集群部署完成！<br>Web UI 入口：';
+                if (data.cluster_links.NameNode) {
+                    html += `<br><a href="${data.cluster_links.NameNode}" target="_blank">NameNode管理界面</a>`;
                 }
-            } else if (data.status === 'running') {
-                setTimeout(pollDeployStatus, 1000);
-                // 清空集群链接
-                document.getElementById('clusterLinks').innerHTML = '';
+                if (data.cluster_links.ResourceManager) {
+                    html += `<br><a href="${data.cluster_links.ResourceManager}" target="_blank">YARN ResourceManager</a>`;
+                }
+                html += '</div>';
+                document.getElementById('clusterLinks').innerHTML = html;
+                document.getElementById('startDeploy').innerHTML = '<i class="bi bi-check-circle me-2"></i>部署完成';
+                document.getElementById('startDeploy').classList.remove('btn-success');
+                document.getElementById('startDeploy').classList.add('btn-secondary');
             } else if (data.status === 'error') {
-                document.getElementById('progressText').textContent = '部署失败：' + (data.message || '未知错误');
-                progressBar.classList.remove('progress-bar-animated');
-                progressBar.classList.add('bg-danger');
-                document.getElementById('clusterLinks').innerHTML = '';
+                document.getElementById('startDeploy').innerHTML = '<i class="bi bi-x-circle me-2"></i>部署失败';
+                document.getElementById('startDeploy').classList.remove('btn-success');
+                document.getElementById('startDeploy').classList.add('btn-danger');
+            }
+            // 继续轮询
+            if (data.status === 'running' || data.status === 'idle') {
+                setTimeout(pollDeployStatus, 1500);
             }
         });
 }

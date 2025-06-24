@@ -6,8 +6,8 @@
 <div class="container py-5">
     <!-- 页面标题 -->
     <div class="text-center mb-5">
-        <h1 class="display-4">关于 Hadoop 部署工具</h1>
-        <p class="lead text-muted">简化 Hadoop 集群部署与管理的专业工具</p>
+        <h1 class="display-4">关于 HadoopDeploy_tool</h1>
+        <p class="lead text-muted">开源 · 自动化 · 可视化 · SSH免密</p>
     </div>
 
     <!-- 产品介绍 -->
@@ -15,16 +15,16 @@
         <div class="col-lg-8 mx-auto">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h2 class="card-title h4"><i class="bi bi-info-circle me-2"></i>产品简介</h2>
+                    <h2 class="card-title h4"><i class="bi bi-info-circle me-2"></i>项目简介</h2>
                     <p class="card-text">
-                        Hadoop 部署工具是一个开源项目，旨在简化 Hadoop 生态系统的部署、配置和管理流程。
-                        通过自动化脚本和友好的用户界面，帮助用户快速搭建生产级的 Hadoop 集群环境。
-                        支持一键部署、批量运维、配置模板、健康检查等多种功能，适用于企业和科研用户。
+                        HadoopDeploy_tool 是由 <b>violet</b> 独立开发和维护的开源项目，致力于简化 Hadoop 集群的自动化部署与管理流程。
+                        项目集成了全自动、半自动、手动三种部署模式，支持 SSH 免密、Web 可视化、进度与日志同步、集群 Web UI 直达等特性。
+                        适用于企业、科研和个人用户。
                     </p>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
                             <a href="/documentation" class="btn btn-sm btn-outline-primary">查看文档</a>
-                            <a href="https://github.com/violet27-chf/Hadoop.git" class="btn btn-sm btn-outline-secondary" target="_blank">
+                            <a href="https://github.com/violet27-chf/HadoopDeploy_tool" class="btn btn-sm btn-outline-secondary" target="_blank">
                                 <i class="bi bi-github me-1"></i>GitHub
                             </a>
                         </div>
@@ -99,25 +99,26 @@
         <div class="col-lg-8 mx-auto">
             <div class="card">
                 <div class="card-body">
-                    <h2 class="h4"><i class="bi bi-people-fill me-2"></i>开发团队</h2>
-                    <p>由大数据基础设施团队开发和维护，致力于提供简单易用的 Hadoop 管理工具。</p>
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <div class="m-2 text-center">
-                            <img src="https://via.placeholder.com/80" class="rounded-circle mb-2" alt="团队成员">
-                            <h5 class="h6 mb-1">张三</h5>
-                            <small class="text-muted">项目负责人</small>
-                        </div>
-                        <div class="m-2 text-center">
-                            <img src="https://via.placeholder.com/80" class="rounded-circle mb-2" alt="团队成员">
-                            <h5 class="h6 mb-1">李四</h5>
-                            <small class="text-muted">后端开发</small>
-                        </div>
-                        <div class="m-2 text-center">
-                            <img src="https://via.placeholder.com/80" class="rounded-circle mb-2" alt="团队成员">
-                            <h5 class="h6 mb-1">王五</h5>
-                            <small class="text-muted">前端设计</small>
-                        </div>
-                    </div>
+                    <h2 class="h4"><i class="bi bi-person-fill me-2"></i>项目成员</h2>
+                    <ul class="list-unstyled mb-0">
+                        <li><b>violet</b>（作者 & 维护者）</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系方式 -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4"><i class="bi bi-envelope-fill me-2"></i>联系方式</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-github me-2"></i> GitHub: <a href="https://github.com/violet27-chf/HadoopDeploy_tool">项目仓库</a></li>
+                        <li class="mb-2"><i class="bi bi-envelope me-2"></i> 邮箱: <a href="mailto:violet@kami666.xyz">violet@kami666.xyz</a></li>
+                        <li><i class="bi bi-bug-fill me-2"></i> 问题反馈: <a href="https://github.com/violet27-chf/HadoopDeploy_tool/issues">提交 Issue</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -126,17 +127,14 @@
     <!-- 愿景与目标 -->
     <section class="mb-5">
         <h2 class="text-center mb-4">项目愿景</h2>
-        <p class="text-center">致力于打造国内领先的 Hadoop 自动化部署与管理平台，助力企业数字化转型。</p>
+        <p class="text-center">打造国内领先的 Hadoop 自动化部署与管理平台，助力大数据基础设施普及。</p>
     </section>
 
     <!-- 发展历程 -->
     <section class="mb-5">
         <h2 class="text-center mb-4">发展历程</h2>
         <ul class="timeline list-unstyled mx-auto" style="max-width:600px;">
-            <li class="mb-3"><strong>2022.01</strong> - 项目立项，核心团队组建</li>
-            <li class="mb-3"><strong>2022.06</strong> - 发布第一个可用版本，支持基础集群部署</li>
-            <li class="mb-3"><strong>2023.03</strong> - 引入自动化运维与可视化界面</li>
-            <li class="mb-3"><strong>2024.01</strong> - 支持多云与容器化部署</li>
+            <li class="mb-3"><strong>2025.06.24</strong> - v1 版本开发上线，完成全自动部署功能</li>
         </ul>
     </section>
 
@@ -145,23 +143,6 @@
         <h2 class="text-center mb-4">用户与社区</h2>
         <p class="text-center">欢迎企业、科研机构和个人开发者参与使用和贡献，加入我们的社区共同进步。</p>
     </section>
-
-    <!-- 联系方式 -->
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="h4"><i class="bi bi-envelope-fill me-2"></i>联系我们</h2>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="bi bi-github me-2"></i> GitHub: <a href="https://github.com/violet27-chf/Hadoop.git">项目仓库</a></li>
-                        <li class="mb-2"><i class="bi bi-envelope me-2"></i> 邮箱: <a href="mailto:violet@kami666.xyz">violet@kami666.xyz</a></li>
-                        <li class="mb-2"><i class="bi bi-chat-left-text me-2"></i> 社区: <a href="#">论坛链接</a></li>
-                        <li><i class="bi bi-bug-fill me-2"></i> 问题反馈: <a href="https://github.com/violet27-chf/Hadoop.git/issues">提交 Issue</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- 页面样式 -->

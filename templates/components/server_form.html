@@ -87,139 +87,143 @@
 </div>
 
 <script>
-    let serverCount = 1;
-    function saveAndRedirect() {
-        const form = document.getElementById('serverForm');
-        if (!form.checkValidity()) {
-            document.getElementById('formTip').classList.remove('d-none');
-            return;
-        }
-        document.getElementById('formTip').classList.add('d-none');
-        const formData = new FormData(form);
-        const servers = [];
-        const hostnames = formData.getAll('hostname[]');
-        const usernames = formData.getAll('username[]');
-        const passwords = formData.getAll('password[]');
-        for (let i = 0; i < hostnames.length; i++) {
-            servers.push({ hostname: hostnames[i], username: usernames[i], password: passwords[i] });
-        }
-        sessionStorage.setItem('serverConfig', JSON.stringify(servers));
-        window.location.href = '/deploy/method';
+// 避免重复声明 serverCount
+if (typeof window.serverCount === 'undefined') {
+    window.serverCount = 1;
+}
+function saveAndRedirect() {
+    const form = document.getElementById('serverForm');
+    if (!form.checkValidity()) {
+        document.getElementById('formTip').classList.remove('d-none');
+        return;
     }
-    function addServer() {
-        serverCount++;
-        const serverList = document.getElementById('serverList');
-        const newServer = document.createElement('div');
-        newServer.className = 'server-item mb-4 p-4 border-0 shadow-sm bg-white position-relative';
-        newServer.style.borderRadius = '1.2rem';
-        newServer.innerHTML = `
-            <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-cpu-fill text-primary fs-5 me-2"></i>
-                <h5 class="mb-0">服务器 #${serverCount}</h5>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">服务器地址</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="bi bi-pc-display"></i></span>
-                    <input type="text" class="form-control form-control-lg" name="hostname[]" placeholder="如 192.168.1.100" required style="border-radius:.5rem;">
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">用户名</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
-                    <input type="text" class="form-control form-control-lg" name="username[]" placeholder="root" required style="border-radius:.5rem;">
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">密码</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
-                    <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
-                </div>
-            </div>
-            <button type="button" class="btn btn-sm btn-danger px-3 position-absolute top-0 end-0 mt-3 me-3 shadow-sm" style="border-radius:1.2rem;transition:all .15s;z-index:2;" onmouseover="this.classList.add('btn-outline-danger','bg-white','text-danger')" onmouseout="this.classList.remove('btn-outline-danger','bg-white','text-danger')" onclick="removeServer(this)">
-                <i class="bi bi-trash"></i> 移除
-            </button>
-        `;
-        serverList.appendChild(newServer);
+    document.getElementById('formTip').classList.add('d-none');
+    const formData = new FormData(form);
+    const servers = [];
+    const hostnames = formData.getAll('hostname[]');
+    const usernames = formData.getAll('username[]');
+    const passwords = formData.getAll('password[]');
+    for (let i = 0; i < hostnames.length; i++) {
+        servers.push({ hostname: hostnames[i], username: usernames[i], password: passwords[i] });
     }
-    function removeServer(button) {
-        if (serverCount > 1) {
-            button.closest('.server-item').remove();
-            serverCount--;
-            const items = document.querySelectorAll('.server-item');
-            items.forEach((item, index) => {
-                item.querySelector('h5').textContent = `服务器 #${index + 1}`;
-            });
-        }
-    }
-    // nmap扫描相关
-    function showScanModal() {
-        document.getElementById('subnetInput').value = '';
-        document.getElementById('scanResult').innerHTML = '';
-        document.getElementById('scanBtnText').classList.remove('d-none');
-        document.getElementById('scanBtnLoading').classList.add('d-none');
-        var modal = new bootstrap.Modal(document.getElementById('scanModal'));
-        modal.show();
-    }
-    function scanSubnet() {
-        const subnet = document.getElementById('subnetInput').value.trim();
-        if (!subnet) {
-            document.getElementById('scanResult').innerHTML = '<div class="alert alert-warning">请输入网段</div>';
-            return;
-        }
-        document.getElementById('scanBtnText').classList.add('d-none');
-        document.getElementById('scanBtnLoading').classList.remove('d-none');
-        document.getElementById('scanResult').innerHTML = '<div class="text-info"><i class=\'bi bi-arrow-repeat me-2\'></i>正在扫描，请稍候...</div>';
-        fetch('/api/scan_hosts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subnet })
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('scanBtnText').classList.remove('d-none');
-            document.getElementById('scanBtnLoading').classList.add('d-none');
-            if (data.success) {
-                if (data.hosts.length === 0) {
-                    document.getElementById('scanResult').innerHTML = '<div class="alert alert-info">未发现开放22端口的主机</div>';
-                } else {
-                    let html = '<div class="alert alert-success border-0 shadow-sm">发现主机：<div class=\'row g-3 mt-2\'>';
-                    data.hosts.forEach(ip => {
-                        html += `<div class='col-12 col-md-6'>
-                            <div class='scan-host-card card border-0 shadow-sm mb-2 p-0' style='border-radius:1.2rem;transition:box-shadow .18s,transform .18s;'>
-                                <div class='card-body d-flex justify-content-between align-items-center py-3 px-4' style='background:linear-gradient(90deg,#e3f0ff 0,#fafdff 100%);border-radius:1.2rem;'>
-                                    <span class='fw-bold text-primary d-flex align-items-center gap-2' style='font-size:1.22rem;letter-spacing:.5px;'>
-                                        <i class='bi bi-pc-display fs-3 text-info'></i>${ip}
-                                        <button type='button' class='scan-host-add-btn btn btn-gradient-scan btn-sm d-flex align-items-center justify-content-center ms-2' style='border-radius:50%;width:2.2rem;height:2.2rem;padding:0;box-shadow:0 2px 8px #4f8cff33;font-size:1.2rem;' title='添加' onclick='addScannedHost("${ip}")'>
-                                            <i class='bi bi-plus-lg'></i>
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>`;
-                    });
-                    html += '</div></div>';
-                    document.getElementById('scanResult').innerHTML = html;
-                }
-            } else {
-                document.getElementById('scanResult').innerHTML = `<div class='alert alert-danger'>扫描失败：${data.msg || data.stderr}</div>`;
-            }
-        })
-        .catch(err => {
-            document.getElementById('scanBtnText').classList.remove('d-none');
-            document.getElementById('scanBtnLoading').classList.add('d-none');
-            document.getElementById('scanResult').innerHTML = `<div class='alert alert-danger'>请求失败：${err}</div>`;
+    sessionStorage.setItem('serverConfig', JSON.stringify(servers));
+    window.location.href = '/deploy/method';
+}
+function addServer() {
+    window.serverCount++;
+    const serverList = document.getElementById('serverList');
+    const newServer = document.createElement('div');
+    newServer.className = 'server-item mb-4 p-4 border-0 shadow-sm bg-white position-relative';
+    newServer.style.borderRadius = '1.2rem';
+    newServer.innerHTML = `
+        <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-cpu-fill text-primary fs-5 me-2"></i>
+            <h5 class="mb-0">服务器 #${window.serverCount}</h5>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">服务器地址</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-pc-display"></i></span>
+                <input type="text" class="form-control form-control-lg" name="hostname[]" placeholder="如 192.168.1.100" required style="border-radius:.5rem;">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">用户名</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control form-control-lg" name="username[]" placeholder="root" required style="border-radius:.5rem;">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">密码</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger px-3 position-absolute top-0 end-0 mt-3 me-3 shadow-sm" style="border-radius:1.2rem;transition:all .15s;z-index:2;" onmouseover="this.classList.add('btn-outline-danger','bg-white','text-danger')" onmouseout="this.classList.remove('btn-outline-danger','bg-white','text-danger')" onclick="removeServer(this)">
+            <i class="bi bi-trash"></i> 移除
+        </button>
+    `;
+    serverList.appendChild(newServer);
+}
+function removeServer(button) {
+    if (window.serverCount > 1) {
+        button.closest('.server-item').remove();
+        window.serverCount--;
+        const items = document.querySelectorAll('.server-item');
+        items.forEach((item, index) => {
+            item.querySelector('h5').textContent = `服务器 #${index + 1}`;
         });
     }
-    function addScannedHost(ip) {
-        addServer();
-        const items = document.querySelectorAll('.server-item');
-        const last = items[items.length - 1];
-        last.querySelector('input[name="hostname[]"]').value = ip;
-        last.querySelector('input[name="username[]"]').focus();
+}
+// nmap扫描相关
+function showScanModal() {
+    document.getElementById('subnetInput').value = '';
+    document.getElementById('scanResult').innerHTML = '';
+    document.getElementById('scanBtnText').classList.remove('d-none');
+    document.getElementById('scanBtnLoading').classList.add('d-none');
+    var modal = new bootstrap.Modal(document.getElementById('scanModal'));
+    modal.show();
+}
+function scanSubnet() {
+    const subnet = document.getElementById('subnetInput').value.trim();
+    if (!subnet) {
+        document.getElementById('scanResult').innerHTML = '<div class="alert alert-warning">请输入网段</div>';
+        return;
     }
+    document.getElementById('scanBtnText').classList.add('d-none');
+    document.getElementById('scanBtnLoading').classList.remove('d-none');
+    document.getElementById('scanResult').innerHTML = '<div class="text-info"><i class=\'bi bi-arrow-repeat me-2\'></i>正在扫描，请稍候...</div>';
+    fetch('/api/scan_hosts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subnet })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('scanBtnText').classList.remove('d-none');
+        document.getElementById('scanBtnLoading').classList.add('d-none');
+        console.log(data); // 调试用
+        if (data.success) {
+            if (data.hosts.length === 0) {
+                document.getElementById('scanResult').innerHTML = '<div class="alert alert-info">未发现开放22端口的主机</div>';
+            } else {
+                let html = '<div class="alert alert-success border-0 shadow-sm">发现主机：<div class=\'row g-3 mt-2\'>';
+                data.hosts.forEach(ip => {
+                    html += `<div class='col-12 col-md-6'>
+                        <div class='scan-host-card card border-0 shadow-sm mb-2 p-0' style='border-radius:1.2rem;transition:box-shadow .18s,transform .18s;'>
+                            <div class='card-body d-flex justify-content-between align-items-center py-3 px-4' style='background:linear-gradient(90deg,#e3f0ff 0,#fafdff 100%);border-radius:1.2rem;'>
+                                <span class='fw-bold text-primary d-flex align-items-center gap-2' style='font-size:1.22rem;letter-spacing:.5px;'>
+                                    <i class='bi bi-pc-display fs-3 text-info'></i>${ip}
+                                    <button type='button' class='scan-host-add-btn btn btn-gradient-scan btn-sm d-flex align-items-center justify-content-center ms-2' style='border-radius:50%;width:2.2rem;height:2.2rem;padding:0;box-shadow:0 2px 8px #4f8cff33;font-size:1.2rem;' title='添加' onclick='addScannedHost("${ip}")'>
+                                        <i class='bi bi-plus-lg'></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                html += '</div></div>';
+                document.getElementById('scanResult').innerHTML = html;
+            }
+        } else {
+            document.getElementById('scanResult').innerHTML = `<div class="alert alert-danger">扫描失败：${data.msg || '未知错误'}<br>${data.trace ? '<pre style=\"font-size:12px\">'+data.trace+'</pre>' : ''}</div>`;
+        }
+    })
+    .catch(err => {
+        document.getElementById('scanBtnText').classList.remove('d-none');
+        document.getElementById('scanBtnLoading').classList.add('d-none');
+        document.getElementById('scanResult').innerHTML = `<div class="alert alert-danger">请求失败：${err}</div>`;
+    });
+}
+function addScannedHost(ip) {
+    addServer();
+    const items = document.querySelectorAll('.server-item');
+    const last = items[items.length - 1];
+    last.querySelector('input[name="hostname[]"]').value = ip;
+    last.querySelector('input[name="username[]"]').focus();
+}
 </script>
 
 <style>
