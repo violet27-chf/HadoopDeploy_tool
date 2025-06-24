@@ -175,40 +175,42 @@ python app.py
 
 ## 📁 项目结构
 
-### 目录结构
-
 ```
 Hadoop/
-├── 📁 templates/                 # HTML模板文件
-│   ├── 📁 components/           # 组件模板
-│   │   ├── deploy-auto.html     # 全自动部署页面
-│   │   ├── deploy-semi-auto.html # 半自动配置页面
-│   │   ├── deploy-manual.html   # 手动配置页面
-│   │   ├── deploy-method.html   # 部署模式选择页面
-│   │   └── ...                  # 其他组件页面
-│   ├── base.html                # 基础模板
-│   ├── index.html               # 首页
-│   └── ...                      # 其他页面模板
-├── 📁 static/                   # 静态资源文件
-│   ├── 📁 css/                 # 样式文件
-│   ├── 📁 js/                  # JavaScript文件
-│   └── 📁 vendor/              # 第三方库
-├── 📁 scripts/                  # 部署脚本
-│   ├── hadoop_deploy.sh        # Linux部署脚本
-│   └── hadoop_deploy.ps1       # Windows部署脚本
-├── 📁 uploads/                  # 文件上传目录
-├── 📁 logs/                     # 日志文件目录
-├── app.py                       # 主应用文件
-├── requirements.txt             # Python依赖包
-├── setup.py                     # Python安装脚本
-├── setup.bat                    # Windows安装脚本
-├── setup.sh                     # Linux/macOS安装脚本
-├── start.bat                    # Windows启动脚本
-├── start.sh                     # Linux/macOS启动脚本
-├── test_upload.py               # 上传功能测试脚本
-├── test_mirrors.py              # 镜像源测试脚本
-├── README.md                    # 项目说明文档
-└── LICENSE                      # 许可证文件
+├── app.py                  # Flask主应用
+├── README.md               # 项目说明文档
+├── requirements.txt        # 依赖列表
+├── .gitignore              # Git忽略文件
+├── setup.sh / .bat         # 安装脚本（Linux/Win）
+├── start.sh / .bat         # 启动脚本（Linux/Win）
+├── make_zip.bat            # 打包脚本
+├── setup.py                # 安装辅助脚本
+├── toolsvenv/              # Python虚拟环境目录
+├── uploads/                # 文件上传目录
+├── logs/                   # 日志目录
+├── scripts/                # 部署脚本
+│   ├── hadoop_deploy.sh    # Linux部署脚本
+│   └── hadoop_deploy.ps1   # Windows部署脚本
+├── static/                 # 静态资源
+│   ├── css/                # 样式文件（main.css, home.css）
+│   ├── js/                 # JS文件（home.js, common.js）
+│   └── vendor/             # 第三方库（bootstrap, bootstrap-icons）
+├── templates/              # HTML模板
+│   ├── base.html           # 基础模板
+│   ├── index.html          # 首页
+│   ├── about.html          # 关于页面
+│   ├── documentation.html  # 文档中心
+│   ├── privacy-policy.html # 隐私政策
+│   ├── terms-of-service.html # 服务条款
+│   └── components/         # 组件模板
+│       ├── server_form.html            # 服务器配置表单
+│       ├── deploy-method.html          # 部署方式选择
+│       ├── deploy-auto.html            # 全自动部署
+│       ├── deploy-semi-auto.html       # 半自动部署
+│       ├── deploy-manual.html          # 手动部署
+│       ├── deploy-semi-auto-progress.html # 半自动进度
+│       ├── deploy-manual-progress.html    # 手动进度
+│       ├── header.html / footer.html   # 公共头/尾
 ```
 
 ### 核心文件说明

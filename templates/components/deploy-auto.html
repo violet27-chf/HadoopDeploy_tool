@@ -96,6 +96,28 @@
     </div>
 </div>
 <style>
+.log-card {
+  background: #181c24 !important;
+  color: #e6eaf3 !important;
+  border-radius: 1rem !important;
+  border: 2px solid #0d6efd33 !important;
+  box-shadow: 0 4px 24px #0d6efd11 !important;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
+  font-size: 1.08rem;
+  padding: 1.2rem 1rem;
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 0;
+}
+.log-card pre {
+  background: transparent !important;
+  color: #e6eaf3 !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 0;
+  font-size: 1.08rem;
+  letter-spacing: 0.5px;
+}
 .log-card::-webkit-scrollbar {
   width: 8px;
   background: #23272e;
@@ -104,12 +126,8 @@
   background: #3a3f4b;
   border-radius: 4px;
 }
-.log-card {
-  transition: box-shadow 0.2s;
-}
-.log-card:focus-within, .log-card:hover {
-  box-shadow: 0 0 0 3px #0d6efd33;
-  border-color: #0d6efd;
+@media (max-width: 768px) {
+  .log-card { font-size: 0.95rem; padding: 0.7rem 0.5rem; }
 }
 </style>
 {% endblock %}
@@ -117,6 +135,21 @@
 {% block extra_js %}
 <script>
 let deployInProgress = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 自动从URL参数写入sessionStorage，兼容URL跳转
+    const urlParams = new URLSearchParams(window.location.search);
+    const configParam = urlParams.get('config');
+    if (configParam) {
+        sessionStorage.setItem('serverConfig', configParam);
+    }
+    // 原有校验逻辑
+    const config = sessionStorage.getItem('serverConfig');
+    if (!config) {
+        alert('未找到服务器配置信息，请返回重新配置');
+        window.location.href = '/';
+    }
+});
 
 function goBack() {
     window.location.href = '/deploy/method';
@@ -132,7 +165,13 @@ function startAutoDeploy() {
     document.getElementById('logContent').textContent = '正在启动部署...\n';
 
     // 获取服务器配置
-    const config = sessionStorage.getItem('serverConfig');
+    let config = sessionStorage.getItem('serverConfig');
+    try {
+        config = JSON.parse(config);
+    } catch (e) {
+        alert('服务器配置信息格式错误');
+        return;
+    }
     if (!config) {
         alert('未找到服务器配置信息');
         return;
@@ -164,21 +203,20 @@ function pollDeployStatus() {
     fetch('/api/deploy/auto/status')
         .then(res => res.json())
         .then(data => {
-            // 更新进度条和步骤
+            // 更新进度条
             const progressBar = document.getElementById('progressBar');
             progressBar.style.width = data.progress + '%';
             progressBar.textContent = data.progress + '%';
             document.getElementById('progressText').textContent = data.message;
-            
             // 更新日志
             if (data.log && data.log.length > 0) {
                 const logElement = document.getElementById('logContent');
                 logElement.textContent = data.log.join('\n');
                 logElement.scrollTop = logElement.scrollHeight;
             }
-            
             // 步骤高亮
-            for (let i = 1; i <= data.total_steps; i++) {
+            const totalSteps = data.total_steps || 6;
+            for (let i = 1; i <= totalSteps; i++) {
                 const stepEl = document.getElementById('step' + i);
                 if (!stepEl) continue;
                 if (i < data.step) {
@@ -192,64 +230,17 @@ function pollDeployStatus() {
                     stepEl.querySelector('small').textContent = '等待中...';
                 }
             }
-            
             if (data.status === 'running') {
                 setTimeout(pollDeployStatus, 1000);
             } else if (data.status === 'done') {
                 document.getElementById('progressText').textContent = '部署完成！';
                 progressBar.classList.remove('progress-bar-animated');
-                progressBar.classList.add('bg-success');
-                showSuccessAlert();
             } else if (data.status === 'error') {
-                document.getElementById('progressText').textContent = '部署失败！';
+                document.getElementById('progressText').textContent = '部署失败：' + (data.message || '未知错误');
                 progressBar.classList.remove('progress-bar-animated');
                 progressBar.classList.add('bg-danger');
-                showErrorAlert(data.message);
             }
-        })
-        .catch(err => {
-            addLog('获取部署状态失败: ' + err.message);
-            setTimeout(pollDeployStatus, 2000); // 出错后2秒重试
         });
 }
-
-function showSuccessAlert() {
-    // 显示成功消息
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-success mt-3';
-    alertDiv.innerHTML = `
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <strong>部署成功！</strong> Hadoop集群已成功部署并启动。
-        <div class="mt-2">
-            <a href="/cluster/status" class="btn btn-sm btn-outline-success me-2">查看集群状态</a>
-            <a href="/cluster/manage" class="btn btn-sm btn-outline-primary">集群管理</a>
-        </div>
-    `;
-    document.querySelector('.card-body').appendChild(alertDiv);
-}
-
-function showErrorAlert(errorMessage) {
-    // 显示错误消息
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-danger mt-3';
-    alertDiv.innerHTML = `
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        <strong>部署失败！</strong> ${errorMessage}
-        <div class="mt-2">
-            <button class="btn btn-sm btn-outline-danger me-2" onclick="location.reload()">重新开始</button>
-            <button class="btn btn-sm btn-outline-secondary" onclick="goBack()">返回</button>
-        </div>
-    `;
-    document.querySelector('.card-body').appendChild(alertDiv);
-}
-
-// 页面加载时检查配置
-document.addEventListener('DOMContentLoaded', function() {
-    const config = sessionStorage.getItem('serverConfig');
-    if (!config) {
-        alert('未找到服务器配置信息，请返回重新配置');
-        window.location.href = '/';
-    }
-});
 </script>
 {% endblock %} 

@@ -94,36 +94,33 @@ def check_system_environment():
 def install_java():
     """安装Java环境"""
     auto_deploy_status['log'].append("开始安装Java环境...")
-    
     system = platform.system()
-    
+    # 检查Java是否已安装
+    code, stdout, stderr = execute_local_command("java -version")
+    if code == 0:
+        auto_deploy_status['log'].append("Java已安装，跳过安装步骤")
+        return True
+    # 未安装则自动安装
+    auto_deploy_status['log'].append("未检测到Java，尝试自动安装...")
     if system == "Windows":
-        # Windows下检查Java是否已安装
-        code, stdout, stderr = execute_local_command("java -version")
-        if code == 0:
-            auto_deploy_status['log'].append("Java已安装，跳过安装步骤")
-            return True
-        else:
-            auto_deploy_status['log'].append("请手动安装Java 8或更高版本")
-            return False
+        auto_deploy_status['log'].append("请手动安装Java 8或更高版本（暂不支持自动安装）")
+        return False
     else:
         # Linux下尝试安装OpenJDK
         auto_deploy_status['log'].append("尝试安装OpenJDK...")
-        
         # 检测包管理器
         code, stdout, stderr = execute_local_command("which apt-get")
         if code == 0:
             # Ubuntu/Debian
-            code, stdout, stderr = execute_local_command("sudo apt-get update && sudo apt-get install -y openjdk-8-jdk")
+            code, stdout, stderr = execute_local_command("sudo apt-get update && sudo apt-get install -y openjdk-8-jdk", timeout=300)
         else:
             code, stdout, stderr = execute_local_command("which yum")
             if code == 0:
                 # CentOS/RHEL
-                code, stdout, stderr = execute_local_command("sudo yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel")
+                code, stdout, stderr = execute_local_command("sudo yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel", timeout=300)
             else:
                 auto_deploy_status['log'].append("未检测到支持的包管理器，请手动安装Java")
                 return False
-        
         if code == 0:
             auto_deploy_status['log'].append("Java安装成功")
             return True
@@ -243,7 +240,7 @@ def configure_hadoop(hadoop_file):
         code, stdout, stderr = execute_local_command(f'tar -xzf "{hadoop_file}" -C "{install_dir}"')
     else:
         # Linux解压
-        code, stdout, stderr = execute_local_command(f"sudo tar -xzf {hadoop_file} -C {install_dir}")
+        code, stdout, stderr = execute_local_command(f"sudo tar -xzf {hadoop_file} -C {install_dir}", timeout=300)
     
     if code != 0:
         auto_deploy_status['log'].append(f"Hadoop解压失败: {stderr}")
@@ -413,13 +410,12 @@ def execute_python_deploy():
         ('启动集群', start_hadoop_cluster),
         ('验证部署', verify_deployment)
     ]
-    
+    progress_map = [10, 30, 50, 70, 90, 100]
     for i, (step_name, step_func) in enumerate(steps, 1):
         auto_deploy_status['step'] = i
-        auto_deploy_status['progress'] = int(i / len(steps) * 100)
+        auto_deploy_status['progress'] = progress_map[i-1]
         auto_deploy_status['message'] = f'正在执行：{step_name}'
         auto_deploy_status['log'].append(f"开始执行步骤 {i}: {step_name}")
-        
         # 执行实际步骤
         if step_name == '下载Hadoop':
             hadoop_file = step_func()
@@ -428,6 +424,7 @@ def execute_python_deploy():
                 auto_deploy_status['log'].append(f"步骤 {i} 完成: {step_name}")
             else:
                 auto_deploy_status['status'] = 'error'
+                auto_deploy_status['progress'] = progress_map[i-1]
                 auto_deploy_status['message'] = f'步骤 {i} 失败: {step_name}'
                 auto_deploy_status['log'].append(f"步骤 {i} 失败: {step_name}")
                 return
@@ -436,12 +433,11 @@ def execute_python_deploy():
                 auto_deploy_status['log'].append(f"步骤 {i} 完成: {step_name}")
             else:
                 auto_deploy_status['status'] = 'error'
+                auto_deploy_status['progress'] = progress_map[i-1]
                 auto_deploy_status['message'] = f'步骤 {i} 失败: {step_name}'
                 auto_deploy_status['log'].append(f"步骤 {i} 失败: {step_name}")
                 return
-        
         time.sleep(1)  # 短暂延迟，让前端有时间更新
-    
     auto_deploy_status['status'] = 'done'
     auto_deploy_status['progress'] = 100
     auto_deploy_status['message'] = '部署完成'
@@ -450,16 +446,22 @@ def execute_python_deploy():
 @app.route('/api/deploy/auto/start', methods=['POST'])
 def api_deploy_auto_start():
     config = request.json.get('config')
+    # 兼容前端传递list、dict或str
+    if isinstance(config, str):
+        try:
+            config = json.loads(config)
+        except Exception:
+            return jsonify({'msg': 'config参数格式错误'}), 400
+    if config is None:
+        return jsonify({'msg': '缺少config参数'}), 400
     if auto_deploy_status['status'] == 'running':
         return jsonify({'msg': '已有部署在进行中'}), 400
-    
     # 重置状态
     auto_deploy_status['status'] = 'idle'
     auto_deploy_status['step'] = 0
     auto_deploy_status['progress'] = 0
     auto_deploy_status['message'] = ''
     auto_deploy_status['log'] = []
-    
     t = threading.Thread(target=auto_deploy_task, args=(config,))
     t.daemon = True  # 设置为守护线程
     t.start()
