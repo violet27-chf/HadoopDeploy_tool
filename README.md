@@ -259,10 +259,7 @@ yarn.scheduler.maximum-allocation-mb: 4096
 3. 在`static/js/`中添加JavaScript逻辑
 4. 在`static/css/`中添加样式
 
-### 修改部署脚本
-1. 修改`scripts/hadoop_deploy.sh`（Linux）
-2. 修改`scripts/hadoop_deploy.ps1`（Windows）
-3. 测试脚本功能
+
 
 ### 添加新的依赖
 1. 在`requirements.txt`中添加包名和版本
