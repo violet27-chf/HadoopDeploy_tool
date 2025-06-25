@@ -261,10 +261,11 @@ def execute_ssh_command_with_log(ssh, command, log_prefix=None):
     stdin, stdout, stderr = ssh.exec_command(command)
     out = stdout.read().decode()
     err = stderr.read().decode()
+    exit_code = stdout.channel.recv_exit_status()
     # 只在出错时写入关键信息
     if log_prefix and err.strip():
         auto_deploy_status['log'].append(f"{log_prefix} 失败: {err.strip()}")
-    return out, err
+    return out, err, exit_code
 
 def configure_hadoop_remote(ssh, hadoop_file_path, install_dir="/opt/hadoop", hadoop_version="3.3.6", master_ip="localhost", resourcemanager_ip="localhost", servers=None, replication=2):
     auto_deploy_status['log'].append(f"[远程] 开始配置Hadoop...（安装路径：{install_dir}）")
@@ -272,15 +273,15 @@ def configure_hadoop_remote(ssh, hadoop_file_path, install_dir="/opt/hadoop", ha
     execute_ssh_command_with_log(ssh, f"mkdir -p {install_dir}", "[远程] 创建目录")
     # 解压Hadoop
     cmd = f"tar -xzf {hadoop_file_path} -C {install_dir}"
-    out, err = execute_ssh_command_with_log(ssh, cmd, "[远程] 解压Hadoop")
-    if err:
+    out, err, exit_code = execute_ssh_command_with_log(ssh, cmd, "[远程] 解压Hadoop")
+    if exit_code != 0:
         auto_deploy_status['log'].append(f"[远程] Hadoop解压失败: {err}")
         return False
     # 创建符号链接
     hadoop_home = f"{install_dir}/hadoop-{hadoop_version}"
     execute_ssh_command_with_log(ssh, f"ln -sf {hadoop_home} {install_dir}/current", "[远程] 创建符号链接")
     # 检查实际Java路径
-    out, err = execute_ssh_command_with_log(ssh, "ls -d /usr/lib/jvm/java-1.8.0-openjdk* 2>/dev/null | head -1", "[远程] 检查Java安装路径")
+    out, err, exit_code = execute_ssh_command_with_log(ssh, "ls -d /usr/lib/jvm/java-1.8.0-openjdk* 2>/dev/null | head -1", "[远程] 检查Java安装路径")
     java_home = out.strip() if out.strip() else "/usr/lib/jvm/java-1.8.0-openjdk"
     # 写入环境变量
     env_content = f"""export JAVA_HOME={java_home}
@@ -427,7 +428,7 @@ def auto_deploy_task(config):
         auto_deploy_status['steps'][1]['status'] = 'doing'
         auto_deploy_status['log'].append("[2/6] 检查Java是否已安装...")
         t0 = time.time()
-        out, err = execute_ssh_command_with_log(ssh, 'java -version', None)
+        out, err, exit_code = execute_ssh_command_with_log(ssh, 'java -version', None)
         t1 = time.time()
         java_output = (out or '') + (err or '')
         auto_deploy_status['log'].append(f"[2/6] java -version 输出: {java_output.strip()} (耗时{t1-t0:.1f}s)")
@@ -435,16 +436,16 @@ def auto_deploy_task(config):
             auto_deploy_status['log'].append("[2/6] 目标服务器已安装Java，跳过安装步骤")
         else:
             auto_deploy_status['log'].append("[2/6] 检查包管理器类型...")
-            out, err = execute_ssh_command_with_log(ssh, 'which yum', None)
+            out, err, exit_code = execute_ssh_command_with_log(ssh, 'which yum', None)
             auto_deploy_status['log'].append(f"[2/6] which yum 输出: {out.strip()} 错误: {err.strip()}")
             if out.strip():
                 auto_deploy_status['log'].append("[2/6] 使用yum安装Java...")
                 t0 = time.time()
-                out3, err3 = execute_ssh_command_with_log(ssh, 'yum install -y java-1.8.0-openjdk*', None)
+                out3, err3, exit_code3 = execute_ssh_command_with_log(ssh, 'yum install -y java-1.8.0-openjdk*', None)
                 t1 = time.time()
                 java_install_output = (out3 or '') + (err3 or '')
                 auto_deploy_status['log'].append(f"[2/6] yum install 输出: {java_install_output.strip()} (耗时{t1-t0:.1f}s)")
-                out_check, err_check = execute_ssh_command_with_log(ssh, 'java -version', None)
+                out_check, err_check, exit_code_check = execute_ssh_command_with_log(ssh, 'java -version', None)
                 java_check_output = (out_check or '') + (err_check or '')
                 auto_deploy_status['log'].append(f"[2/6] java -version(安装后) 输出: {java_check_output.strip()}")
                 if 'version' not in java_check_output:
@@ -454,16 +455,16 @@ def auto_deploy_task(config):
                     ssh.close()
                     return
             else:
-                out, err = execute_ssh_command_with_log(ssh, 'which apt-get', None)
+                out, err, exit_code = execute_ssh_command_with_log(ssh, 'which apt-get', None)
                 auto_deploy_status['log'].append(f"[2/6] which apt-get 输出: {out.strip()} 错误: {err.strip()}")
                 if out.strip():
                     auto_deploy_status['log'].append("[2/6] 使用apt-get安装Java...")
                     t0 = time.time()
-                    out3, err3 = execute_ssh_command_with_log(ssh, 'apt-get install -y openjdk-8-jdk', None)
+                    out3, err3, exit_code3 = execute_ssh_command_with_log(ssh, 'apt-get install -y openjdk-8-jdk', None)
                     t1 = time.time()
                     java_install_output = (out3 or '') + (err3 or '')
                     auto_deploy_status['log'].append(f"[2/6] apt-get install 输出: {java_install_output.strip()} (耗时{t1-t0:.1f}s)")
-                    out_check, err_check = execute_ssh_command_with_log(ssh, 'java -version', None)
+                    out_check, err_check, exit_code_check = execute_ssh_command_with_log(ssh, 'java -version', None)
                     java_check_output = (out_check or '') + (err_check or '')
                     auto_deploy_status['log'].append(f"[2/6] java -version(安装后) 输出: {java_check_output.strip()}")
                     if 'version' not in java_check_output:
@@ -486,25 +487,79 @@ def auto_deploy_task(config):
         auto_deploy_status['steps'][2]['status'] = 'doing'
         ali_url = f"https://mirrors.aliyun.com/apache/hadoop/common/hadoop-{hadoop_version}/hadoop-{hadoop_version}.tar.gz"
         auto_deploy_status['log'].append(f"[3/6] 检查wget: which wget")
-        out, err = execute_ssh_command_with_log(ssh, "which wget", None)
-        auto_deploy_status['log'].append(f"[3/6] which wget 输出: {out.strip()} 错误: {err.strip()}")
-        if out.strip():
+        out, err, exit_code = execute_ssh_command_with_log(ssh, "which wget", None)
+        if exit_code == 0 and out.strip():
+            auto_deploy_status['log'].append(f"[3/6] which wget 输出: {out.strip()}")
+        elif err.strip():
+            auto_deploy_status['log'].append(f"[3/6] which wget 错误: {err.strip()}")
+        else:
+            auto_deploy_status['log'].append(f"[3/6] which wget 未检测到wget")
+        if exit_code == 0 and out.strip():
             auto_deploy_status['log'].append(f"[3/6] 使用wget下载Hadoop...")
             t0 = time.time()
-            out2, err2 = execute_ssh_command_with_log(ssh, f"wget -O /tmp/hadoop-{hadoop_version}.tar.gz {ali_url}", None)
+            out2, err2 = execute_ssh_command_with_log(ssh, f"wget -O /tmp/hadoop-{hadoop_version}.tar.gz {ali_url}", None)[:2]
             t1 = time.time()
             wget_output = (out2 or '') + (err2 or '')
             auto_deploy_status['log'].append(f"[3/6] wget 输出: {wget_output.strip()} (耗时{t1-t0:.1f}s)")
         else:
-            out2, err2 = execute_ssh_command_with_log(ssh, "which curl", None)
-            auto_deploy_status['log'].append(f"[3/6] which curl 输出: {out2.strip()} 错误: {err2.strip()}")
-            if out2.strip():
+            out2, err2, exit_code2 = execute_ssh_command_with_log(ssh, "which curl", None)
+            if exit_code2 == 0 and out2.strip():
+                auto_deploy_status['log'].append(f"[3/6] which curl 输出: {out2.strip()}")
+            elif err2.strip():
+                auto_deploy_status['log'].append(f"[3/6] which curl 错误: {err2.strip()}")
+            else:
+                auto_deploy_status['log'].append(f"[3/6] which curl 未检测到curl")
+            if exit_code2 == 0 and out2.strip():
+                # 检查curl是否可用
+                out_ver, err_ver, exit_code_ver = execute_ssh_command_with_log(ssh, "curl --version", None)
+                if exit_code_ver == 0 and out_ver.strip():
+                    auto_deploy_status['log'].append(f"[3/6] curl --version 输出: {out_ver.strip()}")
+                elif err_ver.strip():
+                    auto_deploy_status['log'].append(f"[3/6] curl --version 错误: {err_ver.strip()}")
+                else:
+                    auto_deploy_status['log'].append(f"[3/6] curl --version 未检测到curl")
                 auto_deploy_status['log'].append(f"[3/6] 使用curl下载Hadoop...")
+                # 进度条日志采集
+                import threading
+                import time as _time
+                progress_log = f"/tmp/hadoop_curl_progress_{int(time.time())}.log"
+                download_cmd = f"curl -L --progress-bar -o /tmp/hadoop-{hadoop_version}.tar.gz {ali_url} 2>{progress_log}"
+                download_done = {'flag': False}
+                def monitor_progress():
+                    last_line = ""
+                    while not download_done['flag']:
+                        try:
+                            sftp = ssh.open_sftp()
+                            try:
+                                with sftp.file(progress_log, 'r') as f:
+                                    lines = f.readlines()
+                                    if lines:
+                                        # 只取最后一行进度
+                                        last_line = lines[-1].strip()
+                                        if last_line:
+                                            auto_deploy_status['log'].append(f'[3/6] 下载进度: {last_line}')
+                            finally:
+                                sftp.close()
+                        except Exception:
+                            pass
+                        _time.sleep(1)
+                progress_thread = threading.Thread(target=monitor_progress)
+                progress_thread.daemon = True
+                progress_thread.start()
                 t0 = time.time()
-                out3, err3 = execute_ssh_command_with_log(ssh, f"curl -L -o /tmp/hadoop-{hadoop_version}.tar.gz {ali_url}", None)
+                out3, err3 = execute_ssh_command_with_log(ssh, download_cmd, None)[:2]
                 t1 = time.time()
+                download_done['flag'] = True
+                progress_thread.join(timeout=2)
+                # 下载完成后清理进度文件
+                try:
+                    ssh.exec_command(f'rm -f {progress_log}')
+                except Exception:
+                    pass
                 curl_output = (out3 or '') + (err3 or '')
                 auto_deploy_status['log'].append(f"[3/6] curl 输出: {curl_output.strip()} (耗时{t1-t0:.1f}s)")
+            else:
+                auto_deploy_status['log'].append(f"[3/6] 未检测到wget或curl，无法下载Hadoop")
         auto_deploy_status['log'].append(f"[3/6] 开始远程解压Hadoop包...")
         # 配置Hadoop并解压
         if not configure_hadoop_remote(ssh, f"/tmp/hadoop-{hadoop_version}.tar.gz", install_dir, hadoop_version, master_ip, resourcemanager_ip, servers, replication):
@@ -520,7 +575,7 @@ def auto_deploy_task(config):
         auto_deploy_status['steps'][3]['status'] = 'doing'
         auto_deploy_status['log'].append(f"[4/6] 格式化NameNode...")
         t0 = time.time()
-        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs namenode -format -force', None)
+        out, err, exit_code = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs namenode -format -force', None)
         t1 = time.time()
         auto_deploy_status['log'].append(f"[4/6] 格式化NameNode 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['steps'][3]['status'] = 'done'
@@ -531,12 +586,12 @@ def auto_deploy_task(config):
         auto_deploy_status['steps'][4]['status'] = 'doing'
         auto_deploy_status['log'].append(f"[5/6] 启动HDFS服务...")
         t0 = time.time()
-        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-dfs.sh', None)
+        out, err, exit_code = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-dfs.sh', None)
         t1 = time.time()
         auto_deploy_status['log'].append(f"[5/6] start-dfs.sh 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['log'].append(f"[5/6] 启动YARN服务...")
         t0 = time.time()
-        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-yarn.sh', None)
+        out, err, exit_code = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/sbin/start-yarn.sh', None)
         t1 = time.time()
         auto_deploy_status['log'].append(f"[5/6] start-yarn.sh 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['steps'][4]['status'] = 'done'
@@ -547,12 +602,12 @@ def auto_deploy_task(config):
         auto_deploy_status['steps'][5]['status'] = 'doing'
         auto_deploy_status['log'].append(f"[6/6] 检查HDFS节点状态...")
         t0 = time.time()
-        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs dfsadmin -report', None)
+        out, err, exit_code = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/hdfs dfsadmin -report', None)
         t1 = time.time()
         auto_deploy_status['log'].append(f"[6/6] hdfs dfsadmin -report 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['log'].append(f"[6/6] 检查YARN节点状态...")
         t0 = time.time()
-        out, err = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/yarn node -list', None)
+        out, err, exit_code = execute_ssh_command_with_log(ssh, f'source ~/.hadoop_env && {hadoop_home}/bin/yarn node -list', None)
         t1 = time.time()
         auto_deploy_status['log'].append(f"[6/6] yarn node -list 输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['steps'][5]['status'] = 'done'
@@ -815,8 +870,6 @@ def upload_java_package():
         return jsonify({'success': False, 'msg': '未选择文件'}), 400
     allowed_extensions = {'.tar.gz', '.tgz', '.zip'}
     file_ext = os.path.splitext(file.filename)[1].lower()
-    if file.filename.endswith('.tar.gz'):
-        file_ext = '.tar.gz'
     if file_ext not in allowed_extensions:
         return jsonify({'success': False, 'msg': '只支持.tar.gz、.tgz或.zip格式的文件'}), 400
     # 直接流式转发到远程服务器
