@@ -504,7 +504,8 @@ def auto_deploy_task(config):
                 out3, err3 = execute_ssh_command_with_log(ssh, f"curl -L -o /tmp/hadoop-{hadoop_version}.tar.gz {ali_url}", None)
                 t1 = time.time()
                 curl_output = (out3 or '') + (err3 or '')
-                auto_deploy_status['log'].append(f"[3/6] curl 输出: {curl_output.strip()} (耗时{t1-t0:.1f}s)")
+                last_line = curl_output.strip().split('\n')[-1] if curl_output.strip() else ''
+                auto_deploy_status['log'].append(f"[{step_idx+1}/{len(auto_deploy_status['steps'])}] curl 输出: {last_line} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['log'].append(f"[3/6] 开始远程解压Hadoop包...")
         # 配置Hadoop并解压
         if not configure_hadoop_remote(ssh, f"/tmp/hadoop-{hadoop_version}.tar.gz", install_dir, hadoop_version, master_ip, resourcemanager_ip, servers, replication):

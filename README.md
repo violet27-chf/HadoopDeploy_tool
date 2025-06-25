@@ -325,23 +325,6 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-### 安全说明
-
-#### 文件上传安全
-- 限制文件类型和大小
-- 验证文件内容
-- 存储在安全目录
-
-#### 网络安全
-- 使用HTTPS
-- 配置防火墙
-- 限制访问IP
-
-#### 数据安全
-- 加密敏感信息
-- 定期备份数据
-- 日志审计
-
 ## 🔧 故障排除
 
 ### 常见问题
@@ -393,32 +376,6 @@ tail -f logs/app.log
 tail -f logs/deploy.log
 ```
 
-## 🧪 测试
-
-### 运行测试脚本
-
-```bash
-# 确保虚拟环境已激活
-python test_upload.py
-```
-
-### 测试内容
-- 文件上传功能测试
-- API接口测试
-- 部署流程测试
-
-### 镜像源测试
-
-```bash
-# 测试下载镜像源的可用性
-python test_mirrors.py
-```
-
-### 测试内容
-- Hadoop下载镜像源测试
-- Java下载镜像源测试
-- 网络连接测试
-
 ## 🤝 贡献指南
 
 欢迎提交PR、Issue，或参与文档完善与功能建议。
@@ -426,8 +383,4 @@ python test_mirrors.py
 ## 📬 联系方式
 
 - 项目主页：[https://github.com/violet27-chf/HadoopDeploy_tool](https://github.com/violet27-chf/HadoopDeploy_tool)
-- 邮箱：violet@kami666.xyz
-
-## 📄 License
-
-本项目基于 MIT License 开源，详见 LICENSE 文件。
+- 邮箱：violet@kami666.xyz。
