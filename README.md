@@ -273,13 +273,6 @@ yarn.scheduler.maximum-allocation-mb: 4096
 python app.py --debug
 ```
 
-### 生产环境部署
-1. 修改`config.ini`中的配置
-2. 使用生产级Web服务器（如Gunicorn）
-3. 配置反向代理（如Nginx）
-4. 设置SSL证书
-```
-
 ## 🔧 故障排除
 
 ### 常见问题
