@@ -116,15 +116,6 @@ pip install -r requirements.txt
 python -c "import flask, paramiko; print('依赖安装成功！')"
 ```
 
-#### 4. 创建必要目录
-
-```bash
-# 创建上传文件目录
-mkdir -p uploads
-
-# 创建日志目录
-mkdir -p logs
-```
 
 ## 🚀 快速开始
 
@@ -189,7 +180,6 @@ HadoopDeploy_tool/
 │   ├── base.html           # 基础模板
 │   ├── documentation.html  # 文档中心
 │   └── about.html          # 关于页面
-├── uploads/                # 上传文件目录
 
 
 ## 📖 使用指南
@@ -280,15 +270,6 @@ yarn.scheduler.maximum-allocation-mb: 4096
 3. 测试安装流程
 ```
 
-#### 查看日志
-```bash
-# 应用日志
-tail -f logs/app.log
-
-# 部署日志
-tail -f logs/deploy.log
-```
-
 #### 调试模式
 ```bash
 # 启动调试模式
@@ -342,15 +323,6 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 - 检查服务器连接
 - 确认服务器权限
 - 查看部署日志
-
-### 日志查看
-
-```bash
-# 查看应用日志
-tail -f logs/app.log
-
-# 查看部署日志
-tail -f logs/deploy.log
 ```
 
 ## 🤝 贡献指南
