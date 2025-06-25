@@ -278,19 +278,6 @@ yarn.scheduler.maximum-allocation-mb: 4096
 1. 在`requirements.txt`中添加包名和版本
 2. 更新安装脚本中的依赖检查
 3. 测试安装流程
-
-### 调试和测试
-
-#### 运行测试
-```bash
-# 测试文件上传功能
-python test_upload.py
-
-# 测试镜像源可用性
-python test_mirrors.py
-
-# 测试API接口
-curl http://localhost:5000/api/deploy/auto/status
 ```
 
 #### 查看日志
@@ -313,16 +300,6 @@ python app.py --debug
 2. 使用生产级Web服务器（如Gunicorn）
 3. 配置反向代理（如Nginx）
 4. 设置SSL证书
-
-### Docker部署
-```dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 5000
-CMD ["python", "app.py"]
 ```
 
 ## 🔧 故障排除

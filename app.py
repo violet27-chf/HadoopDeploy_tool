@@ -410,15 +410,15 @@ def auto_deploy_task(config):
             return
         auto_deploy_status['log'].append("[1/6] 正在关闭防火墙...")
         t0 = time.time()
-        out, err = execute_ssh_command_with_log(ssh, 'systemctl stop firewalld && systemctl disable firewalld', None)
+        stdin, stdout, stderr = ssh.exec_command('systemctl stop firewalld && systemctl disable firewalld')
+        exit_code = stdout.channel.recv_exit_status()
+        out = stdout.read().decode()
+        err = stderr.read().decode()
         t1 = time.time()
-        auto_deploy_status['log'].append(f"[1/6] 防火墙关闭输出: {out.strip()} 错误: {err.strip()} (耗时{t1-t0:.1f}s)")
-        auto_deploy_status['log'].append("[1/6] 正在配置集群节点SSH免密...")
-        try:
-            setup_ssh_key_auth(ssh, servers, servers[0]['username'])
-            auto_deploy_status['log'].append("[1/6] SSH免密配置完成")
-        except Exception as e:
-            auto_deploy_status['log'].append(f"[1/6] SSH免密配置失败: {e}")
+        if exit_code == 0:
+            auto_deploy_status['log'].append(f"[1/6] 防火墙关闭成功: {out.strip() or '无输出'} (耗时{t1-t0:.1f}s)")
+        else:
+            auto_deploy_status['log'].append(f"[1/6] 防火墙关闭失败: {err.strip() or out.strip() or '未知错误'} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['steps'][0]['status'] = 'done'
         # 步骤2：安装Java环境
         auto_deploy_status['step'] = 2
@@ -504,8 +504,7 @@ def auto_deploy_task(config):
                 out3, err3 = execute_ssh_command_with_log(ssh, f"curl -L -o /tmp/hadoop-{hadoop_version}.tar.gz {ali_url}", None)
                 t1 = time.time()
                 curl_output = (out3 or '') + (err3 or '')
-                last_line = curl_output.strip().split('\n')[-1] if curl_output.strip() else ''
-                auto_deploy_status['log'].append(f"[{step_idx+1}/{len(auto_deploy_status['steps'])}] curl 输出: {last_line} (耗时{t1-t0:.1f}s)")
+                auto_deploy_status['log'].append(f"[3/6] curl 输出: {curl_output.strip()} (耗时{t1-t0:.1f}s)")
         auto_deploy_status['log'].append(f"[3/6] 开始远程解压Hadoop包...")
         # 配置Hadoop并解压
         if not configure_hadoop_remote(ssh, f"/tmp/hadoop-{hadoop_version}.tar.gz", install_dir, hadoop_version, master_ip, resourcemanager_ip, servers, replication):
@@ -599,13 +598,14 @@ def semi_auto_deploy_task(config):
             ok, err = upload_file_to_remote(ssh, local_hadoop, remote_hadoop)
             if ok:
                 semi_auto_deploy_status['log'].append(f"已上传用户Hadoop包到远程: {remote_hadoop}")
-                try:
-                    os.remove(local_hadoop)
-                    semi_auto_deploy_status['log'].append("本地Hadoop包已删除")
-                except Exception as e:
-                    semi_auto_deploy_status['log'].append(f"本地Hadoop包删除失败: {e}")
             else:
                 semi_auto_deploy_status['log'].append(f"上传Hadoop包失败: {err}")
+            # 无论上传是否成功，都尝试删除本地包
+            try:
+                os.remove(local_hadoop)
+                semi_auto_deploy_status['log'].append("本地Hadoop包已删除")
+            except Exception as e:
+                semi_auto_deploy_status['log'].append(f"本地Hadoop包删除失败: {e}")
         local_java = None
         for ext in ['.tar.gz', '.tgz', '.zip']:
             path = os.path.join(UPLOAD_FOLDER, f'java-uploaded{ext}')
@@ -617,13 +617,14 @@ def semi_auto_deploy_task(config):
             ok, err = upload_file_to_remote(ssh, local_java, remote_java)
             if ok:
                 semi_auto_deploy_status['log'].append(f"已上传用户Java包到远程: {remote_java}")
-                try:
-                    os.remove(local_java)
-                    semi_auto_deploy_status['log'].append("本地Java包已删除")
-                except Exception as e:
-                    semi_auto_deploy_status['log'].append(f"本地Java包删除失败: {e}")
             else:
                 semi_auto_deploy_status['log'].append(f"上传Java包失败: {err}")
+            # 无论上传是否成功，都尝试删除本地包
+            try:
+                os.remove(local_java)
+                semi_auto_deploy_status['log'].append("本地Java包已删除")
+            except Exception as e:
+                semi_auto_deploy_status['log'].append(f"本地Java包删除失败: {e}")
         semi_auto_deploy_status['steps'][0]['status'] = 'done'
         # 2. 环境准备
         semi_auto_deploy_status['step'] = 2
@@ -777,9 +778,31 @@ def upload_hadoop_package():
     if file.filename == '':
         return jsonify({'success': False, 'msg': '未选择文件'}), 400
     if file and allowed_file(file.filename):
-        save_path = os.path.join(UPLOAD_FOLDER, 'hadoop-uploaded.tar.gz')
-        file.save(save_path)
-        return jsonify({'success': True, 'msg': '上传成功', 'path': save_path})
+        # 直接流式转发到远程服务器
+        hostname = request.form.get('hostname')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if not (hostname and username and password):
+            return jsonify({'success': False, 'msg': '缺少目标服务器信息'}), 400
+        try:
+            import paramiko
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(hostname, username=username, password=password)
+            sftp = ssh.open_sftp()
+            # 保证文件名和用户上传一致
+            remote_path = f"/tmp/{file.filename}"
+            with sftp.file(remote_path, 'wb') as f_remote:
+                while True:
+                    chunk = file.stream.read(4096)
+                    if not chunk:
+                        break
+                    f_remote.write(chunk)
+            sftp.close()
+            ssh.close()
+            return jsonify({'success': True, 'msg': '上传成功', 'remote_path': remote_path})
+        except Exception as e:
+            return jsonify({'success': False, 'msg': f'上传失败: {e}'}), 500
     else:
         return jsonify({'success': False, 'msg': '文件格式不正确'}), 400
 
@@ -790,20 +813,37 @@ def upload_java_package():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'success': False, 'msg': '未选择文件'}), 400
-    
-    # 检查文件格式
     allowed_extensions = {'.tar.gz', '.tgz', '.zip'}
     file_ext = os.path.splitext(file.filename)[1].lower()
     if file.filename.endswith('.tar.gz'):
         file_ext = '.tar.gz'
-    
     if file_ext not in allowed_extensions:
         return jsonify({'success': False, 'msg': '只支持.tar.gz、.tgz或.zip格式的文件'}), 400
-    
-    # 保存文件
-    save_path = os.path.join(UPLOAD_FOLDER, f'java-uploaded{file_ext}')
-    file.save(save_path)
-    return jsonify({'success': True, 'msg': '上传成功', 'path': save_path})
+    # 直接流式转发到远程服务器
+    hostname = request.form.get('hostname')
+    username = request.form.get('username')
+    password = request.form.get('password')
+    if not (hostname and username and password):
+        return jsonify({'success': False, 'msg': '缺少目标服务器信息'}), 400
+    try:
+        import paramiko
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname, username=username, password=password)
+        sftp = ssh.open_sftp()
+        # 保证文件名和用户上传一致
+        remote_path = f"/tmp/{file.filename}"
+        with sftp.file(remote_path, 'wb') as f_remote:
+            while True:
+                chunk = file.stream.read(4096)
+                if not chunk:
+                    break
+                f_remote.write(chunk)
+        sftp.close()
+        ssh.close()
+        return jsonify({'success': True, 'msg': '上传成功', 'remote_path': remote_path})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': f'上传失败: {e}'}), 500
 
 @app.route('/api/scan_hosts', methods=['POST'])
 def scan_hosts():
