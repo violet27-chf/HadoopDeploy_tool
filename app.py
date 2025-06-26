@@ -763,6 +763,9 @@ def api_deploy_auto_status():
 def index():
     return render_template('index.html')
 
+@app.route("/deploy/start")
+def start():
+    return render_template('start.html')
 
 @app.route('/deploy/method')
 def deploy_method():

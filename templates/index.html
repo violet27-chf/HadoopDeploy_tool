@@ -1,29 +1,130 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>HadoopDeploy Tool - 一键部署Hadoop集群</title>
+  <meta name="viewport" content="width=1440">
+  <link rel="stylesheet" href="../static/css/style.css">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <!-- Three.js CDN -->
+  <script src="../static/js/three.min.js"></script>
+</head>
+<body>
+  <!-- 顶部导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-logo">
+      <img src="{{ url_for('static', filename='assets/hadoop-logo.svg') }}" alt="Hadoop Logo" height="40">
+      <span>HadoopDeploy Tool</span>
+    </div>
+    <ul class="navbar-menu">
+      <li><a href="#features">功能介绍</a></li>
+      <li><a href="#process">部署流程</a></li>
+      <li><a href="#advantages">优势亮点</a></li>
+    </ul>
+  </nav>
 
-{% block title %}Hadoop多服务器部署{% endblock %}
+  <!-- 主视觉区 -->
+  <section class="hero">
+    <div class="hero-3d" id="three-canvas"></div>
+    <div class="hero-text">
+      <h1>一键部署Hadoop集群，极致简洁，极速上云</h1>
+      <p>One-Click Hadoop Cluster Deployment, Minimal & Lightning Fast</p>
+      <div class="hero-btns">
+        <a href="{{ url_for('start') }}" class="btn-primary">立即体验</a>
+        <a href="https://github.com/violet27-chf/HadoopDeploy_tool" target="_blank" class="btn-outline">GitHub</a>
+      </div>
+    </div>
+  </section>
 
-{% block extra_css %}
-<link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-<link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap-icons.css') }}" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
-{% endblock %}
+  <!-- 核心功能区 -->
+  <section class="features" id="features">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>全自动/半自动/手动部署</h3>
+      <p>灵活适配不同用户需求，支持一键或自定义部署流程。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔑</div>
+      <h3>SSH免密互信</h3>
+      <p>自动分发密钥，节点间无密码通信，安全高效。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <h3>Web可视化</h3>
+      <p>全流程进度、日志、集群Web UI直达，部署透明可控。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📦</div>
+      <h3>自定义包上传</h3>
+      <p>支持Hadoop/Java安装包自定义上传，满足特殊需求。</p>
+    </div>
+  </section>
 
-{% block content %}
-<div class="home-hero text-center py-5 mb-4 bg-light rounded shadow-sm">
-    <h1 class="display-4 mb-3 fw-bold">Hadoop 多服务器自动化部署</h1>
-    <p class="lead mb-4">一站式集群部署、配置与管理平台，支持全自动、半自动、手动多种模式，助力高效运维。</p>
-    <a href="{{ url_for('documentation') }}" class="btn btn-primary btn-lg me-2"><i class="bi bi-journal-text me-1"></i> 查看文档</a>
-    <a href="{{ url_for('about') }}" class="btn btn-outline-secondary btn-lg"><i class="bi bi-info-circle me-1"></i> 关于项目</a>
-</div>
-<hr class="my-4">
-<div class="mb-4 text-center">
-    <h2 class="h4 mb-3">快速开始</h2>
-    <p class="text-muted">填写服务器信息，立即体验高效的 Hadoop 集群部署</p>
-</div>
-{% include 'components/server_form.html' %}
-<div id="results" class="mt-4"></div>
-{% endblock %}
+  <!-- 部署流程可视化 -->
+  <section class="process" id="process">
+    <h2>部署流程</h2>
+    <div class="process-steps">
+      <div class="process-step"><span>1</span><p>环境检测</p></div>
+      <div class="process-line"></div>
+      <div class="process-step"><span>2</span><p>依赖安装</p></div>
+      <div class="process-line"></div>
+      <div class="process-step"><span>3</span><p>软件下载</p></div>
+      <div class="process-line"></div>
+      <div class="process-step"><span>4</span><p>配置生成</p></div>
+      <div class="process-line"></div>
+      <div class="process-step"><span>5</span><p>服务启动</p></div>
+      <div class="process-line"></div>
+      <div class="process-step"><span>6</span><p>验证测试</p></div>
+    </div>
+  </section>
 
-{% block extra_js %}
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-{% endblock %}
+  <!-- 优势亮点区 -->
+  <section class="advantages" id="advantages">
+    <div class="advantage-card">
+      <div class="advantage-icon">💡</div>
+      <h4>极简体验</h4>
+      <p>苹果官网级极简美学，操作零负担。</p>
+    </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">🖥️</div>
+      <h4>跨平台支持</h4>
+      <p>兼容Windows与Linux，企业级稳定性。</p>
+    </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">🧩</div>
+      <h4>模块化设计</h4>
+      <p>易于扩展和二次开发，满足多样需求。</p>
+    </div>
+  </section>
+
+  <!-- FAQ区 -->
+  <section class="faq" id="faq">
+    <h2>常见问题</h2>
+    <div class="faq-list">
+      <details>
+        <summary>如何激活虚拟环境？</summary>
+        <p>Windows: venv\Scripts\activate<br>Linux: source venv/bin/activate</p>
+      </details>
+      <details>
+        <summary>依赖安装失败怎么办？</summary>
+        <p>升级pip，或使用国内镜像源：<br>pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/</p>
+      </details>
+      <details>
+        <summary>端口被占用如何处理？</summary>
+        <p>使用 netstat -ano | findstr :5000 查找占用进程，或修改app.py端口。</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- 底部 -->
+  <footer class="footer">
+    <div>
+      <a href="https://github.com/violet27-chf/HadoopDeploy_tool" target="_blank">GitHub</a> | 
+      <span>邮箱：violet@kami666.xyz</span>
+    </div>
+    <div>© 2025 HadoopDeploy Tool</div>
+  </footer>
+
+  <script src="../static/js/main.js"></script>
+</body>
+</html> 
