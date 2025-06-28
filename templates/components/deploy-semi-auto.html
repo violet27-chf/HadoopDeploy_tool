@@ -12,6 +12,11 @@
                     <h3 class="mb-0">半自动Hadoop集群配置</h3>
                 </div>
                 <div class="card-body p-4">
+                    <div class="mb-3 d-flex justify-content-end">
+                        <button class="btn btn-outline-primary" id="btnConfigYum" onclick="showConfigYumModal()">
+                            <i class="bi bi-gear"></i> 配置yum源
+                        </button>
+                    </div>
                     <div class="alert alert-warning d-flex align-items-center mb-4">
                         <i class="bi bi-exclamation-triangle me-2 fs-4"></i>
                         <div><strong>半自动模式：</strong>系统将完成基础配置，允许您自定义关键参数。</div>
@@ -202,6 +207,27 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="yumModal" tabindex="-1" aria-labelledby="yumModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="yumModalLabel">配置yum源</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <div class="alert alert-info mb-0">将自动对所有已配置服务器批量操作，无需手动输入服务器信息。</div>
+        </div>
+        <div id="yumProgressArea" class="mt-3" style="min-height:2.5em;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="configYumRepo()">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -261,27 +287,47 @@ function validateConfig() {
 
 document.getElementById('semiAutoForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    // 收集表单数据
+    // 校验主节点地址不能为空
     const form = e.target;
+    if (!form.namenodeHost.value || form.namenodeHost.value.trim() === '') {
+        alert('主节点地址不能为空，请填写主节点IP或主机名！');
+        form.namenodeHost.focus();
+        return;
+    }
+    // 收集表单数据
     const config = {
-        hadoopVersion: form.hadoopVersion.value,
-        javaVersion: form.javaVersion.value,
-        namenodeHost: form.namenodeHost.value,
-        datanodeCount: form.datanodeCount.value,
-        replicationFactor: form.replicationFactor.value,
-        mapReduceMemory: form.mapReduceMemory.value,
-        yarnMemory: form.yarnMemory.value,
-        mapReduceCores: form.mapReduceCores.value,
-        yarnCores: form.yarnCores.value,
-        installHive: form.installHive.checked,
-        installHBase: form.installHBase.checked,
-        installSpark: form.installSpark.checked,
-        installZooKeeper: form.installZooKeeper.checked,
-        installKafka: form.installKafka.checked,
-        installPig: form.installPig.checked,
-        hadoopHome: form.hadoopHome.value,
-        dataDir: form.dataDir.value,
-        additionalConfig: form.additionalConfig.value
+        basic: {
+            hadoopVersion: form.hadoopVersion.value,
+            javaVersion: form.javaVersion.value,
+            namenodeHost: form.namenodeHost.value,
+            hadoopHome: form.hadoopHome.value,
+            dataDir: form.dataDir.value
+        },
+        cluster: {
+            datanodeCount: form.datanodeCount.value,
+            replicationFactor: form.replicationFactor.value,
+            mapReduceMemory: form.mapReduceMemory.value,
+            yarnMemory: form.yarnMemory.value,
+            mapReduceCores: form.mapReduceCores.value,
+            yarnCores: form.yarnCores.value
+        },
+        performance: {
+            performanceTuning: form.performanceTuning ? form.performanceTuning.value : '',
+            heapSize: form.heapSize ? form.heapSize.value : '',
+            gcThreads: form.gcThreads ? form.gcThreads.value : ''
+        },
+        components: {
+            installHive: form.installHive.checked,
+            installHBase: form.installHBase.checked,
+            installSpark: form.installSpark.checked,
+            installZooKeeper: form.installZooKeeper.checked,
+            installKafka: form.installKafka.checked,
+            installPig: form.installPig.checked
+        },
+        advanced: {
+            additionalConfig: form.additionalConfig ? form.additionalConfig.value : '',
+            customXml: form.customXml ? form.customXml.value : ''
+        }
     };
     sessionStorage.setItem('semiAutoConfig', JSON.stringify(config));
     window.location.href = '/deploy/semi-auto/progress';
@@ -393,6 +439,53 @@ function uploadJavaPackage() {
     }).catch(() => {
         statusDiv.textContent = '上传失败，请重试';
         statusDiv.className = 'form-text text-danger';
+    });
+}
+
+function showConfigYumModal() {
+    document.getElementById('yumProgressArea').innerHTML = '';
+    var modal = new bootstrap.Modal(document.getElementById('yumModal'));
+    modal.show();
+}
+
+function configYumRepo() {
+    // 这里假设你有服务器信息（如sessionStorage.serverConfig），可根据实际情况调整
+    let servers = [];
+    try {
+        servers = JSON.parse(sessionStorage.getItem('serverConfig') || '[]');
+    } catch (e) {}
+    if (!servers.length) {
+        document.getElementById('yumProgressArea').innerHTML = '<div class="alert alert-danger">未获取到服务器信息，请先填写并保存服务器配置！</div>';
+        return;
+    }
+    document.getElementById('yumProgressArea').innerHTML = '<div class="text-info">正在批量配置yum源，请稍候...</div>';
+    fetch('/api/yum/configure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ servers })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            let html = '<div class="alert alert-success">所有服务器yum源配置成功！</div>';
+            html += '<ul class="list-group mt-2">';
+            data.results.forEach(r => {
+                html += `<li class="list-group-item list-group-item-success">${r.host}：${r.msg}</li>`;
+            });
+            html += '</ul>';
+            document.getElementById('yumProgressArea').innerHTML = html;
+        } else {
+            let html = '<div class="alert alert-danger">部分服务器配置失败：</div>';
+            html += '<ul class="list-group mt-2">';
+            data.results.forEach(r => {
+                html += `<li class="list-group-item ${r.success ? 'list-group-item-success' : 'list-group-item-danger'}">${r.host}：${r.msg}</li>`;
+            });
+            html += '</ul>';
+            document.getElementById('yumProgressArea').innerHTML = html;
+        }
+    })
+    .catch(err => {
+        document.getElementById('yumProgressArea').innerHTML = '<div class="alert alert-danger">请求失败：' + err + '</div>';
     });
 }
 </script>

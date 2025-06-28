@@ -23,6 +23,134 @@
     </ul>
   </nav>
 
+  <!-- 重要提示横幅 -->
+  <div class="notice-banner">
+    <div class="notice-content">
+      <span class="notice-icon">🔗</span>
+      <span class="notice-text">
+        <strong>重要提示：</strong>如需公网部署，请使用 
+        <a href="https://www.chmlfrp.cn/" target="_blank" class="notice-link">ChmlFrp</a> 
+        配置本地虚拟机22端口映射服务
+      </span>
+    </div>
+  </div>
+
+  <!-- 侧边栏ChmlFrp教程 -->
+  <div class="sidebar-guide" style="position:absolute;top:120px;left:20px;width:280px;max-height:70vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(33,150,243,0.06);border:1px solid rgba(33,150,243,0.1);z-index:5;padding:20px;display:none;font-family:'PingFang SC', 'Roboto', Arial, sans-serif;">
+    <h3 style="color:#2196F3;font-size:16px;font-weight:700;margin-bottom:12px;margin-top:0;">🌐 ChmlFrp端口映射教程 <span style="font-size:11px;color:#666;font-weight:500;">（公网部署必看）</span></h3>
+    <ol style="font-size:13px;line-height:1.5;margin:0;padding-left:16px;color:#222;">
+      <li style="margin-bottom:6px;"><b>注册账号：</b>访问 <a href="https://www.chmlfrp.cn/" target="_blank" style="color:#2196F3;font-weight:600;text-decoration:none;">ChmlFrp官网</a></li>
+      <li style="margin-bottom:6px;"><b>下载客户端：</b>选择对应系统版本</li>
+      <li style="margin-bottom:6px;"><b>创建隧道：</b>配置参数：
+        <ul style="margin:3px 0;padding-left:12px;">
+          <li>本地IP：虚拟机内网IP</li>
+          <li>本地端口：<span style="color:#2196F3;font-weight:600;">22</span></li>
+          <li>隧道类型：<span style="color:#2196F3;font-weight:600;">TCP</span></li>
+          <li>远程端口：自动分配或自定义</li>
+          <li>中转节点：选择延迟低的节点</li>
+        </ul>
+      </li>
+      <li style="margin-bottom:6px;"><b>下载配置：</b>获取 <code style="background:#e3f2fd;padding:1px 4px;border-radius:3px;font-size:11px;color:#1976d2;">frpc.ini</code></li>
+      <li style="margin-bottom:6px;"><b>启动客户端：</b><br><code style="background:#e3f2fd;padding:1px 4px;border-radius:3px;font-size:11px;color:#1976d2;">frpc.exe -c frpc.ini</code></li>
+      <li style="margin-bottom:6px;"><b>公网连接：</b><br><code style="background:#e3f2fd;padding:1px 4px;border-radius:3px;font-size:11px;color:#1976d2;">ssh 用户名@公网IP -p 端口</code></li>
+    </ol>
+    
+    <!-- 高级配置 -->
+    <div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:10px;border-left:3px solid #2196F3;">
+      <h4 style="color:#2196F3;font-size:14px;font-weight:600;margin:0 0 8px 0;">⚙️ 高级配置</h4>
+      <ul style="font-size:12px;line-height:1.4;margin:0;padding-left:12px;color:#222;">
+        <li style="margin-bottom:4px;">• 设置开机自启动</li>
+        <li style="margin-bottom:4px;">• 配置多个隧道</li>
+        <li style="margin-bottom:4px;">• 设置访问控制</li>
+      </ul>
+    </div>
+    
+    <div style="margin-top:12px;font-size:11px;color:#666;border-top:1px solid rgba(33,150,243,0.1);padding-top:8px;">
+      <b style="color:#2196F3;">注意事项：</b>
+      <ul style="margin:3px 0;padding-left:12px;">
+        <li>检查防火墙和端口占用</li>
+        <li>选择延迟低的中转节点</li>
+        <li>更多帮助：<a href="https://docs.chcat.cn/docs/chmlfrp/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/tutorial" target="_blank" style="color:#2196F3;text-decoration:none;">官方文档</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 右侧部署方式对比 -->
+  <div class="deployment-comparison" style="position:absolute;top:120px;right:20px;width:280px;max-height:70vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(33,150,243,0.06);border:1px solid rgba(33,150,243,0.1);z-index:5;padding:20px;display:none;font-family:'PingFang SC', 'Roboto', Arial, sans-serif;">
+    <h3 style="color:#2196F3;font-size:16px;font-weight:700;margin-bottom:16px;margin-top:0;text-align:center;">🚀 部署方式对比</h3>
+    
+    <!-- 本地部署 -->
+    <div style="margin-bottom:16px;padding:12px;background:#f8f9fa;border-radius:10px;border-left:3px solid #2196F3;">
+      <h4 style="color:#2196F3;font-size:14px;font-weight:600;margin:0 0 8px 0;">💻 本地部署</h4>
+      <ul style="font-size:12px;line-height:1.4;margin:0;padding-left:12px;color:#222;">
+        <li style="margin-bottom:4px;">✅ 无需端口映射，直接访问</li>
+        <li style="margin-bottom:4px;">✅ 网络延迟低，响应速度快</li>
+        <li style="margin-bottom:4px;">✅ 功能完整，体验最佳</li>
+        <li style="margin-bottom:4px;">✅ 支持所有部署模式</li>
+        <li style="margin-bottom:4px;">✅ 实时日志和进度监控</li>
+        <li style="margin-bottom:4px;">✅ 集群Web UI直达</li>
+      </ul>
+      <div style="margin-top:8px;font-size:11px;color:#666;">
+        <strong>适用场景：</strong>内网环境、开发测试、学习体验
+      </div>
+    </div>
+
+    <!-- 公网部署 -->
+    <div style="margin-bottom:16px;padding:12px;background:#fff3e0;border-radius:10px;border-left:3px solid #ff9800;">
+      <h4 style="color:#f57c00;font-size:14px;font-weight:600;margin:0 0 8px 0;">🌐 公网部署</h4>
+      <ul style="font-size:12px;line-height:1.4;margin:0;padding-left:12px;color:#222;">
+        <li style="margin-bottom:4px;">🔧 需要配置端口映射</li>
+        <li style="margin-bottom:4px;">🔧 网络延迟相对较高</li>
+        <li style="margin-bottom:4px;">🔧 功能可能受限</li>
+        <li style="margin-bottom:4px;">🔧 需要稳定的网络连接</li>
+        <li style="margin-bottom:4px;">🔧 依赖第三方服务</li>
+        <li style="margin-bottom:4px;">🔧 可能存在安全风险</li>
+      </ul>
+      <div style="margin-top:8px;font-size:11px;color:#666;">
+        <strong>适用场景：</strong>远程部署、演示展示、临时使用
+      </div>
+    </div>
+
+    <!-- 推荐建议 -->
+    <div style="margin-top:16px;padding:10px;background:#e8f5e8;border-radius:6px;border-left:3px solid #4caf50;">
+      <div style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:4px;">💡 推荐建议</div>
+      <div style="font-size:11px;color:#388e3c;line-height:1.3;">
+        优先选择本地部署体验完整功能，公网部署适合远程场景。本地部署提供更稳定、更快速、更安全的部署体验。
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* 响应式设计 */
+    @media (min-width: 1200px) {
+      .sidebar-guide, .deployment-comparison {
+        display: block !important;
+      }
+    }
+    
+    @media (max-width: 1199px) and (min-width: 768px) {
+      .sidebar-guide, .deployment-comparison {
+        display: block !important;
+        position: absolute !important;
+        top: 120px !important;
+        width: 260px !important;
+        font-size: 12px !important;
+      }
+      .sidebar-guide {
+        left: 20px !important;
+      }
+      .deployment-comparison {
+        right: 20px !important;
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .sidebar-guide, .deployment-comparison {
+        display: none !important;
+      }
+    }
+  </style>
+
   <!-- 主视觉区 -->
   <section class="hero">
     <div class="hero-3d" id="three-canvas"></div>
@@ -112,6 +240,19 @@
       <details>
         <summary>端口被占用如何处理？</summary>
         <p>使用 netstat -ano | findstr :5000 查找占用进程，或修改app.py端口。</p>
+      </details>
+      <details>
+        <summary>如何在frp中配置端口映射服务？</summary>
+        <p>推荐使用 <a href="https://www.chmlfrp.cn/" target="_blank">ChmlFrp</a> 进行端口映射配置：<br><br>
+        <strong>步骤1：</strong> 访问 <a href="https://www.chmlfrp.cn/" target="_blank">ChmlFrp官网</a> 注册账号<br>
+        <strong>步骤2：</strong> 下载适合您操作系统的客户端程序<br>
+        <strong>步骤3：</strong> 在管理面板创建隧道，配置如下：<br>
+        • 本地IP：您的虚拟机IP地址<br>
+        • 本地端口：22（SSH端口）<br>
+        • 隧道类型：TCP<br>
+        • 选择合适的中转节点<br><br>
+        <strong>步骤4：</strong> 获取配置文件并启动frp客户端<br><br>
+        配置完成后，您就可以通过公网IP和分配的端口号SSH连接到您的虚拟机了。</p>
       </details>
     </div>
   </section>

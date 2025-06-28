@@ -350,5 +350,21 @@ function configYumRepo() {
         progressArea.innerHTML = '<div class="text-danger">请求失败: ' + err + '</div>';
     });
 }
+
+// 实时日志自动刷新
+function fetchLog() {
+  fetch('/api/log')
+    .then(res => res.text())
+    .then(log => {
+      const logPre = document.getElementById('logContent');
+      logPre.textContent = log;
+      // 自动滚动到底部（滚动 log-card 容器）
+      const logCard = logPre.parentElement;
+      if (logCard) {
+        logCard.scrollTop = logCard.scrollHeight;
+      }
+    });
+}
+setInterval(fetchLog, 1000); // 每秒刷新一次
 </script>
 {% endblock %} 

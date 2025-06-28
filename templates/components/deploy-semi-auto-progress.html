@@ -115,6 +115,13 @@
                             </div>
                         </div>
                     </div>
+                    <!-- 部署日志 -->
+                    <div id="deployLogs" class="mb-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-terminal-split me-2"></i>部署日志</h5>
+                        <div class="log-card bg-dark text-light p-3 rounded shadow-sm border border-2 border-warning" style="max-height: 320px; overflow-y: auto; font-size:1.08rem;">
+                            <pre id="logContent" class="mb-0 text-light" style="font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace; letter-spacing: 0.5px;">等待开始部署...</pre>
+                        </div>
+                    </div>
 
                     <!-- 用户确认区域 -->
                     <div id="userConfirmation" class="mb-4" style="display: none;">
@@ -151,6 +158,7 @@
 {% block extra_js %}
 <script>
 let deployInProgress = false;
+let logTimer = null;
 
 function goBack() {
     window.location.href = '/deploy/semiAutoConfig';
@@ -160,16 +168,26 @@ function loadConfigSummary() {
     const config = sessionStorage.getItem('semiAutoConfig');
     if (config) {
         const configData = JSON.parse(config);
-        document.getElementById('hadoopVersion').textContent = configData.hadoopVersion || '-';
-        document.getElementById('javaVersion').textContent = configData.javaVersion || '-';
-        document.getElementById('namenodeHost').textContent = configData.namenodeHost || '-';
-        document.getElementById('datanodeCount').textContent = configData.datanodeCount || '-';
-        document.getElementById('replicationFactor').textContent = configData.replicationFactor || '-';
-        document.getElementById('mapReduceMemory').textContent = (configData.mapReduceMemory || '-') + ' MB';
+        // 兼容嵌套结构
+        const basic = configData.basic || {};
+        const cluster = configData.cluster || {};
+        document.getElementById('hadoopVersion').textContent = basic.hadoopVersion || '-';
+        document.getElementById('javaVersion').textContent = basic.javaVersion || '-';
+        document.getElementById('namenodeHost').textContent = basic.namenodeHost || '-';
+        document.getElementById('datanodeCount').textContent = cluster.datanodeCount || '-';
+        document.getElementById('replicationFactor').textContent = cluster.replicationFactor || '-';
+        document.getElementById('mapReduceMemory').textContent = (cluster.mapReduceMemory || '-') + ' MB';
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 校验服务器信息是否存在
+    const serverConfig = sessionStorage.getItem('serverConfig');
+    if (!serverConfig || serverConfig === '[]') {
+        alert('未找到服务器配置信息，请先填写服务器信息！');
+        window.location.href = '/deploy/start';
+        return;
+    }
     loadConfigSummary();
 });
 
@@ -185,16 +203,31 @@ function updateSteps(steps) {
             statusClass = '';
         } else if (status === 'doing') {
             statusText = '进行中...';
-            statusClass = 'active border-warning';
+            statusClass = 'list-group-item-info';
         } else if (status === 'done') {
-            statusText = '已完成';
+            statusText = '完成';
             statusClass = 'list-group-item-success';
         } else if (status === 'error') {
             statusText = '失败';
             statusClass = 'list-group-item-danger';
         }
+        // 状态文字
         stepDiv.querySelector('small').textContent = statusText;
+        // 高亮当前步骤
         stepDiv.className = 'list-group-item list-group-item-action ' + statusClass;
+        // 失败时显示错误信息
+        let errorMsg = steps[i].errorMsg || '';
+        let errorDiv = stepDiv.querySelector('.step-error');
+        if (status === 'error' && errorMsg) {
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'step-error text-danger mt-1';
+                stepDiv.appendChild(errorDiv);
+            }
+            errorDiv.textContent = errorMsg;
+        } else if (errorDiv) {
+            errorDiv.remove();
+        }
     }
 }
 
@@ -204,17 +237,19 @@ function startSemiAutoDeploy() {
     document.getElementById('startDeploy').disabled = true;
     document.getElementById('startDeploy').innerHTML = '<i class="bi bi-hourglass-split me-2"></i>部署中...';
     // 获取配置
-    const config = sessionStorage.getItem('semiAutoConfig');
-    if (!config) {
-        alert('未找到配置信息');
-        return;
-    }
+    const config = JSON.parse(sessionStorage.getItem('semiAutoConfig') || '{}');
+    // 读取服务器信息并合并
+    const servers = JSON.parse(sessionStorage.getItem('serverConfig') || '[]');
+    config.servers = servers;
     fetch('/api/deploy/semi-auto/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config: JSON.parse(config) })
+        body: JSON.stringify({ config })
     }).then(res => res.json()).then(data => {
         pollSemiAutoStatus();
+        if (!logTimer) {
+            logTimer = setInterval(fetchLog, 1000);
+        }
     }).catch(err => {
         alert('启动部署失败: ' + err.message);
     });
@@ -228,15 +263,19 @@ function pollSemiAutoStatus() {
             const progressBar = document.getElementById('progressBar');
             progressBar.style.width = (data.progress || 0) + '%';
             progressBar.textContent = (data.progress || 0) + '%';
-            document.getElementById('progressText').textContent = data.log && data.log.length > 0 ? data.log[data.log.length - 1] : '准备开始部署...';
+            // 优化进度条下方文字：下载阶段只显示"正在下载Hadoop..."，不显示详细进度
+            let lastLog = data.log && data.log.length > 0 ? data.log[data.log.length - 1] : '准备开始部署...';
+            if (lastLog.includes('下载进度')) {
+                lastLog = '正在下载Hadoop...';
+            }
+            document.getElementById('progressText').textContent = lastLog;
             // 更新步骤
             if (data.steps) {
                 updateSteps(data.steps);
             }
-            // 更新日志（可选：如有日志区域可补充）
-            // 部署完成后显示集群链接
+            // 部署完成后显示集群链接（显示在日志区下方）
             if (data.status === 'done' && data.cluster_links) {
-                let html = '<div class="alert alert-success">集群部署完成！<br>Web UI 入口：';
+                let html = '<div class="alert alert-success mt-3">集群部署完成！<br>Web UI 入口：';
                 if (data.cluster_links.NameNode) {
                     html += `<br><a href="${data.cluster_links.NameNode}" target="_blank">NameNode管理界面</a>`;
                 }
@@ -244,14 +283,28 @@ function pollSemiAutoStatus() {
                     html += `<br><a href="${data.cluster_links.ResourceManager}" target="_blank">YARN ResourceManager</a>`;
                 }
                 html += '</div>';
-                document.getElementById('progressText').innerHTML += html;
+                // 插入到日志区下方
+                const logsDiv = document.getElementById('deployLogs');
+                let old = document.getElementById('clusterLinks');
+                if (old) old.remove();
+                const div = document.createElement('div');
+                div.id = 'clusterLinks';
+                div.innerHTML = html;
+                logsDiv.appendChild(div);
                 document.getElementById('startDeploy').innerHTML = '<i class="bi bi-check-circle me-2"></i>部署完成';
                 document.getElementById('startDeploy').classList.remove('btn-warning');
                 document.getElementById('startDeploy').classList.add('btn-secondary');
+                // 部署完成后停止日志刷新
+                if (logTimer) {
+                    clearInterval(logTimer);
+                    logTimer = null;
+                }
             } else if (data.status === 'error') {
-                document.getElementById('startDeploy').innerHTML = '<i class="bi bi-x-circle me-2"></i>部署失败';
-                document.getElementById('startDeploy').classList.remove('btn-warning');
-                document.getElementById('startDeploy').classList.add('btn-danger');
+                // 部署失败也停止日志刷新
+                if (logTimer) {
+                    clearInterval(logTimer);
+                    logTimer = null;
+                }
             }
             // 继续轮询
             if (data.status === 'running' || data.status === 'idle') {
@@ -259,5 +312,64 @@ function pollSemiAutoStatus() {
             }
         });
 }
+
+// 实时日志自动刷新（仅在部署中启动）
+function fetchLog() {
+  fetch('/api/deploy/semi-auto/status')
+    .then(res => res.json())
+    .then(data => {
+      const logPre = document.getElementById('logContent');
+      if (data.log) {
+        // 过滤掉包含"下载进度"的所有行（只保留如"正在下载Hadoop..."等关键步骤）
+        const filtered = data.log.filter(line => {
+          if (line.includes('下载进度')) {
+            return false;
+          }
+          return true;
+        });
+        logPre.textContent = filtered.join('\n');
+        // 自动滚动到底部
+        const logCard = logPre.parentElement;
+        if (logCard) {
+          logCard.scrollTop = logCard.scrollHeight;
+        }
+      }
+    });
+}
 </script>
+<style>
+.log-card {
+  background: #181c24 !important;
+  color: #e6eaf3 !important;
+  border-radius: 1rem !important;
+  border: 2px solid #ffc10733 !important;
+  box-shadow: 0 4px 24px #ffc10711 !important;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
+  font-size: 1.08rem;
+  padding: 1.2rem 1rem;
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 0;
+}
+.log-card pre {
+  background: transparent !important;
+  color: #e6eaf3 !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 0;
+  font-size: 1.08rem;
+  letter-spacing: 0.5px;
+}
+.log-card::-webkit-scrollbar {
+  width: 8px;
+  background: #23272e;
+}
+.log-card::-webkit-scrollbar-thumb {
+  background: #3a3f4b;
+  border-radius: 4px;
+}
+@media (max-width: 768px) {
+  .log-card { font-size: 0.95rem; padding: 0.7rem 0.5rem; }
+}
+</style>
 {% endblock %} 

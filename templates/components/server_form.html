@@ -47,13 +47,51 @@
                         <i class="bi bi-cpu-fill text-primary fs-5 me-2"></i>
                         <h5 class="mb-0">服务器 #1</h5>
                     </div>
+                    
+                    <!-- 连接方式选择 -->
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">服务器地址</label>
+                        <label class="form-label fw-semibold">连接方式</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="connection_type_1" id="local_1" value="local" checked>
+                            <label class="btn btn-outline-primary" for="local_1">
+                                <i class="bi bi-house me-1"></i>内网连接
+                            </label>
+                            <input type="radio" class="btn-check" name="connection_type_1" id="public_1" value="public">
+                            <label class="btn btn-outline-success" for="public_1">
+                                <i class="bi bi-globe me-1"></i>公网连接
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 公网IP（公网连接时显示） -->
+                    <div class="mb-3" id="public_ip_field_1" style="display: none;">
+                        <label class="form-label fw-semibold">公网IP</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-globe"></i></span>
+                            <input type="text" class="form-control form-control-lg" name="public_ip[]" placeholder="如 123.123.123.123" style="border-radius:.5rem;">
+                        </div>
+                        <small class="form-text text-muted">通过frp映射的公网IP</small>
+                    </div>
+                    
+                    <!-- 服务器地址（内网IP） -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">服务器地址（内网IP）</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-pc-display"></i></span>
                             <input type="text" class="form-control form-control-lg" name="hostname[]" placeholder="如 192.168.1.100" required style="border-radius:.5rem;">
                         </div>
                     </div>
+                    
+                    <!-- 公网端口（公网连接时显示） -->
+                    <div class="mb-3" id="port_field_1" style="display: none;">
+                        <label class="form-label fw-semibold">公网端口</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-arrow-left-right"></i></span>
+                            <input type="number" class="form-control form-control-lg" name="port[]" placeholder="如 22222" min="1" max="65535" style="border-radius:.5rem;">
+                        </div>
+                        <small class="form-text text-muted">通过frp映射的端口号</small>
+                    </div>
+                    
                     <div class="mb-3">
                         <label class="form-label fw-semibold">用户名</label>
                         <div class="input-group">
@@ -72,7 +110,7 @@
             </div>
             <hr class="my-4" style="opacity:.12;">
             <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mt-2">
-                <button type="button" class="btn btn-gradient-blue btn-lg px-4 shadow-sm" style="border-radius:2rem;transition:all .15s;" onmouseover="this.classList.add('btn-primary','text-white')" onmouseout="this.classList.remove('btn-primary','text-white')" onclick="addServer()">
+                <button type="button" class="btn btn-gradient-blue btn-lg px-4 shadow-sm" style="border-radius:2rem;transition:all .15s;" onmouseover="this.classList.add('btn-primary','text-white')" onmouseout="this.classList.remove('btn-primary','text-white')" onclick="delayedAddServer()">
                     <i class="bi bi-plus-circle me-1"></i> 添加服务器
                 </button>
                 <button type="button" class="btn btn-gradient-green btn-lg px-5 shadow-sm" style="border-radius:2rem;transition:all .15s;" onmouseover="this.classList.add('btn-success','text-white')" onmouseout="this.classList.remove('btn-success','text-white')" onclick="saveAndRedirect()">
@@ -91,6 +129,118 @@
 if (typeof window.serverCount === 'undefined') {
     window.serverCount = 1;
 }
+
+// 全局变量，记录当前选择的连接方式
+window.currentConnectionType = 'local';
+
+// 连接方式切换函数
+function toggleConnectionType(serverIndex) {
+    const portField = document.getElementById(`port_field_${serverIndex}`);
+    const publicIpField = document.getElementById(`public_ip_field_${serverIndex}`);
+    const localRadio = document.getElementById(`local_${serverIndex}`);
+    const hostnameInput = document.querySelector(`#serverList .server-item:nth-child(${serverIndex}) input[name="hostname[]"]`);
+    
+    if (localRadio.checked) {
+        portField.style.display = 'none';
+        if (publicIpField) publicIpField.style.display = 'none';
+        hostnameInput.placeholder = '如 192.168.1.100';
+    } else {
+        portField.style.display = 'block';
+        if (publicIpField) publicIpField.style.display = 'block';
+        hostnameInput.placeholder = '如 192.168.1.100（内网IP）';
+    }
+
+    // 新增：如果是第一个服务器，切换时同步所有服务器端口配置显示
+    if (serverIndex === 1) {
+        for (let i = 2; i <= window.serverCount; i++) {
+            const pf = document.getElementById(`port_field_${i}`);
+            const lr = document.getElementById(`local_${i}`);
+            const hi = document.querySelector(`#serverList .server-item:nth-child(${i}) input[name="hostname[]"]`);
+            if (pf && lr && hi) {
+                if (localRadio.checked) {
+                    pf.style.display = 'none';
+                    hi.placeholder = '如 192.168.1.100';
+                    lr.checked = true;
+                } else {
+                    pf.style.display = 'block';
+                    hi.placeholder = '如 192.168.1.100（内网IP）';
+                    lr.checked = false;
+                    const pr = document.getElementById(`public_${i}`);
+                    if (pr) pr.checked = true;
+                }
+            }
+        }
+    }
+}
+
+// 同步连接方式到所有服务器
+function syncConnectionType(connectionType) {
+    for (let i = 1; i <= window.serverCount; i++) {
+        const localRadio = document.getElementById(`local_${i}`);
+        const publicRadio = document.getElementById(`public_${i}`);
+        
+        if (localRadio && publicRadio) {
+            if (connectionType === 'local') {
+                localRadio.checked = true;
+                publicRadio.checked = false;
+            } else {
+                localRadio.checked = false;
+                publicRadio.checked = true;
+            }
+            toggleConnectionType(i);
+        }
+    }
+}
+
+// 为第一个服务器添加事件监听
+document.addEventListener('DOMContentLoaded', function() {
+    const localRadio1 = document.getElementById('local_1');
+    const publicRadio1 = document.getElementById('public_1');
+    
+    if (localRadio1 && publicRadio1) {
+        localRadio1.addEventListener('change', () => {
+            toggleConnectionType(1);
+            if (window.serverCount > 1) {
+                if (confirm('是否将内网连接方式同步到所有服务器？')) {
+                    syncConnectionType('local');
+                }
+            }
+        });
+        publicRadio1.addEventListener('change', () => {
+            toggleConnectionType(1);
+            if (window.serverCount > 1) {
+                if (confirm('是否将公网连接方式同步到所有服务器？')) {
+                    syncConnectionType('public');
+                }
+            }
+        });
+    }
+
+    // 新增：监听第一个服务器连接方式按钮组的label点击，强制同步input的checked状态
+    const localLabel1 = document.querySelector('label[for="local_1"]');
+    const publicLabel1 = document.querySelector('label[for="public_1"]');
+    if (localLabel1) {
+        localLabel1.addEventListener('click', function() {
+            window.currentConnectionType = 'local';
+        });
+    }
+    if (publicLabel1) {
+        publicLabel1.addEventListener('click', function() {
+            window.currentConnectionType = 'public';
+        });
+    }
+
+    // 新增：监听公网连接按钮的label点击，延迟刷新checked状态
+    const publicLabel1Delay = document.querySelector('label[for="public_1"]');
+    if (publicLabel1Delay) {
+        publicLabel1Delay.addEventListener('click', function() {
+            setTimeout(() => {
+                // 这里可以做一些状态刷新或提示，也可留空
+            }, 80); // 80ms，确保checked状态已更新
+        });
+    }
+});
+
 function saveAndRedirect() {
     const form = document.getElementById('serverForm');
     if (!form.checkValidity()) {
@@ -103,13 +253,41 @@ function saveAndRedirect() {
     const hostnames = formData.getAll('hostname[]');
     const usernames = formData.getAll('username[]');
     const passwords = formData.getAll('password[]');
+    const ports = formData.getAll('port[]');
+    const publicIps = formData.getAll('public_ip[]');
+    const connectionTypes = [];
+    
+    // 获取所有连接方式
+    for (let i = 1; i <= window.serverCount; i++) {
+        const localRadio = document.getElementById(`local_${i}`);
+        connectionTypes.push(localRadio ? (localRadio.checked ? 'local' : 'public') : 'local');
+    }
+    
     for (let i = 0; i < hostnames.length; i++) {
-        servers.push({ hostname: hostnames[i], username: usernames[i], password: passwords[i] });
+        servers.push({ 
+            hostname: hostnames[i], 
+            username: usernames[i], 
+            password: passwords[i],
+            port: ports[i] || '22',
+            public_ip: publicIps[i] || '',
+            connectionType: connectionTypes[i] || 'local'
+        });
     }
     sessionStorage.setItem('serverConfig', JSON.stringify(servers));
     window.location.href = '/deploy/method';
 }
-function addServer() {
+
+function delayedAddServer() {
+    setTimeout(() => {
+        if (window.currentConnectionType === 'public') {
+            addPublicServer();
+        } else {
+            addLocalServer();
+        }
+    }, 80);
+}
+
+function addLocalServer() {
     window.serverCount++;
     const serverList = document.getElementById('serverList');
     const newServer = document.createElement('div');
@@ -121,11 +299,36 @@ function addServer() {
             <h5 class="mb-0">服务器 #${window.serverCount}</h5>
         </div>
         <div class="mb-3">
-            <label class="form-label fw-semibold">服务器地址</label>
+            <label class="form-label fw-semibold">连接方式</label>
+            <div class="btn-group w-100" role="group">
+                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="local_${window.serverCount}" value="local" checked>
+                <label class="btn btn-outline-primary" for="local_${window.serverCount}"><i class="bi bi-house me-1"></i>内网连接</label>
+                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="public_${window.serverCount}" value="public">
+                <label class="btn btn-outline-success" for="public_${window.serverCount}"><i class="bi bi-globe me-1"></i>公网连接</label>
+            </div>
+        </div>
+        <div class="mb-3" id="public_ip_field_${window.serverCount}" style="display: none;">
+            <label class="form-label fw-semibold">公网IP</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-globe"></i></span>
+                <input type="text" class="form-control form-control-lg" name="public_ip[]" placeholder="如 123.123.123.123" style="border-radius:.5rem;">
+            </div>
+            <small class="form-text text-muted">通过frp映射的公网IP</small>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">服务器地址（内网IP）</label>
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="bi bi-pc-display"></i></span>
                 <input type="text" class="form-control form-control-lg" name="hostname[]" placeholder="如 192.168.1.100" required style="border-radius:.5rem;">
             </div>
+        </div>
+        <div class="mb-3" id="port_field_${window.serverCount}" style="display: none;">
+            <label class="form-label fw-semibold">公网端口</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-arrow-left-right"></i></span>
+                <input type="number" class="form-control form-control-lg" name="port[]" placeholder="如 22222" min="1" max="65535" style="border-radius:.5rem;">
+            </div>
+            <small class="form-text text-muted">通过frp映射的端口号</small>
         </div>
         <div class="mb-3">
             <label class="form-label fw-semibold">用户名</label>
@@ -141,22 +344,105 @@ function addServer() {
                 <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
             </div>
         </div>
-        <button type="button" class="btn btn-sm btn-danger px-3 position-absolute top-0 end-0 mt-3 me-3 shadow-sm" style="border-radius:1.2rem;transition:all .15s;z-index:2;" onmouseover="this.classList.add('btn-outline-danger','bg-white','text-danger')" onmouseout="this.classList.remove('btn-outline-danger','bg-white','text-danger')" onclick="removeServer(this)">
-            <i class="bi bi-trash"></i> 移除
-        </button>
+        <div class="d-flex gap-2">
+            <label class="btn btn-outline-primary" for="local_${window.serverCount}" id="label_local_${window.serverCount}">
+                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="local_${window.serverCount}" value="local" hidden>
+                <i class="bi bi-house me-1"></i>内网连接
+            </label>
+            <label class="btn btn-outline-success" for="public_${window.serverCount}" id="label_public_${window.serverCount}">
+                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="public_${window.serverCount}" value="public" checked hidden>
+                <i class="bi bi-globe me-1"></i>公网连接
+            </label>
+        </div>
     `;
     serverList.appendChild(newServer);
+    bindServerLabelEvents(window.serverCount);
 }
-function removeServer(button) {
-    if (window.serverCount > 1) {
-        button.closest('.server-item').remove();
-        window.serverCount--;
-        const items = document.querySelectorAll('.server-item');
-        items.forEach((item, index) => {
-            item.querySelector('h5').textContent = `服务器 #${index + 1}`;
+
+function addPublicServer() {
+    window.serverCount++;
+    const serverList = document.getElementById('serverList');
+    const newServer = document.createElement('div');
+    newServer.className = 'server-item mb-4 p-4 border-0 shadow-sm bg-white position-relative';
+    newServer.style.borderRadius = '1.2rem';
+    newServer.innerHTML = `
+        <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-cpu-fill text-primary fs-5 me-2"></i>
+            <h5 class="mb-0">服务器 #${window.serverCount}</h5>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">服务器地址</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-pc-display"></i></span>
+                <input type="text" class="form-control form-control-lg" name="hostname[]" placeholder="如 123.456.789.10" required style="border-radius:.5rem;">
+            </div>
+        </div>
+        <div class="mb-3" id="port_field_${window.serverCount}">
+            <label class="form-label fw-semibold">公网端口</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-arrow-left-right"></i></span>
+                <input type="number" class="form-control form-control-lg" name="port[]" placeholder="如 22222" min="1" max="65535" style="border-radius:.5rem;">
+            </div>
+            <small class="form-text text-muted">通过frp映射的端口号</small>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">用户名</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control form-control-lg" name="username[]" placeholder="root" required style="border-radius:.5rem;">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">密码</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <label class="btn btn-outline-primary" for="local_${window.serverCount}" id="label_local_${window.serverCount}">
+                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="local_${window.serverCount}" value="local" hidden>
+                <i class="bi bi-house me-1"></i>内网连接
+            </label>
+            <label class="btn btn-outline-success" for="public_${window.serverCount}" id="label_public_${window.serverCount}">
+                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="public_${window.serverCount}" value="public" checked hidden>
+                <i class="bi bi-globe me-1"></i>公网连接
+            </label>
+        </div>
+    `;
+    serverList.appendChild(newServer);
+    bindServerLabelEvents(window.serverCount);
+}
+
+function bindServerLabelEvents(idx) {
+    const localLabel = document.getElementById(`label_local_${idx}`);
+    const publicLabel = document.getElementById(`label_public_${idx}`);
+    const localRadio = document.getElementById(`local_${idx}`);
+    const publicRadio = document.getElementById(`public_${idx}`);
+    const portField = document.getElementById(`port_field_${idx}`);
+    const hostnameInput = document.querySelector(`#serverList .server-item:nth-child(${idx}) input[name="hostname[]"]`);
+    if (localLabel && localRadio) {
+        localLabel.addEventListener('click', function() {
+            window.currentConnectionType = 'local';
+            if (portField) portField.style.display = 'none';
+            if (hostnameInput) hostnameInput.placeholder = '如 192.168.1.100';
+            localRadio.checked = true;
+            if (publicRadio) publicRadio.checked = false;
+            if (hostnameInput) hostnameInput.focus();
+        });
+    }
+    if (publicLabel && publicRadio) {
+        publicLabel.addEventListener('click', function() {
+            window.currentConnectionType = 'public';
+            if (portField) portField.style.display = 'block';
+            if (hostnameInput) hostnameInput.placeholder = '如 192.168.1.100（内网IP）';
+            publicRadio.checked = true;
+            if (localRadio) localRadio.checked = false;
+            if (hostnameInput) hostnameInput.focus();
         });
     }
 }
+
 // nmap扫描相关
 function showScanModal() {
     document.getElementById('subnetInput').value = '';
@@ -221,8 +507,36 @@ function addScannedHost(ip) {
     addServer();
     const items = document.querySelectorAll('.server-item');
     const last = items[items.length - 1];
-    last.querySelector('input[name="hostname[]"]').value = ip;
+    const hostnameInput = last.querySelector('input[name="hostname[]"]');
+    hostnameInput.value = ip;
+    
+    // 根据IP地址判断是否为公网IP，自动设置连接方式
+    if (isPublicIP(ip)) {
+        const publicRadio = last.querySelector(`input[id^="public_"]`);
+        if (publicRadio) {
+            publicRadio.checked = true;
+            toggleConnectionType(window.serverCount);
+        }
+    }
+    
     last.querySelector('input[name="username[]"]').focus();
+}
+
+// 判断是否为公网IP的函数
+function isPublicIP(ip) {
+    // 简单的公网IP判断逻辑
+    const privateRanges = [
+        /^10\./,           // 10.0.0.0/8
+        /^172\.(1[6-9]|2[0-9]|3[0-1])\./, // 172.16.0.0/12
+        /^192\.168\./,     // 192.168.0.0/16
+        /^127\./,          // 127.0.0.0/8 (localhost)
+        /^169\.254\./,     // 169.254.0.0/16 (link-local)
+        /^0\./,            // 0.0.0.0/8
+        /^224\./,          // 224.0.0.0/4 (multicast)
+        /^240\./           // 240.0.0.0/4 (reserved)
+    ];
+    
+    return !privateRanges.some(range => range.test(ip));
 }
 </script>
 

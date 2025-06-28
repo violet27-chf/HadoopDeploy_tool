@@ -59,6 +59,142 @@
             <h2>配置说明</h2>
             <p>所有部署参数可在 Web 界面填写，支持多节点、端口、Hadoop/Java 版本、副本数等。无需手动编辑配置文件。</p>
         </section>
+        <!-- 部署方式指南 -->
+        <section class="mb-5">
+            <h2>部署方式指南</h2>
+            
+            <!-- 本地部署 -->
+            <div class="card mb-4 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0"><i class="bi bi-laptop me-2"></i>本地部署（推荐）</h3>
+                </div>
+                <div class="card-body">
+                    <h4>优势特点</h4>
+                    <ul>
+                        <li>✅ 无需端口映射，直接访问</li>
+                        <li>✅ 网络延迟低，响应速度快</li>
+                        <li>✅ 功能完整，体验最佳</li>
+                        <li>✅ 支持所有部署模式</li>
+                        <li>✅ 实时日志和进度监控</li>
+                        <li>✅ 集群Web UI直达</li>
+                    </ul>
+                    <h4>适用场景</h4>
+                    <p>内网环境、开发测试、学习体验、生产环境部署</p>
+                    <h4>快速开始</h4>
+                    <ol>
+                        <li>在本地机器上安装并启动HadoopDeploy Tool</li>
+                        <li>确保目标服务器在同一网络环境</li>
+                        <li>直接填写服务器IP地址进行部署</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 公网部署 -->
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="h5 mb-0"><i class="bi bi-globe me-2"></i>公网部署</h3>
+                </div>
+                <div class="card-body">
+                    <h4>特点说明</h4>
+                    <ul>
+                        <li>🔧 需要配置端口映射</li>
+                        <li>🔧 网络延迟相对较高</li>
+                        <li>🔧 功能可能受限</li>
+                        <li>🔧 需要稳定的网络连接</li>
+                        <li>🔧 依赖第三方服务</li>
+                        <li>🔧 可能存在安全风险</li>
+                    </ul>
+                    <h4>适用场景</h4>
+                    <p>远程部署、演示展示、临时使用</p>
+                    
+                    <h4>ChmlFrp端口映射配置</h4>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>推荐使用：</strong><a href="https://www.chmlfrp.cn/" target="_blank" class="alert-link">ChmlFrp</a> 进行端口映射配置
+                    </div>
+                    
+                    <h5>配置步骤</h5>
+                    <ol>
+                        <li><strong>注册账号：</strong>访问 <a href="https://www.chmlfrp.cn/" target="_blank">ChmlFrp官网</a> 并注册账号</li>
+                        <li><strong>下载客户端：</strong>在"客户端下载"页面选择与您操作系统匹配的版本（Windows/Linux/Mac）</li>
+                        <li><strong>创建隧道：</strong>登录管理面板，点击"添加隧道"，填写如下参数：
+                            <ul>
+                                <li>本地IP：虚拟机的内网IP地址</li>
+                                <li>本地端口：22（SSH端口）</li>
+                                <li>隧道类型：TCP</li>
+                                <li>远程端口：自动分配或自定义</li>
+                                <li>中转节点：选择延迟低的节点</li>
+                            </ul>
+                        </li>
+                        <li><strong>下载配置文件：</strong>在隧道详情页下载 <code>frpc.ini</code> 配置文件</li>
+                        <li><strong>启动客户端：</strong>将 <code>frpc.exe</code>（或 <code>frpc</code>）与 <code>frpc.ini</code> 放在同一目录，命令行运行：
+                            <br><code>frpc.exe -c frpc.ini</code>
+                        </li>
+                        <li><strong>公网SSH连接：</strong>使用分配的公网IP和端口，示例：
+                            <br><code>ssh 用户名@公网IP -p 分配端口</code>
+                        </li>
+                    </ol>
+
+                    <h5>高级配置</h5>
+                    <ul>
+                        <li>设置开机自启动</li>
+                        <li>配置多个隧道</li>
+                        <li>设置访问控制</li>
+                    </ul>
+
+                    <h5>故障排查</h5>
+                    <ul>
+                        <li>检查防火墙设置</li>
+                        <li>验证端口占用情况</li>
+                        <li>确认网络连接状态</li>
+                        <li>查看客户端日志</li>
+                    </ul>
+
+                    <h5>注意事项</h5>
+                    <ul>
+                        <li>务必保证本地22端口未被占用，且虚拟机网络为桥接或能被宿主机访问</li>
+                        <li>建议优先选择延迟低的中转节点，提升连接速度</li>
+                        <li>如需映射Web端口（如5000），可新建隧道，端口填写5000</li>
+                        <li>更多帮助请参考 <a href="https://docs.chcat.cn/docs/chmlfrp/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/tutorial" target="_blank">官方帮助文档</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 部署方式对比 -->
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h3 class="h5 mb-0"><i class="bi bi-bar-chart me-2"></i>部署方式对比</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="text-primary">本地部署</h4>
+                            <ul class="list-unstyled">
+                                <li>✅ 无需端口映射，直接访问</li>
+                                <li>✅ 网络延迟低，响应速度快</li>
+                                <li>✅ 功能完整，体验最佳</li>
+                                <li>✅ 支持所有部署模式</li>
+                            </ul>
+                            <p class="text-muted"><strong>适用场景：</strong>内网环境、开发测试</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="text-warning">公网部署</h4>
+                            <ul class="list-unstyled">
+                                <li>🔧 需要配置端口映射</li>
+                                <li>🔧 网络延迟相对较高</li>
+                                <li>🔧 功能可能受限</li>
+                                <li>🔧 需要稳定的网络连接</li>
+                            </ul>
+                            <p class="text-muted"><strong>适用场景：</strong>远程部署、演示展示</p>
+                        </div>
+                    </div>
+                    <div class="alert alert-success mt-3">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        <strong>推荐建议：</strong>优先选择本地部署体验完整功能，公网部署适合远程场景。本地部署提供更稳定、更快速、更安全的部署体验。
+                    </div>
+                </div>
+            </div>
+        </section>
         <!-- 常见问题 -->
         <section class="mb-5">
             <h2>常见问题</h2>

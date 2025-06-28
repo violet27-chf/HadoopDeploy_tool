@@ -19,6 +19,24 @@
 <div class="mb-4 text-center">
     <h2 class="h4 mb-3">快速开始</h2>
     <p class="text-muted">填写服务器信息，立即体验高效的 Hadoop 集群部署</p>
+    
+    <!-- 在线部署提示 -->
+    <div class="alert alert-info border-0 shadow-sm mx-auto" style="max-width: 600px; border-radius: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="bi bi-globe fs-3 text-primary"></i>
+            </div>
+            <div class="text-start">
+                <h6 class="mb-1 fw-bold text-primary">
+                    <i class="bi bi-lightbulb me-1"></i>在线部署提示
+                </h6>
+                <p class="mb-0 text-muted">
+                    如需进行<span class="fw-bold text-primary">在线部署</span>，请在服务器配置中选择<span class="fw-bold text-success">公网连接</span>模式，
+                    并填写通过 <a href="https://www.chmlfrp.cn/" target="_blank" class="text-decoration-none fw-bold">ChmlFrp</a> 映射的公网IP和端口号。
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 {% include 'components/server_form.html' %}
 <div id="results" class="mt-4"></div>
