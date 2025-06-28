@@ -1,110 +1,655 @@
-body {
+/* 全局样式重置 */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  min-width: 320px;
+}
+
+body {
   font-family: 'PingFang SC', 'Roboto', Arial, sans-serif;
   background: #fff;
   color: #222;
+  line-height: 1.6;
+  position: relative;
+  min-height: 100vh;
 }
-.navbar {
+
+/* 确保所有容器都不会超出视口宽度 */
+.container, .wrapper, .main-content {
   width: 100%;
-  height: 64px;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* 开发者工具打开时的修复 */
+@media screen and (max-width: 1200px) {
+  /* 当开发者工具打开时，确保侧边栏不会重叠 */
+  .sidebar-guide, .deployment-comparison {
+    position: absolute;
+    top: 140px;
+    max-height: 50vh; /* 减少高度避免重叠 */
+    z-index: 10; /* 确保层级正确 */
+  }
+  
+  .sidebar-guide {
+    left: 10px;
+    width: 260px;
+  }
+  
+  .deployment-comparison {
+    right: 10px;
+    width: 260px;
+  }
+  
+  /* 调整hero区域 */
+  .hero {
+    height: 650px;
+    min-height: 550px;
+    padding: 0 20px;
+  }
+  
+  /* 确保导航栏和提示横幅不受影响 */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .notice-banner {
+    position: relative;
+    z-index: 999;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  /* 防止内容溢出 */
+  .features, .process, .advantages, .faq {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  /* 更小屏幕时的进一步调整 */
+  .sidebar-guide, .deployment-comparison {
+    width: 240px;
+    top: 130px;
+    max-height: 45vh;
+    padding: 16px;
+  }
+  
+  .sidebar-guide {
+    left: 8px;
+  }
+  
+  .deployment-comparison {
+    right: 8px;
+  }
+  
+  .hero {
+    height: 600px;
+    min-height: 500px;
+    padding: 0 16px;
+  }
+  
+  .hero-3d {
+    width: 380px;
+    height: 380px;
+    margin-right: 40px;
+  }
+  
+  .hero-text {
+    max-width: 480px;
+  }
+  
+  /* 调整其他区域 */
+  .features {
+    padding: 48px 20px;
+    gap: 24px;
+  }
+  
+  .advantages {
+    padding: 40px 20px;
+    gap: 20px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  /* 开发者工具打开时的临界点 */
+  .sidebar-guide, .deployment-comparison {
+    display: none; /* 隐藏侧边栏避免重叠 */
+  }
+  
+  .hero {
+    height: 550px;
+    min-height: 450px;
+    padding: 0 12px;
+  }
+  
+  .hero-3d {
+    width: 340px;
+    height: 340px;
+    margin-right: 30px;
+  }
+  
+  .hero-text h1 {
+    font-size: 32px;
+  }
+  
+  .hero-text p {
+    font-size: 18px;
+  }
+  
+  /* 调整按钮大小 */
+  .btn-primary, .btn-outline {
+    padding: 10px 24px;
+    font-size: 16px;
+  }
+  
+  /* 调整功能区域 */
+  .features {
+    padding: 40px 16px;
+    gap: 20px;
+  }
+  
+  .feature-card {
+    padding: 24px 16px;
+  }
+  
+  .advantages {
+    padding: 32px 16px;
+    gap: 16px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  /* 开发者工具打开时的进一步调整 */
+  .hero {
+    flex-direction: column;
+    height: auto;
+    min-height: 500px;
+    padding: 40px 16px;
+    text-align: center;
+  }
+  
+  .hero-3d {
+    width: 320px;
+    height: 320px;
+    margin-right: 0;
+    margin-bottom: 30px;
+    order: 1;
+  }
+  
+  .hero-text {
+    order: 2;
+    max-width: 100%;
+  }
+  
+  .hero-btns {
+    order: 3;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  /* 调整网格布局 */
+  .features {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 32px 16px;
+  }
+  
+  .advantages {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 32px 16px;
+  }
+  
+  /* 显示侧边栏作为页面内容 */
+  .sidebar-guide, .deployment-comparison {
+    display: block;
+    position: static;
+    width: 100%;
+    max-height: none;
+    margin: 20px 0;
+  }
+  
+  .sidebar-guide {
+    order: 4;
+  }
+  
+  .deployment-comparison {
+    order: 5;
+  }
+}
+
+/* 防止开发者工具导致的水平滚动 */
+@media screen and (max-width: 1200px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .navbar, .notice-banner, .hero, .features, .process, .advantages, .faq, .footer {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  
+  /* 确保所有绝对定位元素不会超出视口 */
+  .sidebar-guide, .deployment-comparison {
+    max-width: calc(100vw - 20px);
+  }
+}
+
+/* 开发者工具打开时的z-index层级管理 */
+@media screen and (max-width: 1200px) {
+  .navbar {
+    z-index: 1000;
+  }
+  
+  .notice-banner {
+    z-index: 999;
+  }
+  
+  .sidebar-guide, .deployment-comparison {
+    z-index: 10;
+  }
+  
+  .hero-3d {
+    z-index: 1;
+  }
+  
+  /* 确保下拉菜单在最上层 */
+  .navbar-menu.active {
+    z-index: 1001;
+  }
+}
+
+/* 开发者工具打开时的额外修复 */
+@media screen and (max-width: 1200px) and (max-height: 800px) {
+  /* 当屏幕高度较小时的特殊处理 */
+  .hero {
+    height: 500px;
+    min-height: 400px;
+    padding: 20px;
+  }
+  
+  .hero-3d {
+    width: 300px;
+    height: 300px;
+    margin-right: 20px;
+  }
+  
+  .hero-text h1 {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  
+  .hero-text p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .btn-primary, .btn-outline {
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+  
+  /* 调整侧边栏位置 */
+  .sidebar-guide, .deployment-comparison {
+    top: 120px;
+    max-height: 40vh;
+  }
+}
+
+/* 防止开发者工具导致的布局问题 */
+@media screen and (max-width: 1200px) {
+  /* 确保所有容器都有正确的盒模型 */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  /* 防止文本溢出 */
+  .hero-text h1, .hero-text p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
+  /* 确保按钮不会超出容器 */
+  .hero-btns {
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  
+  /* 防止3D模型溢出 */
+  .hero-3d {
+    overflow: hidden;
+    border-radius: 32px;
+  }
+  
+  .hero-3d canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  
+  /* 确保功能区域正确显示 */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 40px 20px;
+  }
+  
+  .feature-card {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  /* 确保优势区域正确显示 */
+  .advantages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 40px 20px;
+  }
+  
+  .advantage-card {
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* 开发者工具打开时的移动端适配 */
+@media screen and (max-width: 800px) and (max-height: 600px) {
+  .hero {
+    height: auto;
+    min-height: 400px;
+    padding: 20px 16px;
+  }
+  
+  .hero-3d {
+    width: 280px;
+    height: 280px;
+    margin-bottom: 20px;
+  }
+  
+  .hero-text h1 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  
+  .hero-text p {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .btn-primary, .btn-outline {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-width: 100px;
+  }
+  
+  /* 调整功能区域 */
+  .features {
+    padding: 24px 16px;
+    gap: 16px;
+  }
+  
+  .feature-card {
+    padding: 20px 16px;
+    min-height: 160px;
+  }
+  
+  .feature-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+  
+  .feature-card h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .feature-card p {
+    font-size: 13px;
+  }
+  
+  /* 调整优势区域 */
+  .advantages {
+    padding: 24px 16px;
+    gap: 16px;
+  }
+  
+  .advantage-card {
+    padding: 20px 16px;
+    min-height: 140px;
+  }
+  
+  .advantage-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  
+  .advantage-card h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .advantage-card p {
+    font-size: 12px;
+  }
+}
+
+/* 确保在开发者工具打开时所有交互元素都能正常工作 */
+@media screen and (max-width: 1200px) {
+  /* 确保按钮有足够的点击区域 */
+  .btn-primary, .btn-outline {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  /* 确保链接有足够的点击区域 */
+  .navbar-menu a, .notice-link, .sidebar-guide a, .deployment-comparison a {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  /* 确保下拉菜单正确显示 */
+  .navbar-menu.active {
+    display: flex;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    flex-direction: column;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 0 0 12px 12px;
+    z-index: 1001;
+  }
+  
+  /* 确保滚动条样式正确 */
+  .sidebar-guide, .deployment-comparison {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(33, 150, 243, 0.3) transparent;
+  }
+  
+  .sidebar-guide::-webkit-scrollbar, .deployment-comparison::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar-guide::-webkit-scrollbar-track, .deployment-comparison::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .sidebar-guide::-webkit-scrollbar-thumb, .deployment-comparison::-webkit-scrollbar-thumb {
+    background: rgba(33, 150, 243, 0.3);
+    border-radius: 3px;
+  }
+  
+  .sidebar-guide::-webkit-scrollbar-thumb:hover, .deployment-comparison::-webkit-scrollbar-thumb:hover {
+    background: rgba(33, 150, 243, 0.5);
+  }
+}
+
+/* 导航栏样式 */
+.navbar {
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding: 0 32px;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(33,150,243,0.04);
-  padding: 0 48px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 1000;
+  height: 64px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow: hidden;
 }
 .navbar-logo {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-.navbar-logo span {
-  font-size: 24px;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 20px;
   color: #2196F3;
-  letter-spacing: 1px;
+  text-decoration: none;
+}
+.navbar-logo img {
+  height: 40px;
 }
 .navbar-menu {
   display: flex;
-  gap: 32px;
   list-style: none;
   margin: 0;
   padding: 0;
-  margin-left: 32px;
+  gap: 32px;
 }
 .navbar-menu li a {
+  color: #333;
   text-decoration: none;
-  color: #222;
-  font-size: 18px;
-  transition: color 0.2s;
-  padding-bottom: 4px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 .navbar-menu li a:hover {
   color: #2196F3;
-  border-bottom: 2px solid #2196F3;
+  background: rgba(33, 150, 243, 0.1);
+}
+
+/* 移动端菜单按钮 - 默认隐藏 */
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+.navbar-toggle:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+.navbar-toggle span {
+  width: 25px;
+  height: 3px;
+  background: #2196F3;
+  margin: 3px 0;
+  transition: 0.3s ease;
+  border-radius: 2px;
 }
 
 /* 重要提示横幅样式 */
 .notice-banner {
-  width: 100%;
   background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
-  padding: 12px 0;
+  padding: 12px 32px;
   box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
   position: relative;
-  z-index: 9;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow: hidden;
 }
-
 .notice-content {
-  max-width: 1200px;
-  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 0 48px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
 }
-
 .notice-icon {
-  font-size: 20px;
-  animation: pulse 2s infinite;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
 }
-
 .notice-text {
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   text-align: center;
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
-
 .notice-link {
   color: #fff;
   text-decoration: underline;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: opacity 0.3s ease;
+  word-break: break-all;
 }
-
 .notice-link:hover {
-  color: #FFE0B2;
-  text-decoration: none;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  opacity: 0.8;
 }
 
 .hero {
   width: 100%;
-  height: 600px;
+  height: 700px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #fff;
   position: relative;
+  min-height: 600px;
 }
 .hero-3d {
   width: 420px;
@@ -113,6 +658,12 @@ body {
   background: transparent;
   border-radius: 32px;
   box-shadow: 0 8px 32px rgba(33,150,243,0.08);
+}
+.hero-3d canvas {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 32px;
+  display: block;
 }
 .hero-text {
   max-width: 520px;
@@ -131,6 +682,7 @@ body {
 .hero-btns {
   display: flex;
   gap: 16px;
+  justify-content: flex-start;
 }
 .btn-primary, .btn-outline {
   display: inline-block;
@@ -159,15 +711,15 @@ body {
 }
 
 .features {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
   background: #F5F5F5;
-  padding: 64px 0;
+  padding: 64px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .feature-card {
-  width: 280px;
-  height: 200px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(33,150,243,0.06);
@@ -176,6 +728,7 @@ body {
   align-items: center;
   padding: 32px 20px;
   transition: box-shadow 0.2s, transform 0.2s;
+  min-height: 200px;
 }
 .feature-card:hover {
   box-shadow: 0 8px 32px rgba(33,150,243,0.12);
@@ -189,12 +742,14 @@ body {
   font-size: 20px;
   color: #2196F3;
   margin: 0 0 8px 0;
+  text-align: center;
 }
 .feature-card p {
   font-size: 16px;
   color: #666;
   margin: 0;
   text-align: center;
+  line-height: 1.5;
 }
 
 .process {
@@ -246,14 +801,15 @@ body {
 }
 
 .advantages {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
   background: #F5F5F5;
-  padding: 48px 0;
+  padding: 48px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .advantage-card {
-  width: 260px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(33,150,243,0.06);
@@ -261,6 +817,12 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 28px 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(33, 150, 243, 0.1);
+}
+.advantage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(33,150,243,0.12);
 }
 .advantage-icon {
   font-size: 36px;
@@ -270,12 +832,14 @@ body {
   font-size: 18px;
   color: #2196F3;
   margin: 0 0 8px 0;
+  font-weight: 600;
 }
 .advantage-card p {
   font-size: 14px;
   color: #666;
   margin: 0;
   text-align: center;
+  line-height: 1.5;
 }
 
 .faq {
@@ -324,4 +888,677 @@ body {
 }
 .footer a:hover {
   text-decoration: underline;
+}
+
+/* 优势亮点区域响应式样式 */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0 24px;
+  }
+  
+  .navbar-logo span {
+    font-size: 18px;
+  }
+  
+  .navbar-logo img {
+    height: 36px;
+  }
+  
+  .navbar-menu {
+    gap: 24px;
+  }
+  
+  .notice-banner {
+    padding: 12px 24px;
+  }
+  
+  .notice-content {
+    gap: 12px;
+  }
+  
+  .notice-text {
+    font-size: 14px;
+  }
+  
+  .hero-btns {
+    justify-content: center;
+  }
+  
+  .advantages {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 40px 24px;
+  }
+  
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 48px 24px;
+  }
+  
+  .hero-3d {
+    width: 360px;
+    height: 360px;
+    margin-right: 40px;
+  }
+  
+  .hero-3d canvas {
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 防止水平滚动 */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .navbar {
+    padding: 0 16px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .navbar-logo span {
+    font-size: 16px;
+  }
+  
+  .navbar-logo img {
+    height: 32px;
+  }
+  
+  /* 显示移动端菜单按钮 */
+  .navbar-toggle {
+    display: flex;
+  }
+  
+  .navbar-menu {
+    display: none;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    flex-direction: column;
+    gap: 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px 0;
+    border-radius: 0 0 12px 12px;
+    z-index: 1000;
+    box-sizing: border-box;
+    max-width: 100vw;
+  }
+  
+  .navbar-menu.active {
+    display: flex;
+  }
+  
+  .navbar-menu li {
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .navbar-menu li:last-child {
+    border-bottom: none;
+  }
+  
+  .navbar-menu a {
+    display: block;
+    padding: 8px 16px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-menu a:hover {
+    color: #2196F3;
+  }
+  
+  .notice-banner {
+    padding: 10px 16px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .notice-content {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .notice-text {
+    font-size: 13px;
+    line-height: 1.4;
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
+  .notice-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  
+  .hero {
+    flex-direction: column;
+    height: auto;
+    min-height: 500px;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  
+  .hero-3d {
+    width: 320px;
+    height: 320px;
+    margin-right: 0;
+    margin-bottom: 40px;
+    order: 1;
+  }
+  
+  .hero-3d canvas {
+    border-radius: 20px;
+  }
+  
+  .hero-text {
+    order: 2;
+    max-width: 100%;
+  }
+  
+  .hero-btns {
+    order: 3;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .btn-primary, .btn-outline {
+    padding: 10px 28px;
+    font-size: 16px;
+    min-width: 120px;
+  }
+  
+  .advantages {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 32px 16px;
+  }
+  
+  .advantage-card {
+    padding: 24px 16px;
+  }
+  
+  .advantage-icon {
+    font-size: 32px;
+  }
+  
+  .advantage-card h4 {
+    font-size: 16px;
+  }
+  
+  .advantage-card p {
+    font-size: 14px;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 32px 16px;
+  }
+  
+  .feature-card {
+    padding: 24px 16px;
+    min-height: 180px;
+  }
+  
+  .feature-icon {
+    font-size: 36px;
+  }
+  
+  .feature-card h3 {
+    font-size: 18px;
+  }
+  
+  .feature-card p {
+    font-size: 14px;
+  }
+  
+  .sidebar-guide, .deployment-comparison {
+    position: static;
+    width: 100%;
+    max-height: none;
+    margin: 20px 0;
+    display: block;
+  }
+  
+  .sidebar-guide {
+    order: 4;
+  }
+  
+  .deployment-comparison {
+    order: 5;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 防止水平滚动 */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .navbar {
+    padding: 0 12px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .navbar-logo span {
+    font-size: 14px;
+  }
+  
+  .navbar-logo img {
+    height: 28px;
+  }
+  
+  .notice-banner {
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .notice-content {
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .notice-text {
+    font-size: 12px;
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
+  .notice-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  
+  .hero-btns {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .btn-primary, .btn-outline {
+    width: 100%;
+    max-width: 280px;
+    padding: 12px 24px;
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .hero-3d {
+    width: 280px;
+    height: 280px;
+    margin-bottom: 24px;
+  }
+  
+  .hero-3d canvas {
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  /* 防止水平滚动 */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .navbar {
+    padding: 0 8px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .navbar-logo span {
+    font-size: 12px;
+  }
+  
+  .navbar-logo img {
+    height: 24px;
+  }
+  
+  .notice-banner {
+    padding: 6px 8px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .notice-content {
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .notice-text {
+    font-size: 11px;
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
+  .notice-icon {
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  
+  .hero-btns {
+    gap: 10px;
+  }
+  
+  .btn-primary, .btn-outline {
+    max-width: 240px;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .hero-3d {
+    width: 240px;
+    height: 240px;
+    margin-bottom: 20px;
+  }
+  
+  .hero-3d canvas {
+    border-radius: 12px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .navbar {
+    padding: 0 48px;
+  }
+  
+  .navbar-logo span {
+    font-size: 22px;
+  }
+  
+  .navbar-logo img {
+    height: 44px;
+  }
+  
+  .notice-banner {
+    padding: 16px 48px;
+  }
+  
+  .notice-text {
+    font-size: 16px;
+  }
+  
+  .notice-icon {
+    font-size: 20px;
+  }
+  
+  .hero-btns {
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .btn-primary, .btn-outline {
+    padding: 14px 40px;
+    font-size: 20px;
+  }
+  
+  .advantages {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    max-width: 1400px;
+  }
+  
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    max-width: 1400px;
+  }
+  
+  .hero-3d {
+    width: 480px;
+    height: 480px;
+    margin-right: 80px;
+  }
+  
+  .hero-3d canvas {
+    border-radius: 40px;
+  }
+}
+
+/* 侧边栏样式 */
+.sidebar-guide, .deployment-comparison {
+  position: absolute;
+  top: 140px; /* 调整位置，避免与提示横幅重叠 */
+  width: 280px;
+  max-height: 60vh; /* 减少高度，确保在hero区域内 */
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.06);
+  border: 1px solid rgba(33,150,243,0.1);
+  z-index: 5;
+  padding: 20px;
+  display: block; /* 默认显示 */
+  font-family: 'PingFang SC', 'Roboto', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.sidebar-guide {
+  left: 20px;
+}
+
+.deployment-comparison {
+  right: 20px;
+}
+
+/* 侧边栏内容样式 */
+.sidebar-guide h3, .deployment-comparison h3 {
+  color: #2196F3;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  margin-top: 0;
+  text-align: center;
+}
+
+.sidebar-guide h3 {
+  margin-bottom: 12px;
+}
+
+.sidebar-guide ol, .sidebar-guide ul, .deployment-comparison ul {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 16px;
+  color: #222;
+}
+
+.sidebar-guide li, .deployment-comparison li {
+  margin-bottom: 6px;
+}
+
+.sidebar-guide a, .deployment-comparison a {
+  color: #2196F3;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sidebar-guide a:hover, .deployment-comparison a:hover {
+  text-decoration: underline;
+}
+
+.sidebar-guide code, .deployment-comparison code {
+  background: #e3f2fd;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: #1976d2;
+}
+
+/* 侧边栏卡片样式 */
+.sidebar-guide .config-card, .deployment-comparison .deploy-card {
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  border-left: 3px solid;
+}
+
+.sidebar-guide .config-card {
+  background: #f8f9fa;
+  border-left-color: #2196F3;
+}
+
+.deployment-comparison .local-deploy {
+  background: #f8f9fa;
+  border-left-color: #2196F3;
+}
+
+.deployment-comparison .public-deploy {
+  background: #fff3e0;
+  border-left-color: #ff9800;
+}
+
+.deployment-comparison .recommendation {
+  background: #e8f5e8;
+  border-left-color: #4caf50;
+  margin-top: 16px;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+/* 侧边栏标题样式 */
+.sidebar-guide h4, .deployment-comparison h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.sidebar-guide .config-card h4 {
+  color: #2196F3;
+}
+
+.deployment-comparison .local-deploy h4 {
+  color: #2196F3;
+}
+
+.deployment-comparison .public-deploy h4 {
+  color: #f57c00;
+}
+
+/* 侧边栏列表样式 */
+.sidebar-guide .config-card ul, .deployment-comparison ul {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+  padding-left: 12px;
+  color: #222;
+}
+
+.sidebar-guide .config-card li, .deployment-comparison li {
+  margin-bottom: 4px;
+}
+
+/* 侧边栏底部样式 */
+.sidebar-guide .notice-section {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #666;
+  border-top: 1px solid rgba(33,150,243,0.1);
+  padding-top: 8px;
+}
+
+.sidebar-guide .notice-section b {
+  color: #2196F3;
+}
+
+.sidebar-guide .notice-section ul {
+  margin: 3px 0;
+  padding-left: 12px;
+}
+
+/* 侧边栏响应式样式 */
+@media (max-width: 1200px) {
+  .sidebar-guide, .deployment-comparison {
+    width: 260px;
+    top: 130px;
+    max-height: 55vh;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar-guide, .deployment-comparison {
+    width: 240px;
+    top: 125px;
+    max-height: 50vh;
+    padding: 16px;
+  }
+  
+  .sidebar-guide h3, .deployment-comparison h3 {
+    font-size: 15px;
+  }
+  
+  .sidebar-guide ol, .sidebar-guide ul, .deployment-comparison ul {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-guide, .deployment-comparison {
+    position: static;
+    width: 100%;
+    max-height: none;
+    margin: 20px 0;
+    display: block;
+  }
+  
+  .sidebar-guide {
+    order: 4;
+  }
+  
+  .deployment-comparison {
+    order: 5;
+  }
+}
+
+/* 无黑点列表样式 */
+.no-bullet {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
 } 

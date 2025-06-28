@@ -12,8 +12,10 @@
 <div class="home-hero text-center py-5 mb-4 bg-light rounded shadow-sm">
     <h1 class="display-4 mb-3 fw-bold">Hadoop 多服务器自动化部署</h1>
     <p class="lead mb-4">一站式集群部署、配置与管理平台，支持全自动、半自动、手动多种模式，助力高效运维。</p>
-    <a href="{{ url_for('documentation') }}" class="btn btn-primary btn-lg me-2"><i class="bi bi-journal-text me-1"></i> 查看文档</a>
-    <a href="{{ url_for('about') }}" class="btn btn-outline-secondary btn-lg"><i class="bi bi-info-circle me-1"></i> 关于项目</a>
+    <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+        <a href="{{ url_for('documentation') }}" class="btn btn-primary btn-lg"><i class="bi bi-journal-text me-1"></i> 查看文档</a>
+        <a href="{{ url_for('about') }}" class="btn btn-outline-secondary btn-lg"><i class="bi bi-info-circle me-1"></i> 关于项目</a>
+    </div>
 </div>
 <hr class="my-4">
 <div class="mb-4 text-center">
@@ -22,11 +24,11 @@
     
     <!-- 在线部署提示 -->
     <div class="alert alert-info border-0 shadow-sm mx-auto" style="max-width: 600px; border-radius: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);">
-        <div class="d-flex align-items-center">
-            <div class="me-3">
+        <div class="d-flex align-items-center flex-column flex-md-row">
+            <div class="me-0 me-md-3 mb-2 mb-md-0">
                 <i class="bi bi-globe fs-3 text-primary"></i>
             </div>
-            <div class="text-start">
+            <div class="text-center text-md-start">
                 <h6 class="mb-1 fw-bold text-primary">
                     <i class="bi bi-lightbulb me-1"></i>在线部署提示
                 </h6>
@@ -45,3 +47,66 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}
+
+<style>
+    /* 响应式样式 */
+    @media (max-width: 768px) {
+        .home-hero {
+            padding: 2rem 1rem !important;
+        }
+        
+        .home-hero h1 {
+            font-size: 2rem;
+        }
+        
+        .home-hero .lead {
+            font-size: 1.1rem;
+        }
+        
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .alert {
+            margin: 0 1rem;
+            padding: 1rem;
+        }
+        
+        .alert .d-flex {
+            gap: 1rem;
+        }
+        
+        .alert h6 {
+            font-size: 1rem;
+        }
+        
+        .alert p {
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .home-hero h1 {
+            font-size: 1.75rem;
+        }
+        
+        .home-hero .lead {
+            font-size: 1rem;
+        }
+        
+        .btn-lg {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            margin: 0 0.5rem;
+            padding: 0.75rem;
+        }
+        
+        .alert .bi {
+            font-size: 1.5rem !important;
+        }
+    }
+</style>

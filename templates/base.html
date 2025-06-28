@@ -2,13 +2,62 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}Hadoop部署系统{% endblock %}</title>
     <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap-icons.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* 响应式基础样式 */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            
+            .mt-4 {
+                margin-top: 1rem !important;
+            }
+            
+            .mt-5 {
+                margin-top: 1.5rem !important;
+            }
+            
+            .mb-4 {
+                margin-bottom: 1rem !important;
+            }
+            
+            .mb-5 {
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .p-4 {
+                padding: 1rem !important;
+            }
+            
+            .p-5 {
+                padding: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            
+            .mt-4 {
+                margin-top: 0.75rem !important;
+            }
+            
+            .mt-5 {
+                margin-top: 1rem !important;
+            }
+        }
+    </style>
     <!-- Bootstrap Icons
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"> -->
     </head>

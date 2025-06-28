@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>HadoopDeploy Tool - 一键部署Hadoop集群</title>
-  <meta name="viewport" content="width=1440">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="stylesheet" href="../static/css/style.css">
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
   <!-- Three.js CDN -->
@@ -20,7 +23,14 @@
       <li><a href="#features">功能介绍</a></li>
       <li><a href="#process">部署流程</a></li>
       <li><a href="#advantages">优势亮点</a></li>
+      <li><a href="#faq">常见问题</a></li>
     </ul>
+    <!-- 移动端菜单按钮，标准结构 -->
+    <div class="navbar-toggle" aria-label="切换菜单">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
   </nav>
 
   <!-- 重要提示横幅 -->
@@ -35,122 +45,6 @@
     </div>
   </div>
 
-  <!-- 侧边栏ChmlFrp教程 -->
-  <div class="sidebar-guide" style="position:absolute;top:120px;left:20px;width:280px;max-height:70vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(33,150,243,0.06);border:1px solid rgba(33,150,243,0.1);z-index:5;padding:20px;display:none;font-family:'PingFang SC', 'Roboto', Arial, sans-serif;">
-    <h3 style="color:#2196F3;font-size:16px;font-weight:700;margin-bottom:12px;margin-top:0;">🌐 ChmlFrp端口映射教程 <span style="font-size:11px;color:#666;font-weight:500;">（公网部署必看）</span></h3>
-    <ol style="font-size:13px;line-height:1.5;margin:0;padding-left:16px;color:#222;">
-      <li style="margin-bottom:6px;"><b>注册账号：</b>访问 <a href="https://www.chmlfrp.cn/" target="_blank" style="color:#2196F3;font-weight:600;text-decoration:none;">ChmlFrp官网</a></li>
-      <li style="margin-bottom:6px;"><b>下载客户端：</b>选择对应系统版本</li>
-      <li style="margin-bottom:6px;"><b>创建隧道：</b>配置参数：
-        <ul style="margin:3px 0;padding-left:12px;">
-          <li>本地IP：虚拟机内网IP</li>
-          <li>本地端口：<span style="color:#2196F3;font-weight:600;">22</span></li>
-          <li>隧道类型：<span style="color:#2196F3;font-weight:600;">TCP</span></li>
-          <li>远程端口：自动分配或自定义</li>
-          <li>中转节点：选择延迟低的节点</li>
-        </ul>
-      </li>
-      <li style="margin-bottom:6px;"><b>下载配置：</b>获取 <code style="background:#e3f2fd;padding:1px 4px;border-radius:3px;font-size:11px;color:#1976d2;">frpc.ini</code></li>
-      <li style="margin-bottom:6px;"><b>启动客户端：</b><br><code style="background:#e3f2fd;padding:1px 4px;border-radius:3px;font-size:11px;color:#1976d2;">frpc.exe -c frpc.ini</code></li>
-      <li style="margin-bottom:6px;"><b>公网连接：</b><br><code style="background:#e3f2fd;padding:1px 4px;border-radius:3px;font-size:11px;color:#1976d2;">ssh 用户名@公网IP -p 端口</code></li>
-    </ol>
-    
-    <!-- 高级配置 -->
-    <div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:10px;border-left:3px solid #2196F3;">
-      <h4 style="color:#2196F3;font-size:14px;font-weight:600;margin:0 0 8px 0;">⚙️ 高级配置</h4>
-      <ul style="font-size:12px;line-height:1.4;margin:0;padding-left:12px;color:#222;">
-        <li style="margin-bottom:4px;">• 设置开机自启动</li>
-        <li style="margin-bottom:4px;">• 配置多个隧道</li>
-        <li style="margin-bottom:4px;">• 设置访问控制</li>
-      </ul>
-    </div>
-    
-    <div style="margin-top:12px;font-size:11px;color:#666;border-top:1px solid rgba(33,150,243,0.1);padding-top:8px;">
-      <b style="color:#2196F3;">注意事项：</b>
-      <ul style="margin:3px 0;padding-left:12px;">
-        <li>检查防火墙和端口占用</li>
-        <li>选择延迟低的中转节点</li>
-        <li>更多帮助：<a href="https://docs.chcat.cn/docs/chmlfrp/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/tutorial" target="_blank" style="color:#2196F3;text-decoration:none;">官方文档</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- 右侧部署方式对比 -->
-  <div class="deployment-comparison" style="position:absolute;top:120px;right:20px;width:280px;max-height:70vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(33,150,243,0.06);border:1px solid rgba(33,150,243,0.1);z-index:5;padding:20px;display:none;font-family:'PingFang SC', 'Roboto', Arial, sans-serif;">
-    <h3 style="color:#2196F3;font-size:16px;font-weight:700;margin-bottom:16px;margin-top:0;text-align:center;">🚀 部署方式对比</h3>
-    
-    <!-- 本地部署 -->
-    <div style="margin-bottom:16px;padding:12px;background:#f8f9fa;border-radius:10px;border-left:3px solid #2196F3;">
-      <h4 style="color:#2196F3;font-size:14px;font-weight:600;margin:0 0 8px 0;">💻 本地部署</h4>
-      <ul style="font-size:12px;line-height:1.4;margin:0;padding-left:12px;color:#222;">
-        <li style="margin-bottom:4px;">✅ 无需端口映射，直接访问</li>
-        <li style="margin-bottom:4px;">✅ 网络延迟低，响应速度快</li>
-        <li style="margin-bottom:4px;">✅ 功能完整，体验最佳</li>
-        <li style="margin-bottom:4px;">✅ 支持所有部署模式</li>
-        <li style="margin-bottom:4px;">✅ 实时日志和进度监控</li>
-        <li style="margin-bottom:4px;">✅ 集群Web UI直达</li>
-      </ul>
-      <div style="margin-top:8px;font-size:11px;color:#666;">
-        <strong>适用场景：</strong>内网环境、开发测试、学习体验
-      </div>
-    </div>
-
-    <!-- 公网部署 -->
-    <div style="margin-bottom:16px;padding:12px;background:#fff3e0;border-radius:10px;border-left:3px solid #ff9800;">
-      <h4 style="color:#f57c00;font-size:14px;font-weight:600;margin:0 0 8px 0;">🌐 公网部署</h4>
-      <ul style="font-size:12px;line-height:1.4;margin:0;padding-left:12px;color:#222;">
-        <li style="margin-bottom:4px;">🔧 需要配置端口映射</li>
-        <li style="margin-bottom:4px;">🔧 网络延迟相对较高</li>
-        <li style="margin-bottom:4px;">🔧 功能可能受限</li>
-        <li style="margin-bottom:4px;">🔧 需要稳定的网络连接</li>
-        <li style="margin-bottom:4px;">🔧 依赖第三方服务</li>
-        <li style="margin-bottom:4px;">🔧 可能存在安全风险</li>
-      </ul>
-      <div style="margin-top:8px;font-size:11px;color:#666;">
-        <strong>适用场景：</strong>远程部署、演示展示、临时使用
-      </div>
-    </div>
-
-    <!-- 推荐建议 -->
-    <div style="margin-top:16px;padding:10px;background:#e8f5e8;border-radius:6px;border-left:3px solid #4caf50;">
-      <div style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:4px;">💡 推荐建议</div>
-      <div style="font-size:11px;color:#388e3c;line-height:1.3;">
-        优先选择本地部署体验完整功能，公网部署适合远程场景。本地部署提供更稳定、更快速、更安全的部署体验。
-      </div>
-    </div>
-  </div>
-
-  <style>
-    /* 响应式设计 */
-    @media (min-width: 1200px) {
-      .sidebar-guide, .deployment-comparison {
-        display: block !important;
-      }
-    }
-    
-    @media (max-width: 1199px) and (min-width: 768px) {
-      .sidebar-guide, .deployment-comparison {
-        display: block !important;
-        position: absolute !important;
-        top: 120px !important;
-        width: 260px !important;
-        font-size: 12px !important;
-      }
-      .sidebar-guide {
-        left: 20px !important;
-      }
-      .deployment-comparison {
-        right: 20px !important;
-      }
-    }
-    
-    @media (max-width: 767px) {
-      .sidebar-guide, .deployment-comparison {
-        display: none !important;
-      }
-    }
-  </style>
-
   <!-- 主视觉区 -->
   <section class="hero">
     <div class="hero-3d" id="three-canvas"></div>
@@ -163,6 +57,1214 @@
       </div>
     </div>
   </section>
+
+  <!-- 侧边栏ChmlFrp教程 -->
+  <div class="sidebar-guide">
+    <h3>🌐 ChmlFrp端口映射教程 <span style="font-size:11px;color:#666;font-weight:500;">（公网部署必看）</span></h3>
+    <ol>
+      <li><b>注册账号：</b>访问 <a href="https://www.chmlfrp.cn/" target="_blank">ChmlFrp官网</a></li>
+      <li><b>下载客户端：</b>选择对应系统版本</li>
+      <li><b>创建隧道：</b>配置参数：
+        <ul class="no-bullet">
+          <li>本地IP：虚拟机内网IP</li>
+          <li>本地端口：<span style="color:#2196F3;font-weight:600;">22</span></li>
+          <li>隧道类型：<span style="color:#2196F3;font-weight:600;">TCP</span></li>
+          <li>远程端口：自动分配或自定义</li>
+          <li>中转节点：选择延迟低的节点</li>
+        </ul>
+      </li>
+      <li><b>下载配置：</b>获取 <code>frpc.ini</code></li>
+      <li><b>启动客户端：</b><br><code>frpc.exe -c frpc.ini</code></li>
+      <li><b>公网连接：</b><br><code>ssh 用户名@公网IP -p 端口</code></li>
+    </ol>
+    
+    <div class="notice-section">
+      <b>注意事项：</b>
+      <ul class="no-bullet">
+        <li>检查防火墙和端口占用</li>
+        <li>选择延迟低的中转节点</li>
+        <li>更多帮助：<a href="https://docs.chcat.cn/docs/chmlfrp/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/tutorial" target="_blank">官方文档</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 右侧部署方式对比 -->
+  <div class="deployment-comparison">
+    <h3>🚀 部署方式对比</h3>
+    
+    <!-- 本地部署 -->
+    <div class="local-deploy">
+      <h4>💻 本地部署</h4>
+      <ul class="no-bullet">
+        <li>✅ 无需端口映射，直接访问</li>
+        <li>✅ 网络延迟低，响应速度快</li>
+        <li>✅ 功能完整，体验最佳</li>
+        <li>✅ 支持所有部署模式</li>
+        <li>✅ 实时日志和进度监控</li>
+        <li>✅ 集群Web UI直达</li>
+      </ul>
+      <div style="margin-top:8px;font-size:11px;color:#666;">
+        <strong>适用场景：</strong>内网环境、开发测试、学习体验
+      </div>
+    </div>
+
+    <!-- 公网部署 -->
+    <div class="public-deploy">
+      <h4>🌐 公网部署</h4>
+      <ul class="no-bullet">
+        <li>🔧 需要配置端口映射</li>
+        <li>🔧 网络延迟相对较高</li>
+        <li>🔧 功能可能受限</li>
+        <li>🔧 需要稳定的网络连接</li>
+        <li>🔧 依赖第三方服务</li>
+        <li>🔧 可能存在安全风险</li>
+      </ul>
+      <div style="margin-top:8px;font-size:11px;color:#666;">
+        <strong>适用场景：</strong>远程部署、演示展示、临时使用
+      </div>
+    </div>
+
+    <!-- 推荐建议 -->
+    <div class="recommendation">
+      <div style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:4px;">💡 推荐建议</div>
+      <div style="font-size:11px;color:#388e3c;line-height:1.3;">
+        优先选择本地部署体验完整功能，公网部署适合远程场景。本地部署提供更稳定、更快速、更安全的部署体验。
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* 强制竖屏显示 */
+    @media screen and (orientation: landscape) and (max-width: 768px) {
+      body {
+        transform: rotate(90deg);
+        transform-origin: left top;
+        width: 100vh;
+        height: 100vw;
+        overflow-x: hidden;
+        position: absolute;
+        top: 100%;
+        left: 0;
+      }
+      
+      /* 隐藏横屏时的内容 */
+      .hero, .features, .process, .advantages, .faq, .footer {
+        display: none !important;
+      }
+      
+      /* 显示竖屏提示 */
+      body::before {
+        content: "请旋转设备至竖屏模式以获得最佳体验";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-90deg);
+        background: rgba(33, 150, 243, 0.9);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        font-size: 16px;
+        text-align: center;
+        z-index: 9999;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      }
+    }
+    
+    /* 竖屏优化样式 */
+    @media screen and (orientation: portrait) and (max-width: 768px) {
+      /* 确保竖屏时正常显示 */
+      body {
+        transform: none;
+        width: 100%;
+        height: auto;
+        position: static;
+        top: auto;
+        left: auto;
+      }
+      
+      .hero, .features, .process, .advantages, .faq, .footer {
+        display: block !important;
+      }
+      
+      /* 优化竖屏布局 */
+      .hero {
+        min-height: 100vh;
+        padding: 20px 16px 0 16px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      }
+      
+      .hero-3d {
+        width: 280px;
+        height: 280px;
+        order: 1 !important;
+        flex-shrink: 0;
+        margin-right: 0 !important;
+        margin-bottom: 20px !important;
+      }
+      
+      .hero-3d canvas {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 16px !important;
+        display: block !important;
+      }
+      
+      .hero-text {
+        order: 2 !important;
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .hero-text h1 {
+        font-size: 24px;
+        margin-bottom: 16px;
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      
+      .hero-text p {
+        font-size: 16px;
+        margin-bottom: 24px;
+        line-height: 1.5;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      
+      .hero-btns {
+        order: 3 !important;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 20px auto;
+      }
+      
+      .btn-primary, .btn-outline {
+        width: 100%;
+        text-align: center;
+        padding: 14px 24px;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+      
+      /* 侧边栏内容竖屏优化 */
+      .sidebar-guide, .deployment-comparison {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 16px 20px 16px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 16px rgba(33,150,243,0.1) !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+      }
+      
+      .sidebar-guide {
+        left: auto !important;
+        margin-bottom: 16px !important;
+      }
+      
+      .deployment-comparison {
+        right: auto !important;
+      }
+      
+      /* 移动端侧边栏内容优化 */
+      .sidebar-guide h3, .deployment-comparison h3 {
+        font-size: 18px !important;
+        margin-bottom: 16px !important;
+        text-align: center !important;
+      }
+      
+      .sidebar-guide ol, .deployment-comparison ol {
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        padding-left: 20px !important;
+      }
+      
+      .sidebar-guide li, .deployment-comparison li {
+        margin-bottom: 8px !important;
+      }
+      
+      .sidebar-guide code, .deployment-comparison code {
+        font-size: 12px !important;
+        padding: 2px 6px !important;
+      }
+      
+      .sidebar-guide .bg-white, .deployment-comparison .bg-white {
+        padding: 12px !important;
+        margin-top: 12px !important;
+      }
+      
+      .sidebar-guide .bg-white h4, .deployment-comparison .bg-white h4 {
+        font-size: 15px !important;
+        margin-bottom: 8px !important;
+      }
+      
+      .sidebar-guide .bg-white ul, .deployment-comparison .bg-white ul {
+        font-size: 13px !important;
+        padding-left: 16px !important;
+      }
+      
+      /* 其他区域竖屏优化 */
+      .features {
+        padding: 32px 16px;
+        gap: 16px;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      
+      .feature-card {
+        width: 100%;
+        height: auto;
+        min-height: 180px;
+        padding: 24px 16px;
+        border-radius: 12px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .feature-icon {
+        font-size: 36px;
+        margin-bottom: 16px;
+      }
+      
+      .feature-card h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+      
+      .feature-card p {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      
+      .process {
+        padding: 32px 16px;
+      }
+      
+      .process h2 {
+        font-size: 24px;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      
+      .process-steps {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .process-step {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+      }
+      
+      .process-line {
+        display: none;
+      }
+      
+      .advantages {
+        padding: 32px 16px;
+        gap: 16px;
+        display: grid;
+        grid-template-columns: 1fr;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      
+      .advantage-card {
+        width: 100%;
+        padding: 20px 16px;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+        background: #fff;
+        border: 1px solid rgba(33, 150, 243, 0.1);
+        box-shadow: 0 2px 8px rgba(33, 150, 243, 0.05);
+      }
+      
+      .advantage-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(33, 150, 243, 0.1);
+      }
+      
+      .advantage-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+        display: block;
+      }
+      
+      .advantage-card h4 {
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: #2196F3;
+        font-weight: 600;
+      }
+      
+      .advantage-card p {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #666;
+        margin: 0;
+      }
+      
+      .faq {
+        padding: 32px 16px;
+      }
+      
+      .faq h2 {
+        font-size: 24px;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      
+      .faq-list details {
+        margin-bottom: 16px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .faq-list summary {
+        font-size: 16px;
+        padding: 16px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      
+      .faq-list p {
+        font-size: 14px;
+        padding: 16px;
+        line-height: 1.6;
+        background: #fff;
+      }
+      
+      .footer {
+        padding: 24px 16px;
+        text-align: center;
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+
+    /* 响应式设计 */
+    @media (min-width: 1200px) {
+      .sidebar-guide, .deployment-comparison {
+        display: block !important;
+      }
+      
+      .advantages {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        padding: 48px 32px;
+      }
+    }
+    
+    @media (max-width: 1199px) and (min-width: 768px) {
+      .sidebar-guide, .deployment-comparison {
+        display: block !important;
+        position: absolute !important;
+        top: 120px !important;
+        width: 260px !important;
+        font-size: 12px !important;
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+      }
+      .sidebar-guide {
+        left: 20px !important;
+      }
+      .deployment-comparison {
+        right: 20px !important;
+      }
+      
+      .advantages {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding: 40px 24px;
+      }
+      
+      /* 平板端侧边栏内容优化 */
+      .sidebar-guide h3, .deployment-comparison h3 {
+        font-size: 14px !important;
+        margin-bottom: 12px !important;
+      }
+      
+      .sidebar-guide ol, .deployment-comparison ol {
+        font-size: 11px !important;
+        line-height: 1.4 !important;
+        padding-left: 14px !important;
+      }
+      
+      .sidebar-guide li, .deployment-comparison li {
+        margin-bottom: 6px !important;
+      }
+      
+      .sidebar-guide code, .deployment-comparison code {
+        font-size: 10px !important;
+        padding: 1px 4px !important;
+      }
+      
+      .sidebar-guide .bg-white, .deployment-comparison .bg-white {
+        padding: 10px !important;
+        margin-top: 10px !important;
+      }
+      
+      .sidebar-guide .bg-white h4, .deployment-comparison .bg-white h4 {
+        font-size: 12px !important;
+        margin-bottom: 6px !important;
+      }
+      
+      .sidebar-guide .bg-white ul, .deployment-comparison .bg-white ul {
+        font-size: 10px !important;
+        padding-left: 12px !important;
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .sidebar-guide, .deployment-comparison {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 16px 20px 16px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 16px rgba(33,150,243,0.1) !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+      }
+      
+      .sidebar-guide {
+        left: auto !important;
+        margin-bottom: 16px !important;
+      }
+      
+      .deployment-comparison {
+        right: auto !important;
+      }
+      
+      /* 进一步优化小屏手机的主视觉区 */
+      .hero {
+        padding: 16px 12px;
+        min-height: 450px;
+        gap: 16px;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      
+      .hero-3d {
+        width: 240px;
+        height: 240px;
+        margin-bottom: 0;
+        order: 1 !important;
+        margin-right: 0 !important;
+      }
+      
+      .hero-3d canvas {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 16px !important;
+        display: block !important;
+      }
+      
+      .hero-text {
+        order: 2 !important;
+        text-align: center;
+      }
+      
+      .hero-text h1 {
+        font-size: 20px;
+        margin-bottom: 12px;
+        line-height: 1.4;
+        padding: 0 8px;
+      }
+      
+      .hero-text p {
+        font-size: 14px;
+        margin-bottom: 20px;
+        line-height: 1.5;
+        padding: 0 8px;
+      }
+      
+      .hero-btns {
+        order: 3 !important;
+        max-width: 280px;
+        gap: 10px;
+      }
+      
+      .btn-primary, .btn-outline {
+        padding: 12px 20px;
+        font-size: 15px;
+      }
+      
+      /* 移动端侧边栏内容优化 */
+      .sidebar-guide h3, .deployment-comparison h3 {
+        font-size: 18px !important;
+        margin-bottom: 16px !important;
+        text-align: center !important;
+      }
+      
+      .sidebar-guide ol, .deployment-comparison ol {
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        padding-left: 20px !important;
+      }
+      
+      .sidebar-guide li, .deployment-comparison li {
+        margin-bottom: 8px !important;
+      }
+      
+      .sidebar-guide code, .deployment-comparison code {
+        font-size: 12px !important;
+        padding: 2px 6px !important;
+      }
+      
+      .sidebar-guide .bg-white, .deployment-comparison .bg-white {
+        padding: 12px !important;
+        margin-top: 12px !important;
+      }
+      
+      .sidebar-guide .bg-white h4, .deployment-comparison .bg-white h4 {
+        font-size: 15px !important;
+        margin-bottom: 8px !important;
+      }
+      
+      .sidebar-guide .bg-white ul, .deployment-comparison .bg-white ul {
+        font-size: 13px !important;
+        padding-left: 16px !important;
+      }
+    }
+
+    /* 移动端导航栏样式 */
+    .navbar-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar-toggle:hover {
+      background-color: rgba(33, 150, 243, 0.1);
+    }
+
+    .navbar-toggle span {
+      width: 25px;
+      height: 3px;
+      background: #2196F3;
+      margin: 3px 0;
+      transition: 0.3s ease;
+      border-radius: 2px;
+    }
+
+    /* 响应式断点样式 */
+    @media (max-width: 1024px) {
+      .navbar {
+        padding: 0 24px;
+      }
+      
+      .hero {
+        height: auto;
+        min-height: 500px;
+        flex-direction: column;
+        padding: 40px 24px;
+        text-align: center;
+      }
+      
+      .hero-3d {
+        width: 320px;
+        height: 320px;
+        margin-right: 0;
+        margin-bottom: 40px;
+      }
+      
+      .hero-text h1 {
+        font-size: 28px;
+      }
+      
+      .hero-text p {
+        font-size: 18px;
+      }
+      
+      .features {
+        flex-wrap: wrap;
+        gap: 24px;
+        padding: 40px 24px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .feature-card {
+        width: 100%;
+        min-width: 280px;
+      }
+      
+      .advantages {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 40px 24px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-menu {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        flex-direction: column;
+        gap: 0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 20px 0;
+        border-radius: 0 0 12px 12px;
+        animation: slideDown 0.3s ease;
+      }
+      
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .navbar-menu.active {
+        display: flex;
+      }
+      
+      .navbar-menu li {
+        width: 100%;
+        text-align: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.3s ease;
+      }
+      
+      .navbar-menu li:hover {
+        background-color: rgba(33, 150, 243, 0.05);
+      }
+      
+      .navbar-menu li:last-child {
+        border-bottom: none;
+      }
+      
+      .navbar-menu a {
+        display: block;
+        padding: 8px 16px;
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+      
+      .navbar-menu a:hover {
+        color: #2196F3;
+      }
+      
+      .navbar-toggle {
+        display: flex;
+      }
+      
+      .notice-content {
+        padding: 0 16px;
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+      
+      .notice-text {
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      
+      .hero-3d {
+        width: 280px;
+        height: 280px;
+        margin-bottom: 0;
+        order: 1;
+        flex-shrink: 0;
+      }
+      
+      .hero-3d canvas {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 16px !important;
+        display: block !important;
+      }
+      
+      .hero-text h1 {
+        font-size: 24px;
+        margin-bottom: 16px;
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      
+      .hero-text p {
+        font-size: 16px;
+        margin-bottom: 24px;
+        line-height: 1.5;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      
+      .btn-primary, .btn-outline {
+        width: 100%;
+        text-align: center;
+        padding: 14px 24px;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-primary:hover, .btn-outline:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+      }
+      
+      .features {
+        padding: 32px 16px;
+        gap: 16px;
+      }
+      
+      .feature-card {
+        width: 100%;
+        height: auto;
+        min-height: 180px;
+        padding: 24px 16px;
+        border-radius: 12px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(33, 150, 243, 0.15);
+      }
+      
+      .feature-icon {
+        font-size: 36px;
+        margin-bottom: 16px;
+      }
+      
+      .feature-card h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+      
+      .feature-card p {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      
+      .process {
+        padding: 32px 16px;
+      }
+      
+      .process h2 {
+        font-size: 24px;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      
+      .process-steps {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .process-step {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+      }
+      
+      .process-step:hover {
+        background: #e3f2fd;
+      }
+      
+      .process-line {
+        display: none;
+      }
+      
+      .advantages {
+        padding: 32px 16px;
+        gap: 16px;
+      }
+      
+      .advantage-card {
+        width: 100%;
+        padding: 20px 16px;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+      }
+      
+      .advantage-card:hover {
+        transform: translateY(-2px);
+      }
+      
+      .faq {
+        padding: 32px 16px;
+      }
+      
+      .faq h2 {
+        font-size: 24px;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      
+      .faq-list details {
+        margin-bottom: 16px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .faq-list summary {
+        font-size: 16px;
+        padding: 16px;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      
+      .faq-list summary:hover {
+        background: #e3f2fd;
+      }
+      
+      .faq-list p {
+        font-size: 14px;
+        padding: 16px;
+        line-height: 1.6;
+        background: #fff;
+      }
+      
+      .footer {
+        padding: 24px 16px;
+        text-align: center;
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar-logo span {
+        font-size: 18px;
+      }
+      
+      .navbar-logo img {
+        height: 32px;
+      }
+      
+      /* 进一步优化小屏手机的主视觉区 */
+      .hero {
+        padding: 16px 12px;
+        min-height: 450px;
+        gap: 16px;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      
+      .hero-3d {
+        width: 240px;
+        height: 240px;
+        margin-bottom: 0;
+        order: 1 !important;
+        margin-right: 0 !important;
+      }
+      
+      .hero-3d canvas {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 16px !important;
+        display: block !important;
+      }
+      
+      .hero-text {
+        order: 2 !important;
+        text-align: center;
+      }
+      
+      .hero-btns {
+        order: 3 !important;
+      }
+      
+      /* 小屏手机侧边栏内容进一步优化 */
+      .sidebar-guide, .deployment-comparison {
+        margin: 16px 12px !important;
+        font-size: 13px !important;
+        padding: 16px !important;
+      }
+      
+      .sidebar-guide h3, .deployment-comparison h3 {
+        font-size: 16px !important;
+        margin-bottom: 12px !important;
+      }
+      
+      .sidebar-guide ol, .deployment-comparison ol {
+        font-size: 13px !important;
+        padding-left: 18px !important;
+      }
+      
+      .sidebar-guide li, .deployment-comparison li {
+        margin-bottom: 6px !important;
+      }
+      
+      .sidebar-guide code, .deployment-comparison code {
+        font-size: 11px !important;
+        padding: 1px 4px !important;
+      }
+      
+      .sidebar-guide .bg-white, .deployment-comparison .bg-white {
+        padding: 10px !important;
+        margin-top: 10px !important;
+      }
+      
+      .sidebar-guide .bg-white h4, .deployment-comparison .bg-white h4 {
+        font-size: 14px !important;
+        margin-bottom: 6px !important;
+      }
+      
+      .sidebar-guide .bg-white ul, .deployment-comparison .bg-white ul {
+        font-size: 12px !important;
+        padding-left: 14px !important;
+      }
+      
+      .feature-card {
+        min-height: 160px;
+        padding: 20px 12px;
+      }
+      
+      .feature-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+      
+      .feature-card h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      
+      .feature-card p {
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      
+      .process-step {
+        padding: 12px;
+        gap: 8px;
+      }
+      
+      .process-step span {
+        font-size: 18px;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+      }
+      
+      .process-step p {
+        font-size: 14px;
+      }
+      
+      .advantage-card {
+        padding: 16px 12px;
+      }
+      
+      .advantage-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      
+      .advantage-card h4 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      
+      .advantage-card p {
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      
+      .faq-list summary {
+        font-size: 15px;
+        padding: 12px;
+      }
+      
+      .faq-list p {
+        font-size: 13px;
+        padding: 12px;
+      }
+      
+      .notice-text {
+        font-size: 13px;
+      }
+      
+      .notice-icon {
+        font-size: 16px;
+      }
+    }
+
+    /* 超小屏手机优化 */
+    @media (max-width: 360px) {
+      .hero {
+        padding: 12px 8px;
+        min-height: 400px;
+        gap: 12px;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      
+      .hero-3d {
+        width: 200px;
+        height: 200px;
+        order: 1 !important;
+        margin-right: 0 !important;
+      }
+      
+      .hero-3d canvas {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 16px !important;
+        display: block !important;
+      }
+      
+      .hero-text {
+        order: 2 !important;
+        text-align: center;
+      }
+      
+      .hero-btns {
+        order: 3 !important;
+      }
+      
+      .features,
+      .process,
+      .advantages,
+      .faq {
+        padding: 20px;
+        page-break-inside: avoid;
+      }
+    }
+
+    /* 平板横屏优化 */
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+      .hero {
+        flex-direction: row;
+        text-align: left;
+        padding: 40px 48px;
+      }
+      
+      .hero-3d {
+        margin-right: 40px;
+        margin-bottom: 0;
+      }
+      
+      .hero-btns {
+        flex-direction: row;
+      }
+    }
+
+    /* 高分辨率屏幕优化 */
+    @media (min-width: 1440px) {
+      .hero {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      
+      .features {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+      }
+      
+      .process {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      
+      .advantages {
+        max-width: 1400px;
+        margin: 0 auto;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+      
+      .faq {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+    }
+
+    /* 触摸设备优化 */
+    @media (hover: none) and (pointer: coarse) {
+      .feature-card:hover,
+      .advantage-card:hover,
+      .process-step:hover,
+      .faq-list summary:hover {
+        transform: none;
+        background-color: inherit;
+      }
+      
+      .btn-primary:hover,
+      .btn-outline:hover {
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .navbar-toggle:hover {
+        background-color: transparent;
+      }
+    }
+
+    /* 打印样式 */
+    @media print {
+      .navbar,
+      .notice-banner,
+      .sidebar-guide,
+      .deployment-comparison,
+      .hero-3d,
+      .hero-btns {
+        display: none !important;
+      }
+      
+      .hero {
+        padding: 20px;
+        text-align: center;
+      }
+      
+      .features,
+      .process,
+      .advantages,
+      .faq {
+        padding: 20px;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
 
   <!-- 核心功能区 -->
   <section class="features" id="features">
@@ -223,6 +1325,36 @@
       <h4>模块化设计</h4>
       <p>易于扩展和二次开发，满足多样需求。</p>
     </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">📱</div>
+      <h4>移动端部署</h4>
+      <p>支持手机端一键部署Hadoop集群，随时随地管理。</p>
+    </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">🎨</div>
+      <h4>响应式设计</h4>
+      <p>完美适配各种屏幕尺寸，移动端体验更佳。</p>
+    </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">⚡</div>
+      <h4>一键部署</h4>
+      <p>全自动/半自动/手动三种模式，满足不同需求。</p>
+    </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">🔒</div>
+      <h4>安全可靠</h4>
+      <p>SSH免密互信，自动密钥分发，安全高效。</p>
+    </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">📊</div>
+      <h4>可视化监控</h4>
+      <p>实时进度、日志查看，集群Web UI直达。</p>
+    </div>
+    <div class="advantage-card">
+      <div class="advantage-icon">🌐</div>
+      <h4>网络适配</h4>
+      <p>支持内网部署和公网映射，灵活应对各种环境。</p>
+    </div>
   </section>
 
   <!-- FAQ区 -->
@@ -266,6 +1398,177 @@
     <div>© 2025 HadoopDeploy Tool</div>
   </footer>
 
-  <script src="../static/js/main.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  
+  <!-- 移动端菜单切换脚本 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navbarToggle = document.querySelector('.navbar-toggle');
+      const navbarMenu = document.querySelector('.navbar-menu');
+      
+      // 屏幕方向检测
+      function checkOrientation() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isLandscape && isMobile) {
+          // 横屏且是移动设备
+          showLandscapeWarning();
+        } else {
+          // 竖屏或桌面设备
+          hideLandscapeWarning();
+        }
+      }
+      
+      // 显示横屏警告
+      function showLandscapeWarning() {
+        let warning = document.getElementById('landscape-warning');
+        if (!warning) {
+          warning = document.createElement('div');
+          warning.id = 'landscape-warning';
+          warning.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(33, 150, 243, 0.95);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            font-size: 18px;
+            text-align: center;
+            z-index: 10000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            max-width: 300px;
+            line-height: 1.5;
+          `;
+          warning.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 16px;">📱</div>
+            <div style="font-weight: 600; margin-bottom: 8px;">请旋转设备</div>
+            <div>为了获得最佳体验，请将设备旋转至竖屏模式</div>
+          `;
+          document.body.appendChild(warning);
+        }
+        warning.style.display = 'block';
+      }
+      
+      // 隐藏横屏警告
+      function hideLandscapeWarning() {
+        const warning = document.getElementById('landscape-warning');
+        if (warning) {
+          warning.style.display = 'none';
+        }
+      }
+      
+      // 初始检查
+      checkOrientation();
+      
+      // 监听屏幕方向变化
+      window.addEventListener('orientationchange', function() {
+        setTimeout(checkOrientation, 100);
+      });
+      
+      // 监听窗口大小变化
+      window.addEventListener('resize', function() {
+        checkOrientation();
+      });
+      
+      if (navbarToggle && navbarMenu) {
+        navbarToggle.addEventListener('click', function() {
+          navbarMenu.classList.toggle('active');
+          
+          // 添加汉堡菜单动画
+          const spans = navbarToggle.querySelectorAll('span');
+          spans.forEach((span, index) => {
+            if (navbarMenu.classList.contains('active')) {
+              if (index === 0) span.style.transform = 'rotate(45deg) translate(5px, 5px)';
+              if (index === 1) span.style.opacity = '0';
+              if (index === 2) span.style.transform = 'rotate(-45deg) translate(7px, -6px)';
+            } else {
+              span.style.transform = 'none';
+              span.style.opacity = '1';
+            }
+          });
+        });
+        
+        // 点击菜单项后关闭菜单
+        const menuItems = navbarMenu.querySelectorAll('a');
+        menuItems.forEach(item => {
+          item.addEventListener('click', function() {
+            navbarMenu.classList.remove('active');
+            const spans = navbarToggle.querySelectorAll('span');
+            spans.forEach(span => {
+              span.style.transform = 'none';
+              span.style.opacity = '1';
+            });
+          });
+        });
+        
+        // 点击页面其他区域关闭菜单
+        document.addEventListener('click', function(event) {
+          if (!navbarToggle.contains(event.target) && !navbarMenu.contains(event.target)) {
+            navbarMenu.classList.remove('active');
+            const spans = navbarToggle.querySelectorAll('span');
+            spans.forEach(span => {
+              span.style.transform = 'none';
+              span.style.opacity = '1';
+            });
+          }
+        });
+      }
+      
+      // 响应式处理：窗口大小改变时重置菜单状态
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+          navbarMenu.classList.remove('active');
+          const spans = navbarToggle.querySelectorAll('span');
+          spans.forEach(span => {
+            span.style.transform = 'none';
+            span.style.opacity = '1';
+          });
+        }
+      });
+
+      // 平滑滚动到锚点
+      const anchorLinks = document.querySelectorAll('a[href^="#"]');
+      anchorLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+          
+          if (targetElement) {
+            const offsetTop = targetElement.offsetTop - 80; // 考虑固定导航栏高度
+            window.scrollTo({
+              top: offsetTop,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+      // 添加滚动监听，高亮当前导航项
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.navbar-menu a[href^="#"]');
+      
+      window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.clientHeight;
+          if (window.pageYOffset >= sectionTop - 100) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
-</html> 
+</html>

@@ -21,7 +21,7 @@
                         项目集成了全自动、半自动、手动三种部署模式，支持 SSH 免密、Web 可视化、进度与日志同步、集群 Web UI 直达等特性。
                         适用于企业、科研和个人用户。
                     </p>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
                         <div class="btn-group">
                             <a href="/documentation" class="btn btn-sm btn-outline-primary">查看文档</a>
                             <a href="https://github.com/violet27-chf/HadoopDeploy_tool" class="btn btn-sm btn-outline-secondary" target="_blank">
@@ -217,6 +217,103 @@
     }
     .card:hover {
         transform: translateY(-5px);
+    }
+    
+    /* 响应式样式 */
+    @media (max-width: 768px) {
+        .container {
+            padding: 2rem 1rem;
+        }
+        
+        .display-4 {
+            font-size: 2.5rem;
+        }
+        
+        .lead {
+            font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn-group .btn {
+            margin-bottom: 0.5rem;
+        }
+        
+        .fs-1 {
+            font-size: 2rem !important;
+        }
+        
+        .card-header h3 {
+            font-size: 1rem;
+        }
+        
+        .card-body ul li {
+            font-size: 0.9rem;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .container {
+            padding: 1.5rem 0.75rem;
+        }
+        
+        .display-4 {
+            font-size: 2rem;
+        }
+        
+        .lead {
+            font-size: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .fs-1 {
+            font-size: 1.75rem !important;
+        }
+        
+        .card-header h3 {
+            font-size: 0.9rem;
+        }
+        
+        .card-body ul li {
+            font-size: 0.85rem;
+        }
+        
+        .badge {
+            font-size: 0.7rem;
+        }
+        
+        .timeline {
+            padding: 0 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .display-4 {
+            font-size: 1.75rem;
+        }
+        
+        .card-body ul li {
+            font-size: 0.8rem;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
     }
 </style>
 {% endblock %}

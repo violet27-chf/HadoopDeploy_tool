@@ -15,10 +15,10 @@ fi
 
 # 2. 安装常用依赖
 if command -v yum &>/dev/null; then
-    yum install -y wget curl openssh-server openssh-clients java-1.8.0-openjdk-devel
+    yum install -y wget curl openssh-server openssh-clients java-1.8.0-openjdk-devel nmap
 elif command -v apt-get &>/dev/null; then
     apt-get update
-    apt-get install -y wget curl openssh-server openjdk-8-jdk
+    apt-get install -y wget curl openssh-server openjdk-8-jdk nmap
 fi
 
 # 3. 配置JAVA_HOME
@@ -62,9 +62,17 @@ if [ ! -f ~/.ssh/id_rsa ]; then
     ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
 fi
 
-# 8. 打印完成信息
+# 8. 验证nmap安装
+if command -v nmap &>/dev/null; then
+    echo "✅ nmap 安装成功，版本：$(nmap --version | head -n1)"
+else
+    echo "❌ nmap 安装失败，请手动安装"
+fi
+
+# 9. 打印完成信息
 clear
 echo "\nHadoop环境基础依赖已安装，JAVA_HOME/HADOOP_HOME已配置，主机名与hosts已同步。"
 echo "如需多节点免密，请将本机~/.ssh/id_rsa.pub内容追加到所有节点的~/.ssh/authorized_keys。"
 echo "Hadoop目录：$HADOOP_HOME"
+echo "nmap已安装，可用于网段扫描功能"
 echo "请重启终端或执行 source /etc/profile 以生效环境变量。" 

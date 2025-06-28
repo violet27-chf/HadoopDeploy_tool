@@ -100,8 +100,83 @@
                     <li>如发现隐私泄露问题，请立即联系技术支持</li>
                 </ul>
             </section>
-            <p class="text-muted mt-4">最后更新日期：{{ current_year }}</p>
+            <p class="text-muted mt-4">最后更新日期：2025-06-28</p>
         </div>
     </div>
 </div>
+
+<style>
+    /* 响应式隐私政策样式 */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+        
+        .card-body {
+            padding: 2rem 1.5rem !important;
+        }
+        
+        h1 {
+            font-size: 1.75rem;
+            text-align: center;
+        }
+        
+        .h5 {
+            font-size: 1.1rem;
+        }
+        
+        ul {
+            font-size: 0.9rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1.5rem 1rem !important;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+        }
+        
+        .h5 {
+            font-size: 1rem;
+        }
+        
+        ul {
+            font-size: 0.85rem;
+            padding-left: 1rem;
+        }
+        
+        .ps-4 {
+            padding-left: 1rem !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .card-body {
+            padding: 1rem 0.75rem !important;
+        }
+        
+        h1 {
+            font-size: 1.35rem;
+        }
+        
+        .h5 {
+            font-size: 0.95rem;
+        }
+        
+        ul {
+            font-size: 0.8rem;
+        }
+        
+        .bi {
+            font-size: 0.9rem;
+        }
+    }
+</style>
 {% endblock %}
