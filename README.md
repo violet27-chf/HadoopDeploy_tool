@@ -285,8 +285,10 @@ HadoopDeploy_tool/
 │   ├── base.html           # 基础模板
 │   ├── documentation.html  # 文档中心
 │   └── about.html          # 关于页面
-
-
+├── setup.bat               #windows安装脚本
+├── setup.sh                #Linux/macOS安装脚本
+├── start.bat               #windows启动脚本
+├── start.sh                #Linux/macOS启动脚本
 ## 📖 使用指南
 
 ### 部署模式说明
