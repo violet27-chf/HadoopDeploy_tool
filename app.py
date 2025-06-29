@@ -272,7 +272,11 @@ def execute_ssh_command_with_log(ssh, command, log_prefix=None, status_obj=None,
             if out.strip():
                 log_append(status_obj, f"{log_prefix} {out.strip()}", level)
             if err.strip():
-                log_append(status_obj, f"{log_prefix} [错误] {err.strip()}", "ERROR")
+                # 只有当命令真正失败时才标记为错误
+                if exit_code != 0:
+                    log_append(status_obj, f"{log_prefix} [错误] {err.strip()}", "ERROR")
+                else:
+                    log_append(status_obj, f"{log_prefix} {err.strip()}", level)
         return out, err, exit_code
     except Exception as e:
         if status_obj is not None:
@@ -293,13 +297,17 @@ def execute_ssh_command_stream_log(ssh, command, log_prefix=None, status_obj=Non
                 break
         for line in iter(lambda: stderr.readline(2048), ""):
             if line:
-                msg = f"{log_prefix} [错误] {line.rstrip()}" if log_prefix else f"[错误] {line.rstrip()}"
                 if status_obj is not None:
-                    log_append(status_obj, msg, "ERROR")
+                    log_append(status_obj, f"{log_prefix} {line.rstrip()}", "INFO")
                 err_lines.append(line.rstrip())
             else:
                 break
         exit_code = stdout.channel.recv_exit_status()
+        # 如果命令失败，重新标记stderr内容为错误
+        if exit_code != 0 and status_obj is not None and err_lines:
+            for line in err_lines:
+                msg = f"{log_prefix} [错误] {line}" if log_prefix else f"[错误] {line}"
+                log_append(status_obj, msg, "ERROR")
         return '\n'.join(out_lines), '\n'.join(err_lines), exit_code
     except Exception as e:
         if status_obj is not None:

@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}项目工具链 - HadoopDeploy Tool{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/toolchain.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="toolchain-container">
+    <!-- 工具链标题区域 -->
+    <div class="toolchain-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="toolchain-title">
+                        <i class="bi bi-diagram-3"></i>
+                        Hadoop部署工具链
+                    </h1>
+                    <p class="toolchain-subtitle">
+                        完整的Hadoop集群部署与管理工具链，从环境准备到集群运维的全流程解决方案
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="toolchain-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">8</span>
+                            <span class="stat-label">核心工具</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">3</span>
+                            <span class="stat-label">部署模式</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">自动化</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具链流程图 -->
+    <div class="toolchain-flow">
+        <div class="container">
+            <div class="flow-diagram">
+                <!-- 第一阶段：环境准备 -->
+                <div class="flow-stage" data-stage="1">
+                    <div class="stage-header">
+                        <div class="stage-icon">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <h3>环境准备</h3>
+                        <span class="stage-number">01</span>
+                    </div>
+                    <div class="stage-content">
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>系统检测</h4>
+                                <p>自动检测操作系统、Python版本、网络连接等基础环境</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-download"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>依赖安装</h4>
+                                <p>自动安装Java、SSH、nmap等必要依赖软件</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-network"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>网络扫描</h4>
+                                <p>使用nmap扫描网段，自动发现可用服务器节点</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 连接线 -->
+                <div class="flow-connector">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+
+                <!-- 第二阶段：配置管理 -->
+                <div class="flow-stage" data-stage="2">
+                    <div class="stage-header">
+                        <div class="stage-icon">
+                            <i class="bi bi-sliders"></i>
+                        </div>
+                        <h3>配置管理</h3>
+                        <span class="stage-number">02</span>
+                    </div>
+                    <div class="stage-content">
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-key"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>SSH密钥管理</h4>
+                                <p>自动生成和分发SSH密钥，建立节点间免密通信</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>配置文件生成</h4>
+                                <p>根据用户配置自动生成Hadoop相关配置文件</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-upload"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>包管理</h4>
+                                <p>支持自定义Hadoop/Java安装包上传和管理</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 连接线 -->
+                <div class="flow-connector">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+
+                <!-- 第三阶段：部署执行 -->
+                <div class="flow-stage" data-stage="3">
+                    <div class="stage-header">
+                        <div class="stage-icon">
+                            <i class="bi bi-rocket"></i>
+                        </div>
+                        <h3>部署执行</h3>
+                        <span class="stage-number">03</span>
+                    </div>
+                    <div class="stage-content">
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-play-circle"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>全自动部署</h4>
+                                <p>一键完成所有部署步骤，无需人工干预</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-pause-circle"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>半自动部署</h4>
+                                <p>关键步骤人工确认，平衡自动化与灵活性</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-hand-index"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>手动部署</h4>
+                                <p>完全自定义部署流程，适合高级用户</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 连接线 -->
+                <div class="flow-connector">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+
+                <!-- 第四阶段：监控运维 -->
+                <div class="flow-stage" data-stage="4">
+                    <div class="stage-header">
+                        <div class="stage-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>监控运维</h3>
+                        <span class="stage-number">04</span>
+                    </div>
+                    <div class="stage-content">
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>实时监控</h4>
+                                <p>实时监控集群状态、资源使用情况和性能指标</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-journal-text"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>日志管理</h4>
+                                <p>集中管理所有节点的日志信息，支持搜索和分析</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div class="tool-info">
+                                <h4>健康检查</h4>
+                                <p>定期检查集群健康状态，及时发现和处理问题</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具链特性 -->
+    <div class="toolchain-features">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning"></i>
+                        </div>
+                        <h4>高效自动化</h4>
+                        <p>全流程自动化部署，大幅提升部署效率，减少人工错误</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h4>安全可靠</h4>
+                        <p>SSH密钥管理、访问控制、操作日志记录，确保部署安全</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-phone"></i>
+                        </div>
+                        <h4>移动端支持</h4>
+                        <p>完美支持移动端访问，随时随地管理Hadoop集群</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-gear-wide-connected"></i>
+                        </div>
+                        <h4>灵活配置</h4>
+                        <p>支持多种部署模式，满足不同场景和用户需求</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具链统计 -->
+    <div class="toolchain-stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>5分钟</h3>
+                            <p>平均部署时间</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>99.9%</h3>
+                            <p>部署成功率</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>1000+</h3>
+                            <p>服务用户数</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-server"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>500+</h3>
+                            <p>部署集群数</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 开始使用 -->
+    <div class="toolchain-cta">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h2>准备开始您的Hadoop部署之旅？</h2>
+                    <p>选择适合您的部署模式，开始构建高性能的Hadoop集群</p>
+                    <div class="cta-buttons">
+                        <a href="{{ url_for('start') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-play-fill"></i>
+                            立即开始
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/toolchain.js') }}"></script>
+{% endblock %} 

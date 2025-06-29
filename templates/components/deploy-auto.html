@@ -81,12 +81,11 @@
                     </div>
                     <!-- 部署日志 -->
                     <div id="deployLogs" class="mb-4">
-                        <h5 class="fw-bold mb-3"><i class="bi bi-terminal-split me-2"></i>部署日志</h5>
-                        <div class="log-card bg-dark text-light p-3 rounded shadow-sm border border-2 border-primary" style="max-height: 320px; overflow-y: auto; font-size:1.08rem;">
-                            <pre id="logContent" class="mb-0 text-light" style="font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace; letter-spacing: 0.5px;">等待开始部署...</pre>
+                        <h5 class="fw-bold mb-2" style="font-size:1.1rem;"><i class="bi bi-terminal me-2"></i>部署日志</h5>
+                        <div class="log-card-simple p-2" style="max-height: 260px; overflow-y: auto;">
+                            <pre id="logContent" class="mb-0" style="background:transparent; color:#e6eaf3; font-family:'JetBrains Mono','Fira Mono','Consolas',monospace; font-size:1rem; line-height:1.7; letter-spacing:0.2px;">等待开始部署...</pre>
                         </div>
-                        <!-- 部署完成后显示Hadoop集群访问链接 -->
-                        <div id="clusterLinks" class="mt-3"></div>
+                        <div id="clusterLinks" class="mt-2"></div>
                     </div>
                     <!-- 操作按钮 -->
                     <div class="d-flex justify-content-between mt-4">
@@ -124,38 +123,38 @@
   </div>
 </div>
 <style>
-.log-card {
+.log-card-simple {
   background: #181c24 !important;
   color: #e6eaf3 !important;
-  border-radius: 1rem !important;
-  border: 2px solid #0d6efd33 !important;
-  box-shadow: 0 4px 24px #0d6efd11 !important;
+  border-radius: 0.7rem !important;
+  border: 1px solid #2a2f3a !important;
+  box-shadow: none !important;
   font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
-  font-size: 1.08rem;
-  padding: 1.2rem 1rem;
-  max-height: 320px;
+  font-size: 1rem;
+  padding: 0.7rem 0.7rem;
+  max-height: 260px;
   overflow-y: auto;
   margin-bottom: 0;
 }
-.log-card pre {
+.log-card-simple pre {
   background: transparent !important;
   color: #e6eaf3 !important;
   border: none !important;
   box-shadow: none !important;
   margin-bottom: 0;
-  font-size: 1.08rem;
-  letter-spacing: 0.5px;
+  font-size: 1rem;
+  letter-spacing: 0.2px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
-.log-card::-webkit-scrollbar {
+.log-card-simple::-webkit-scrollbar {
   width: 8px;
   background: #23272e;
 }
-.log-card::-webkit-scrollbar-thumb {
+.log-card-simple::-webkit-scrollbar-thumb {
   background: #3a3f4b;
   border-radius: 4px;
-}
-@media (max-width: 768px) {
-  .log-card { font-size: 0.95rem; padding: 0.7rem 0.5rem; }
 }
 </style>
 {% endblock %}
@@ -163,6 +162,7 @@
 {% block extra_js %}
 <script>
 let deployInProgress = false;
+let lastLogLength = 0;
 
 function updateSteps(steps) {
     for (let i = 0; i < steps.length; i++) {
@@ -254,6 +254,11 @@ function addLog(message) {
     logElement.scrollTop = logElement.scrollHeight;
 }
 
+function highlightLog(logText) {
+    // 高亮[错误]为红色，其余不变
+    return logText.replace(/(\[错误\].*)/g, '<span style="color:#d32f2f;font-weight:bold;">$1</span>');
+}
+
 function pollDeployStatus() {
     fetch('/api/deploy/auto/status')
         .then(res => res.json())
@@ -266,7 +271,8 @@ function pollDeployStatus() {
             document.getElementById('progressText').textContent = data.log && data.log.length > 0 ? data.log[data.log.length - 1] : '准备开始部署...';
             // 更新日志
             if (data.log) {
-                document.getElementById('logContent').textContent = data.log.map((msg, idx) => `[${idx+1}] ${msg}`).join('\n');
+                const raw = data.log.map((msg, idx) => `[${idx+1}] ${msg}`).join('\n');
+                document.getElementById('logContent').innerHTML = highlightLog(raw);
                 document.getElementById('logContent').scrollTop = document.getElementById('logContent').scrollHeight;
             }
             // 更新步骤
@@ -351,20 +357,24 @@ function configYumRepo() {
     });
 }
 
-// 实时日志自动刷新
 function fetchLog() {
   fetch('/api/log')
     .then(res => res.text())
     .then(log => {
       const logPre = document.getElementById('logContent');
-      logPre.textContent = log;
-      // 自动滚动到底部（滚动 log-card 容器）
-      const logCard = logPre.parentElement;
-      if (logCard) {
-        logCard.scrollTop = logCard.scrollHeight;
+      const lines = log.split('\n');
+      if (lines.length > lastLogLength) {
+        const newLines = lines.slice(lastLogLength).join('\n');
+        logPre.innerHTML += (lastLogLength > 0 ? '\n' : '') + highlightLog(newLines);
+        lastLogLength = lines.length;
+        // 自动滚动到底部
+        const logCard = logPre.parentElement;
+        if (logCard) {
+          logCard.scrollTop = logCard.scrollHeight;
+        }
       }
     });
 }
-setInterval(fetchLog, 1000); // 每秒刷新一次
+setInterval(fetchLog, 2000); // 每2秒刷新一次
 </script>
 {% endblock %} 
