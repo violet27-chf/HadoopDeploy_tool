@@ -14,7 +14,10 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="/">首页</a>
+                    <a class="nav-link {% if request.endpoint == 'toolchain' %}active{% endif %}" href="{{ url_for('toolchain') }}">工具链</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'start' %}active{% endif %}" href="{{ url_for('start') }}">开始</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.endpoint == 'documentation' %}active{% endif %}" href="{{ url_for('documentation') }}">文档</a>

@@ -354,15 +354,6 @@ function addLocalServer() {
             <i class="bi bi-cpu-fill text-primary fs-5 me-2"></i>
             <h5 class="mb-0">服务器 #${window.serverCount}</h5>
         </div>
-        <div class="mb-3">
-            <label class="form-label fw-semibold">连接方式</label>
-            <div class="btn-group w-100" role="group">
-                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="local_${window.serverCount}" value="local" checked>
-                <label class="btn btn-outline-primary" for="local_${window.serverCount}"><i class="bi bi-house me-1"></i>内网连接</label>
-                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="public_${window.serverCount}" value="public">
-                <label class="btn btn-outline-success" for="public_${window.serverCount}"><i class="bi bi-globe me-1"></i>公网连接</label>
-            </div>
-        </div>
         <div class="mb-3" id="public_ip_field_${window.serverCount}" style="display: none;">
             <label class="form-label fw-semibold">公网IP</label>
             <div class="input-group">
@@ -399,16 +390,6 @@ function addLocalServer() {
                 <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
                 <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
             </div>
-        </div>
-        <div class="d-flex gap-2">
-            <label class="btn btn-outline-primary" for="local_${window.serverCount}" id="label_local_${window.serverCount}">
-                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="local_${window.serverCount}" value="local" hidden>
-                <i class="bi bi-house me-1"></i>内网连接
-            </label>
-            <label class="btn btn-outline-success" for="public_${window.serverCount}" id="label_public_${window.serverCount}">
-                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="public_${window.serverCount}" value="public" checked hidden>
-                <i class="bi bi-globe me-1"></i>公网连接
-            </label>
         </div>
     `;
     serverList.appendChild(newServer);
@@ -454,16 +435,6 @@ function addPublicServer() {
                 <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
                 <input type="password" class="form-control form-control-lg" name="password[]" placeholder="请输入密码" required style="border-radius:.5rem;">
             </div>
-        </div>
-        <div class="d-flex gap-2">
-            <label class="btn btn-outline-primary" for="local_${window.serverCount}" id="label_local_${window.serverCount}">
-                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="local_${window.serverCount}" value="local" hidden>
-                <i class="bi bi-house me-1"></i>内网连接
-            </label>
-            <label class="btn btn-outline-success" for="public_${window.serverCount}" id="label_public_${window.serverCount}">
-                <input type="radio" class="btn-check" name="connection_type_${window.serverCount}" id="public_${window.serverCount}" value="public" checked hidden>
-                <i class="bi bi-globe me-1"></i>公网连接
-            </label>
         </div>
     `;
     serverList.appendChild(newServer);
