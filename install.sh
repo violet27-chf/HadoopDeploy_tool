@@ -45,6 +45,30 @@ log_step() {
     echo -e "${PURPLE}[STEP]${NC} $1"
 }
 
+# 进度条函数
+show_progress() {
+    local current=$1
+    local total=$2
+    local width=40
+    local percent=$(( 100 * current / total ))
+    local filled=$(( width * current / total ))
+    local empty=$(( width - filled ))
+    printf "\r["
+    for ((i=0; i<filled; i++)); do printf "#"; done
+    for ((i=0; i<empty; i++)); do printf " "; done
+    printf "] %3d%%" "$percent"
+}
+
+total_steps=7  # 主要步骤数（根据实际步骤调整）
+current_step=1
+
+log_step_with_progress() {
+    local msg="$1"
+    show_progress $current_step $total_steps
+    echo -e "  $msg"
+    current_step=$((current_step+1))
+}
+
 # 显示欢迎信息
 show_welcome() {
     clear
@@ -88,7 +112,7 @@ show_welcome() {
 
 # 检查系统环境
 check_system() {
-    log_step "检查系统环境..."
+    log_step_with_progress "检查系统环境..."
     
     # 检查操作系统
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -130,7 +154,7 @@ check_system() {
 
 # 安装系统依赖
 install_dependencies() {
-    log_step "安装系统依赖..."
+    log_step_with_progress "安装系统依赖..."
     
     if [[ -f /etc/debian_version ]]; then
         # Debian/Ubuntu系统
@@ -171,7 +195,7 @@ install_dependencies() {
 
 # 创建安装目录
 create_directories() {
-    log_step "创建安装目录..."
+    log_step_with_progress "创建安装目录..."
     
     # 创建主安装目录
     sudo mkdir -p $INSTALL_DIR
@@ -190,7 +214,7 @@ create_directories() {
 
 # 下载项目文件
 download_project() {
-    log_step "下载项目文件..."
+    log_step_with_progress "下载项目文件..."
     
     cd $INSTALL_DIR
     
@@ -216,7 +240,7 @@ download_project() {
 
 # 安装Python依赖
 install_python_deps() {
-    log_step "安装Python依赖..."
+    log_step_with_progress "安装Python依赖..."
     
     cd $INSTALL_DIR/HadoopDeploy_tool
     
@@ -243,7 +267,7 @@ install_python_deps() {
 
 # 配置环境变量
 setup_environment() {
-    log_step "配置环境变量..."
+    log_step_with_progress "配置环境变量..."
     
     # 创建环境变量文件
     cat > $INSTALL_DIR/HadoopDeploy_tool/.env << EOF
@@ -275,7 +299,7 @@ EOF
 
 # 创建启动脚本
 create_startup_script() {
-    log_step "创建启动脚本..."
+    log_step_with_progress "创建启动脚本..."
     
     cat > $INSTALL_DIR/HadoopDeploy_tool/start.sh << 'EOF'
 #!/bin/bash
@@ -314,7 +338,7 @@ EOF
 
 # 创建系统服务
 create_systemd_service() {
-    log_step "创建系统服务..."
+    log_step_with_progress "创建系统服务..."
     
     # 检查是否为root用户
     if [[ $EUID -ne 0 ]]; then
@@ -351,7 +375,7 @@ EOF
 
 # 配置防火墙
 configure_firewall() {
-    log_step "配置防火墙..."
+    log_step_with_progress "配置防火墙..."
     
     # 检查是否为root用户
     if [[ $EUID -ne 0 ]]; then
@@ -376,7 +400,7 @@ configure_firewall() {
 
 # 创建卸载脚本
 create_uninstall_script() {
-    log_step "创建卸载脚本..."
+    log_step_with_progress "创建卸载脚本..."
     
     cat > $INSTALL_DIR/uninstall.sh << 'EOF'
 #!/bin/bash
@@ -424,7 +448,7 @@ EOF
 
 # 显示安装完成信息
 show_completion() {
-    log_step "安装完成！"
+    log_step_with_progress "安装完成！"
     
     echo -e "${GREEN}"
     echo "╔══════════════════════════════════════════════════════════════╗"
@@ -508,4 +532,8 @@ main() {
 trap 'log_error "安装过程中发生错误，请检查日志"; exit 1' ERR
 
 # 脚本入口
-main "$@" 
+main "$@"
+
+# 安装结束后显示100%进度
+show_progress $total_steps $total_steps
+printf "  安装完成！\n" 
