@@ -393,8 +393,8 @@ export YARN_NODEMANAGER_USER=root"""
     auto_deploy_status['progress'] = 100
     auto_deploy_status['status'] = 'done'
     auto_deploy_status['steps'][5]['status'] = 'done'
-    nn_url = f'http://{servers[0]['hostname']}:9870'
-    rm_url = f'http://{servers[0]['hostname']}:8088'
+    nn_url = f'http://{servers[0]["hostname"]}:9870'
+    rm_url = f'http://{servers[0]["hostname"]}:8088'
     auto_deploy_status['cluster_links'] = {
         'NameNode': nn_url,
         'ResourceManager': rm_url
@@ -412,4 +412,4 @@ def api_deploy_auto_status():
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0',port=8000)
+    app.run(debug=True,host='0.0.0.0',port=5000)
