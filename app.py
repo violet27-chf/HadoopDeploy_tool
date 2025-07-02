@@ -652,8 +652,7 @@ export YARN_NODEMANAGER_USER=root"""
     auto_deploy_status['progress'] = 100
     auto_deploy_status['status'] = 'done'
     auto_deploy_status['steps'][5]['status'] = 'done'
-    
-    # 生成集群访问链接
+
     nn_url = f'http://{servers[0]["hostname"]}:9870'
     rm_url = f'http://{servers[0]["hostname"]}:8088'
     auto_deploy_status['cluster_links'] = {
@@ -1284,4 +1283,8 @@ def api_deploy_auto_clear_logs():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run(debug=True,host='0.0.0.0',port=5000)
+=======
+    app.run(debug=True,host='0.0.0.0',port=5000)
+>>>>>>> 0a6b98477671af29fa14b4cbe729545eb6f9d2b1
