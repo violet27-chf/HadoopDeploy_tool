@@ -38,10 +38,7 @@
                                             <option value="custom">自定义上传 (.tar.gz)</option>
                                         </select>
                                         <div id="uploadSection" class="mt-2" style="display: none;">
-                                            <input class="form-control" type="file" id="hadoopUpload" accept=".tar.gz,.tgz">
-                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadHadoopPackage()">
-                                                <i class="bi bi-upload me-1"></i>上传
-                                            </button>
+                                            <input class="form-control" type="file" id="hadoopUpload" accept=".tar.gz,.tgz" onchange="uploadHadoopPackage()">
                                             <div id="uploadStatus" class="form-text"></div>
                                         </div>
                                     </div>
@@ -56,10 +53,7 @@
                                             <option value="custom">自定义上传 (.tar.gz/.zip)</option>
                                         </select>
                                         <div id="javaUploadSection" class="mt-2" style="display: none;">
-                                            <input class="form-control" type="file" id="javaUpload" accept=".tar.gz,.tgz,.zip">
-                                            <button class="btn btn-outline-primary btn-sm mt-1" onclick="uploadJavaPackage()">
-                                                <i class="bi bi-upload me-1"></i>上传
-                                            </button>
+                                            <input class="form-control" type="file" id="javaUpload" accept=".tar.gz,.tgz,.zip" onchange="uploadJavaPackage()">
                                             <div id="javaUploadStatus" class="form-text"></div>
                                         </div>
                                     </div>
@@ -198,7 +192,7 @@
                                 <i class="bi bi-arrow-left me-2"></i>返回
                             </button>
                             <button type="submit" class="btn btn-warning btn-lg px-5 text-white">
-                                <i class="bi bi-play-fill me-2"></i>开始半自动部署
+                                <i class="bi bi-play-fill me-2"></i>准备好了
                             </button>
                         </div>
                     </form>
@@ -375,8 +369,17 @@ function uploadHadoopPackage() {
         return;
     }
     
+    // 获取服务器配置
+    const serverConfig = sessionStorage.getItem('serverConfig');
+    if (!serverConfig) {
+        statusDiv.textContent = '未找到服务器配置信息，请先配置服务器';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('config', serverConfig);
     
     statusDiv.textContent = '正在上传...';
     statusDiv.className = 'form-text text-info';
@@ -386,15 +389,33 @@ function uploadHadoopPackage() {
         body: formData
     }).then(res => res.json()).then(data => {
         if (data.success) {
-            statusDiv.textContent = '上传成功！文件已保存';
+            statusDiv.textContent = data.msg || '上传hadoop包成功';
             statusDiv.className = 'form-text text-success';
             sessionStorage.setItem('hadoopUploaded', '1');
             sessionStorage.setItem('uploadedFileName', file.name);
+            // 保存后端返回的临时文件信息
+            if (data.temp_path) sessionStorage.setItem('hadoopTempPath', data.temp_path);
+            if (data.filename) sessionStorage.setItem('hadoopSavedFilename', data.filename);
+            if (data.size) sessionStorage.setItem('hadoopSavedFileSize', data.size);
+            if (data.config) sessionStorage.setItem('hadoopSavedConfig', JSON.stringify(data.config));
+            // 显示详细的上传结果
+            if (data.results && data.results.length > 0) {
+                let resultText = '上传结果：';
+                data.results.forEach(result => {
+                    if (result.success) {
+                        resultText += `\n✅ ${result.hostname}: ${result.filename} (${result.size} bytes)`;
+                    } else {
+                        resultText += `\n❌ ${result.hostname}: ${result.error}`;
+                    }
+                });
+                console.log(resultText);
+            }
         } else {
-            statusDiv.textContent = data.msg || '上传失败';
+            statusDiv.textContent = data.msg || data.error || '上传失败';
             statusDiv.className = 'form-text text-danger';
         }
-    }).catch(() => {
+    }).catch((error) => {
+        console.error('上传错误:', error);
         statusDiv.textContent = '上传失败，请重试';
         statusDiv.className = 'form-text text-danger';
     });
@@ -417,10 +438,18 @@ function uploadJavaPackage() {
         return;
     }
     
+    // 获取服务器配置
+    const serverConfig = sessionStorage.getItem('serverConfig');
+    if (!serverConfig) {
+        statusDiv.textContent = '未找到服务器配置信息，请先配置服务器';
+        statusDiv.className = 'form-text text-danger';
+        return;
+    }
+    
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('config', serverConfig);
     
-    statusDiv.textContent = '正在上传...';
     statusDiv.className = 'form-text text-info';
     
     fetch('/api/upload/java', {
@@ -428,15 +457,33 @@ function uploadJavaPackage() {
         body: formData
     }).then(res => res.json()).then(data => {
         if (data.success) {
-            statusDiv.textContent = '上传成功！文件已保存';
+            statusDiv.textContent = data.msg || '上传java包成功';
             statusDiv.className = 'form-text text-success';
             sessionStorage.setItem('javaUploaded', '1');
             sessionStorage.setItem('uploadedFileName', file.name);
+            // 保存后端返回的临时文件信息
+            if (data.temp_path) sessionStorage.setItem('javaTempPath', data.temp_path);
+            if (data.filename) sessionStorage.setItem('javaSavedFilename', data.filename);
+            if (data.size) sessionStorage.setItem('javaSavedFileSize', data.size);
+            if (data.config) sessionStorage.setItem('javaSavedConfig', JSON.stringify(data.config));
+            // 显示详细的上传结果
+            if (data.results && data.results.length > 0) {
+                let resultText = '上传结果：';
+                data.results.forEach(result => {
+                    if (result.success) {
+                        resultText += `\n✅ ${result.hostname}: ${result.filename} (${result.size} bytes)`;
+                    } else {
+                        resultText += `\n❌ ${result.hostname}: ${result.error}`;
+                    }
+                });
+                console.log(resultText);
+            }
         } else {
-            statusDiv.textContent = data.msg || '上传失败';
+            statusDiv.textContent = data.msg || data.error || '上传失败';
             statusDiv.className = 'form-text text-danger';
         }
-    }).catch(() => {
+    }).catch((error) => {
+        console.error('上传错误:', error);
         statusDiv.textContent = '上传失败，请重试';
         statusDiv.className = 'form-text text-danger';
     });

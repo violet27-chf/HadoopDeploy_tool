@@ -3,98 +3,226 @@
 {% block title %}全自动Hadoop部署 - Hadoop部署系统{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="mb-3 d-flex justify-content-end">
-                <button class="btn btn-outline-primary" id="btnConfigYum" onclick="showConfigYumModal()">
-                    <i class="bi bi-gear"></i> 配置yum源
-                </button>
-            </div>
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white d-flex align-items-center" style="border-top-left-radius: 1.2rem; border-top-right-radius: 1.2rem;">
-                    <i class="bi bi-gear-fill me-2 fs-3"></i>
-                    <h3 class="mb-0">全自动Hadoop集群部署</h3>
-                </div>
-                <div class="card-body p-4">
-                    <div class="alert alert-info d-flex align-items-center mb-4">
-                        <i class="bi bi-info-circle me-2 fs-4"></i>
-                        <div><strong>全自动模式：</strong>系统将自动完成所有配置步骤，无需人工干预。(请确保服务器已配置yum源，如果未配置，请点击配置yum源按钮)</div>
-                    </div>
-                    <hr>
-                    <!-- 部署进度 -->
-                    <div id="deployProgress" class="mb-4">
-                        <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-steps me-2"></i>部署进度</h5>
-                        <div class="progress mb-3" style="height: 1.5rem;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary fs-6 fw-bold" 
-                                 role="progressbar" style="width: 0%" id="progressBar">0%</div>
+<div class="deploy-page-wrapper">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <!-- 页面头部 -->
+                <div class="page-header mb-4">
+                    <div class="header-content">
+                        <div class="header-left">
+                            <h1 class="page-title">
+                                <i class="bi bi-rocket-takeoff"></i>
+                                全自动Hadoop集群部署
+                            </h1>
+                            <p class="page-subtitle">一键部署，智能配置，让Hadoop集群部署变得简单高效</p>
                         </div>
-                        <div id="progressText" class="text-muted">准备开始部署...</div>
+                        <div class="header-right">
+                            <button class="btn btn-gradient-primary" id="btnConfigYum" onclick="showConfigYumModal()">
+                                <i class="bi bi-gear-fill"></i>
+                                <span>配置yum源</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区域 -->
+                <div class="main-content">
+                    <!-- 信息提示卡片 -->
+                    <div class="info-card mb-4">
+                        <div class="info-icon">
+                            <i class="bi bi-lightbulb-fill"></i>
+                        </div>
+                        <div class="info-content">
+                            <h6 class="info-title">全自动部署模式</h6>
+                            <p class="info-text">系统将自动完成所有配置步骤，包括环境检测、Java安装、Hadoop下载配置等，无需人工干预。请确保服务器已配置yum源。</p>
+                        </div>
+                    </div>
+
+                    <!-- 部署进度区域 -->
+                    <div class="progress-section mb-4">
+                        <div class="section-header">
+                            <h5 class="section-title">
+                                <i class="bi bi-bar-chart-steps"></i>
+                                部署进度
+                            </h5>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-wrapper">
+                                <div class="progress-bar-custom" id="progressBar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                    <div class="progress-text">0%</div>
+                                </div>
+                            </div>
+                            <div class="progress-status">
+                                <span id="progressText" class="status-text">准备开始部署...</span>
+                            </div>
+                        </div>
                     </div>
                     <!-- 部署步骤 -->
                     <div id="deploySteps" class="mb-4">
-                        <h5 class="fw-bold mb-3"><i class="bi bi-list-ol me-2"></i>部署步骤</h5>
-                        <div class="list-group list-group-flush">
-                            <div class="list-group-item list-group-item-action py-3 px-4" id="step1">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <h6 class="mb-1 fw-semibold"><i class="bi bi-search text-primary me-2"></i>1. 环境检测</h6>
-                                    <small class="text-muted">等待中...</small>
+                        <div class="steps-header mb-4">
+                            <h5 class="fw-bold mb-2">
+                                <i class="bi bi-list-ol me-2 text-primary"></i>部署步骤
+                            </h5>
+                            <p class="text-muted mb-0">系统将按顺序执行以下6个步骤，请耐心等待</p>
+                        </div>
+                        <div class="steps-container">
+                            <div class="steps-row">
+                                <div class="step-card" id="step1">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <div class="step-header">
+                                            <h6 class="step-title">
+                                                <i class="bi bi-search"></i>
+                                            </h6>
+                                            <div class="step-status">
+                                                <span class="status-badge status-pending">等待中</span>
+                                            </div>
+                                        </div>
+                                        <p class="step-description">环境检测</p>
+                                        <div class="step-progress">
+                                            <div class="progress-line"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="mb-1">连接服务器，检测环境，关闭防火墙</p>
-                            </div>
-                            <div class="list-group-item list-group-item-action py-3 px-4" id="step2">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <h6 class="mb-1 fw-semibold"><i class="bi bi-cup-hot text-primary me-2"></i>2. 安装Java环境</h6>
-                                    <small class="text-muted">等待中...</small>
+                                
+                                <div class="step-card" id="step2">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <div class="step-header">
+                                            <h6 class="step-title">
+                                                <i class="bi bi-cup-hot"></i>
+                                            </h6>
+                                            <div class="step-status">
+                                                <span class="status-badge status-pending">等待中</span>
+                                            </div>
+                                        </div>
+                                        <p class="step-description">安装Java</p>
+                                        <div class="step-progress">
+                                            <div class="progress-line"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="mb-1">安装和配置Java运行环境</p>
-                            </div>
-                            <div class="list-group-item list-group-item-action py-3 px-4" id="step3">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <h6 class="mb-1 fw-semibold"><i class="bi bi-download text-primary me-2"></i>3. 下载Hadoop</h6>
-                                    <small class="text-muted">等待中...</small>
+                                
+                                <div class="step-card" id="step3">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <div class="step-header">
+                                            <h6 class="step-title">
+                                                <i class="bi bi-download"></i>
+                                            </h6>
+                                            <div class="step-status">
+                                                <span class="status-badge status-pending">等待中</span>
+                                            </div>
+                                        </div>
+                                        <p class="step-description">下载Hadoop</p>
+                                        <div class="step-progress">
+                                            <div class="progress-line"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="mb-1">下载并解压Hadoop安装包</p>
-                            </div>
-                            <div class="list-group-item list-group-item-action py-3 px-4" id="step4">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <h6 class="mb-1 fw-semibold"><i class="bi bi-file-earmark-text text-primary me-2"></i>4. 配置Hadoop</h6>
-                                    <small class="text-muted">等待中...</small>
+                                
+                                <div class="step-card" id="step4">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <div class="step-header">
+                                            <h6 class="step-title">
+                                                <i class="bi bi-file-earmark-text"></i>
+                                            </h6>
+                                            <div class="step-status">
+                                                <span class="status-badge status-pending">等待中</span>
+                                            </div>
+                                        </div>
+                                        <p class="step-description">配置Hadoop</p>
+                                        <div class="step-progress">
+                                            <div class="progress-line"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="mb-1">自动配置Hadoop核心参数</p>
-                            </div>
-                            <div class="list-group-item list-group-item-action py-3 px-4" id="step5">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <h6 class="mb-1 fw-semibold"><i class="bi bi-play-fill text-primary me-2"></i>5. 启动集群</h6>
-                                    <small class="text-muted">等待中...</small>
+                                
+                                <div class="step-card" id="step5">
+                                    <div class="step-number">5</div>
+                                    <div class="step-content">
+                                        <div class="step-header">
+                                            <h6 class="step-title">
+                                                <i class="bi bi-play-fill"></i>
+                                            </h6>
+                                            <div class="step-status">
+                                                <span class="status-badge status-pending">等待中</span>
+                                            </div>
+                                        </div>
+                                        <p class="step-description">启动集群</p>
+                                        <div class="step-progress">
+                                            <div class="progress-line"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="mb-1">启动Hadoop集群服务</p>
-                            </div>
-                            <div class="list-group-item list-group-item-action py-3 px-4" id="step6">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <h6 class="mb-1 fw-semibold"><i class="bi bi-patch-check-fill text-primary me-2"></i>6. 验证部署</h6>
-                                    <small class="text-muted">等待中...</small>
+                                
+                                <div class="step-card" id="step6">
+                                    <div class="step-number">6</div>
+                                    <div class="step-content">
+                                        <div class="step-header">
+                                            <h6 class="step-title">
+                                                <i class="bi bi-patch-check-fill"></i>
+                                            </h6>
+                                            <div class="step-status">
+                                                <span class="status-badge status-pending">等待中</span>
+                                            </div>
+                                        </div>
+                                        <p class="step-description">验证部署</p>
+                                        <div class="step-progress">
+                                            <div class="progress-line"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="mb-1">验证集群运行状态</p>
                             </div>
                         </div>
                     </div>
-                    <!-- 部署日志 -->
-                    <div id="deployLogs" class="mb-4">
-                        <h5 class="fw-bold mb-2" style="font-size:1.1rem;"><i class="bi bi-terminal me-2"></i>部署日志</h5>
-                        <div class="log-card-simple p-2" style="max-height: 260px; overflow-y: auto;">
-                            <pre id="logContent" class="mb-0" style="background:transparent; color:#e6eaf3; font-family:'JetBrains Mono','Fira Mono','Consolas',monospace; font-size:1rem; line-height:1.7; letter-spacing:0.2px;">等待开始部署...</pre>
+                    <!-- 部署日志区域 -->
+                    <div class="logs-section mb-4">
+                        <div class="section-header">
+                            <h5 class="section-title">
+                                <i class="bi bi-terminal"></i>
+                                实时部署日志
+                            </h5>
+                            <div class="log-controls">
+                                <button class="btn btn-sm btn-outline-secondary clear-logs-btn" onclick="clearLogs()" title="清空所有日志">
+                                    <i class="bi bi-trash"></i>
+                                    清空日志
+                                </button>
+                            </div>
                         </div>
-                        <div id="clusterLinks" class="mt-2"></div>
+                        <div class="log-container">
+                            <div class="log-terminal">
+                                <div class="terminal-header">
+                                    <div class="terminal-buttons">
+                                        <span class="terminal-btn terminal-btn-close"></span>
+                                        <span class="terminal-btn terminal-btn-minimize"></span>
+                                        <span class="terminal-btn terminal-btn-maximize"></span>
+                                    </div>
+                                    <div class="terminal-title">Hadoop Deploy Terminal</div>
+                                </div>
+                                <div class="terminal-body">
+                                    <pre id="logContent" class="log-content">等待开始部署...</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="clusterLinks" class="mt-3"></div>
                     </div>
-                    <!-- 操作按钮 -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <button class="btn btn-outline-secondary btn-lg px-4" onclick="goBack()">
-                            <i class="bi bi-arrow-left me-2"></i>返回
-                        </button>
-                        <button class="btn btn-success btn-lg px-5" id="startDeploy" onclick="startAutoDeploy()">
-                            <i class="bi bi-play-fill me-2"></i>开始自动部署
-                        </button>
+
+                    <!-- 操作按钮区域 -->
+                    <div class="action-section">
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-secondary btn-action" onclick="goBack()">
+                                <i class="bi bi-arrow-left"></i>
+                                <span>返回上一步</span>
+                            </button>
+                            <button class="btn btn-gradient-success btn-action" id="startDeploy" onclick="startAutoDeploy()">
+                                <i class="bi bi-rocket-takeoff"></i>
+                                <span>开始自动部署</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,38 +231,599 @@
 </div>
 <!-- 配置yum源弹窗 -->
 <div class="modal fade" id="yumModal" tabindex="-1" aria-labelledby="yumModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content yum-modal">
       <div class="modal-header">
-        <h5 class="modal-title" id="yumModalLabel">配置yum源</h5>
+        <div class="modal-title-wrapper">
+          <div class="modal-icon">
+            <i class="bi bi-gear-fill"></i>
+          </div>
+          <div>
+            <h5 class="modal-title" id="yumModalLabel">配置YUM源</h5>
+            <p class="modal-subtitle">批量配置所有服务器的YUM源</p>
+          </div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
       </div>
       <div class="modal-body">
-        <div class="mb-3">
-          <div class="alert alert-info mb-0">将自动对所有已配置服务器批量操作，无需手动输入服务器信息。</div>
+        <div class="yum-info-card">
+          <div class="yum-info-icon">
+            <i class="bi bi-info-circle-fill"></i>
+          </div>
+          <div class="yum-info-content">
+            <h6>自动批量操作</h6>
+            <p>系统将自动对所有已配置的服务器进行YUM源配置，无需手动输入服务器信息。</p>
+          </div>
         </div>
-        <div id="yumProgressArea" class="mt-3" style="min-height:2.5em;"></div>
+        <div id="yumProgressArea" class="yum-progress-area"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary" onclick="configYumRepo()">确定</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle me-2"></i>取消
+        </button>
+        <button type="button" class="btn btn-gradient-primary" onclick="configYumRepo()">
+          <i class="bi bi-check-circle me-2"></i>开始配置
+        </button>
       </div>
     </div>
   </div>
 </div>
 <style>
-.log-card-simple {
-  background: #181c24 !important;
-  color: #e6eaf3 !important;
-  border-radius: 0.7rem !important;
-  border: 1px solid #2a2f3a !important;
-  box-shadow: none !important;
-  font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
-  font-size: 1rem;
-  padding: 0.7rem 0.7rem;
-  max-height: 260px;
+/* 全局页面样式 */
+.deploy-page-wrapper {
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+/* 页面头部样式 */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.page-title {
+  color: #2c3e50;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.page-title i {
+  color: #667eea;
+  font-size: 2rem;
+}
+
+.page-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* 主内容区域 */
+.main-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 信息提示卡片 */
+.info-card {
+  display: flex;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 1px solid #90caf9;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+}
+
+.info-icon {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.info-icon i {
+  font-size: 1.3rem;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-title {
+  color: #1565c0;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.info-text {
+  color: #0d47a1;
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* 区域标题样式 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.section-title {
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title i {
+  color: #667eea;
+}
+
+/* 进度条样式 */
+.progress-container {
+  background: #f8f9fa;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.progress-wrapper {
+  margin-bottom: 1rem;
+}
+
+.progress-bar-custom {
+  position: relative;
+  height: 2rem;
+  background: #e9ecef;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 1rem;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.progress-status {
+  text-align: center;
+}
+
+.status-text {
+  color: #6c757d;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* 日志终端样式 */
+.log-container {
+  background: #1e1e1e;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
+}
+
+.terminal-header {
+  background: #2d2d2d;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #444;
+}
+
+.terminal-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-right: 1rem;
+}
+
+.terminal-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.terminal-btn-close {
+  background: #ff5f56;
+}
+
+.terminal-btn-minimize {
+  background: #ffbd2e;
+}
+
+.terminal-btn-maximize {
+  background: #27ca3f;
+}
+
+.terminal-title {
+  color: #ccc;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.terminal-body {
+  padding: 1rem;
+  max-height: 300px;
   overflow-y: auto;
-  margin-bottom: 0;
+}
+
+.log-content {
+  background: transparent;
+  color: #e6eaf3;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.terminal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-body::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* 清空日志按钮样式 */
+.clear-logs-btn {
+  border-color: #dc3545;
+  color: #dc3545;
+  background: transparent;
+}
+
+.clear-logs-btn:hover {
+  background: #dc3545;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.clear-logs-btn:active {
+  transform: translateY(0);
+}
+
+/* 操作按钮样式 */
+.action-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #f8f9fa;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.btn-action {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: 160px;
+  justify-content: center;
+}
+
+.btn-gradient-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+}
+
+.btn-gradient-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8, #6a4190);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-gradient-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+}
+
+.btn-gradient-success:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+.btn-outline-secondary {
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  background: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background: #6c757d;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+}
+
+/* 动画效果 */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .deploy-page-wrapper {
+    padding: 1rem 0;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .page-title {
+    font-size: 1.8rem;
+  }
+  
+  .main-content {
+    padding: 1.5rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn-action {
+    width: 100%;
+  }
+  
+  .info-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .info-icon {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .steps-row {
+    gap: 0.5rem;
+  }
+  
+  .step-card {
+    min-width: 120px;
+    max-width: 130px;
+    padding: 1rem 0.8rem;
+  }
+  
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .step-title i {
+    font-size: 1.1rem;
+  }
+  
+  .step-description {
+    font-size: 0.8rem;
+  }
+  
+  .status-badge {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.65rem;
+  }
+}
+
+/* YUM配置弹窗样式 */
+.yum-modal {
+  border-radius: 1.5rem;
+  border: none;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.yum-modal .modal-header {
+  border-bottom: 2px solid #f8f9fa;
+  padding: 1.5rem 2rem;
+}
+
+.modal-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.modal-icon {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-icon i {
+  font-size: 1.3rem;
+}
+
+.modal-title {
+  color: #2c3e50;
+  font-weight: 600;
+  margin: 0 0 0.3rem 0;
+  font-size: 1.3rem;
+}
+
+.modal-subtitle {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.yum-modal .modal-body {
+  padding: 2rem;
+}
+
+.yum-info-card {
+  display: flex;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+  border: 1px solid #c3e6cb;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.yum-info-icon {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.yum-info-icon i {
+  font-size: 1.1rem;
+}
+
+.yum-info-content h6 {
+  color: #155724;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.yum-info-content p {
+  color: #0f5132;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.yum-progress-area {
+  min-height: 3rem;
+  background: #f8f9fa;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.yum-modal .modal-footer {
+  border-top: 2px solid #f8f9fa;
+  padding: 1.5rem 2rem;
+  gap: 1rem;
+}
+
+.yum-modal .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .log-card-simple pre {
   background: transparent !important;
@@ -156,6 +845,492 @@
   background: #3a3f4b;
   border-radius: 4px;
 }
+
+/* 部署成功卡片样式 */
+.deployment-success-card {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 1px solid #c3e6cb;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 20px rgba(40, 167, 69, 0.15);
+  animation: slideInUp 0.6s ease-out;
+}
+
+.success-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(40, 167, 69, 0.2);
+}
+
+.success-icon {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.success-icon i {
+  font-size: 1.8rem;
+}
+
+.success-title h4 {
+  color: #155724;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.success-title p {
+  color: #0f5132;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.links-title {
+  color: #155724;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.link-card {
+  background: white;
+  border-radius: 0.8rem;
+  padding: 1.2rem;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.link-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.link-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
+  border-color: #28a745;
+}
+
+.namenode-card::before {
+  background: linear-gradient(90deg, #007bff, #0056b3);
+}
+
+.resourcemanager-card::before {
+  background: linear-gradient(90deg, #fd7e14, #e55a00);
+}
+
+.link-card:hover.namenode-card::before {
+  background: linear-gradient(90deg, #0056b3, #004085);
+}
+
+.link-card:hover.resourcemanager-card::before {
+  background: linear-gradient(90deg, #e55a00, #cc4a00);
+}
+
+.link-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.namenode-card .link-icon {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.resourcemanager-card .link-icon {
+  background: linear-gradient(135deg, #fd7e14, #e55a00);
+}
+
+.link-content {
+  flex: 1;
+}
+
+.link-title {
+  color: #212529;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.link-desc {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  text-decoration: none;
+  border-radius: 0.6rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.namenode-card .link-button {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.namenode-card .link-button:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+}
+
+.resourcemanager-card .link-button {
+  background: linear-gradient(135deg, #fd7e14, #e55a00);
+}
+
+.resourcemanager-card .link-button:hover {
+  background: linear-gradient(135deg, #e55a00, #cc4a00);
+}
+
+.success-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.success-tip {
+  display: flex;
+  align-items: center;
+  color: #0f5132;
+  font-size: 0.9rem;
+  background: rgba(40, 167, 69, 0.1);
+  padding: 0.8rem 1rem;
+  border-radius: 0.6rem;
+  border-left: 4px solid #28a745;
+}
+
+.success-tip i {
+  color: #28a745;
+  font-size: 1rem;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 部署步骤样式 */
+.steps-header {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.steps-header h5 {
+  color: #2c3e50;
+  font-size: 1.3rem;
+}
+
+.steps-container {
+  position: relative;
+}
+
+.steps-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.steps-row::-webkit-scrollbar {
+  display: none;
+}
+
+.step-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+  max-width: 160px;
+  padding: 1.2rem 1rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  border: 2px solid #f8f9fa;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e9ecef, #dee2e6);
+  transition: all 0.3s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.step-number {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e9ecef, #dee2e6);
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  border: 3px solid #f8f9fa;
+}
+
+.step-content {
+  width: 100%;
+  text-align: center;
+}
+
+.step-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.step-title {
+  color: #495057;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-title i {
+  color: #6c757d;
+  font-size: 1.3rem;
+}
+
+.step-description {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin: 0 0 0.8rem 0;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.step-progress {
+  position: relative;
+  height: 4px;
+  background: #f8f9fa;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-line {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.status-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.8rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.status-doing {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: 1px solid #007bff;
+  animation: pulse 2s infinite;
+}
+
+.status-done {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.status-error {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+/* 步骤状态样式 */
+.step-card.step-pending .step-number {
+  background: linear-gradient(135deg, #e9ecef, #dee2e6);
+  color: #6c757d;
+}
+
+.step-card.step-doing {
+  border-color: #007bff;
+  box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+  transform: scale(1.05);
+}
+
+.step-card.step-doing::before {
+  background: linear-gradient(90deg, #007bff, #0056b3);
+}
+
+.step-card.step-doing .step-number {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-color: #007bff;
+}
+
+.step-card.step-done {
+  border-color: #28a745;
+  box-shadow: 0 4px 20px rgba(40, 167, 69, 0.15);
+}
+
+.step-card.step-done::before {
+  background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.step-card.step-done .step-number {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border-color: #28a745;
+}
+
+.step-card.step-error {
+  border-color: #dc3545;
+  box-shadow: 0 4px 20px rgba(220, 53, 69, 0.15);
+}
+
+.step-card.step-error::before {
+  background: linear-gradient(90deg, #dc3545, #c82333);
+}
+
+.step-card.step-error .step-number {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  border-color: #dc3545;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .success-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .success-icon {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .links-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .link-card {
+    padding: 1rem;
+  }
+  
+  .deployment-success-card {
+    padding: 1rem;
+  }
+  
+  .step-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .step-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    margin-right: 1rem;
+  }
+}
 </style>
 {% endblock %}
 
@@ -168,26 +1343,38 @@ function updateSteps(steps) {
     for (let i = 0; i < steps.length; i++) {
         const stepDiv = document.getElementById('step' + (i + 1));
         if (!stepDiv) continue;
+        
         let status = steps[i].status;
-        let statusText = '';
-        let statusClass = '';
-        if (status === 'pending') {
-            statusText = '等待中...';
-            statusClass = '';
-        } else if (status === 'doing') {
-            statusText = '进行中...';
-            statusClass = 'active border-primary';
-        } else if (status === 'done') {
-            statusText = '已完成';
-            statusClass = 'list-group-item-success';
-        } else if (status === 'error') {
-            statusText = '失败';
-            statusClass = 'list-group-item-danger';
+        const statusBadge = stepDiv.querySelector('.status-badge');
+        const progressLine = stepDiv.querySelector('.progress-line');
+        
+        // 移除所有状态类
+        stepDiv.classList.remove('step-pending', 'step-doing', 'step-done', 'step-error');
+        if (statusBadge) {
+            statusBadge.classList.remove('status-pending', 'status-doing', 'status-done', 'status-error');
         }
-        // 设置状态文本
-        stepDiv.querySelector('small').textContent = statusText;
-        // 设置高亮样式
-        stepDiv.className = 'list-group-item list-group-item-action py-3 px-4 ' + statusClass;
+        
+        if (status === 'pending') {
+            if (statusBadge) statusBadge.textContent = '等待中';
+            if (statusBadge) statusBadge.classList.add('status-pending');
+            stepDiv.classList.add('step-pending');
+            if (progressLine) progressLine.style.width = '0%';
+        } else if (status === 'doing') {
+            if (statusBadge) statusBadge.textContent = '进行中';
+            if (statusBadge) statusBadge.classList.add('status-doing');
+            stepDiv.classList.add('step-doing');
+            if (progressLine) progressLine.style.width = '50%';
+        } else if (status === 'done') {
+            if (statusBadge) statusBadge.textContent = '已完成';
+            if (statusBadge) statusBadge.classList.add('status-done');
+            stepDiv.classList.add('step-done');
+            if (progressLine) progressLine.style.width = '100%';
+        } else if (status === 'error') {
+            if (statusBadge) statusBadge.textContent = '失败';
+            if (statusBadge) statusBadge.classList.add('status-error');
+            stepDiv.classList.add('step-error');
+            if (progressLine) progressLine.style.width = '0%';
+        }
     }
 }
 
@@ -203,6 +1390,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!config) {
         alert('未找到服务器配置信息，请返回重新配置');
         window.location.href = '/';
+    }
+    
+    // 初始化步骤状态
+    for (let i = 1; i <= 6; i++) {
+        const stepDiv = document.getElementById('step' + i);
+        if (stepDiv) {
+            stepDiv.classList.add('step-pending');
+            const statusBadge = stepDiv.querySelector('.status-badge');
+            if (statusBadge) {
+                statusBadge.classList.add('status-pending');
+            }
+        }
     }
 });
 
@@ -265,10 +1464,13 @@ function pollDeployStatus() {
         .then(data => {
             // 更新进度条
             const progressBar = document.getElementById('progressBar');
-            progressBar.style.width = (data.progress || 0) + '%';
-            progressBar.textContent = (data.progress || 0) + '%';
+            const progressFill = progressBar.querySelector('.progress-fill');
+            const progressText = progressBar.querySelector('.progress-text');
+            const progress = data.progress || 0;
+            progressFill.style.width = progress + '%';
+            progressText.textContent = progress + '%';
             // 更新进度文本
-            document.getElementById('progressText').textContent = data.log && data.log.length > 0 ? data.log[data.log.length - 1] : '准备开始部署...';
+            document.getElementById('progressText').innerHTML = data.log && data.log.length > 0 ? data.log[data.log.length - 1] : '准备开始部署...';
             // 更新日志
             if (data.log) {
                 const raw = data.log.map((msg, idx) => `[${idx+1}] ${msg}`).join('\n');
@@ -281,14 +1483,64 @@ function pollDeployStatus() {
             }
             // 部署完成后显示集群链接
             if (data.status === 'done' && data.cluster_links) {
-                let html = '<div class="alert alert-success">集群部署完成！<br>Web UI 入口：';
+                let html = `
+                <div class="deployment-success-card">
+                    <div class="success-header">
+                        <div class="success-icon">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <div class="success-title">
+                            <h4 class="mb-1">🎉 集群部署成功！</h4>
+                            <p class="mb-0">Hadoop集群已成功启动，您现在可以访问以下管理界面</p>
+                        </div>
+                    </div>
+                    <div class="cluster-links-container">
+                        <h5 class="links-title"><i class="bi bi-link-45deg me-2"></i>Web UI 管理入口</h5>
+                        <div class="links-grid">`;
+                
                 if (data.cluster_links.NameNode) {
-                    html += `<br><a href="${data.cluster_links.NameNode}" target="_blank">NameNode管理界面</a>`;
+                    html += `
+                            <div class="link-card namenode-card">
+                                <div class="link-icon">
+                                    <i class="bi bi-hdd-network"></i>
+                                </div>
+                                <div class="link-content">
+                                    <h6 class="link-title">NameNode 管理界面</h6>
+                                    <p class="link-desc">HDFS文件系统管理</p>
+                                    <a href="${data.cluster_links.NameNode}" target="_blank" class="link-button">
+                                        <i class="bi bi-box-arrow-up-right me-2"></i>访问界面
+                                    </a>
+                                </div>
+                            </div>`;
                 }
+                
                 if (data.cluster_links.ResourceManager) {
-                    html += `<br><a href="${data.cluster_links.ResourceManager}" target="_blank">YARN ResourceManager</a>`;
+                    html += `
+                            <div class="link-card resourcemanager-card">
+                                <div class="link-icon">
+                                    <i class="bi bi-cpu"></i>
+                                </div>
+                                <div class="link-content">
+                                    <h6 class="link-title">YARN ResourceManager</h6>
+                                    <p class="link-desc">资源调度与管理</p>
+                                    <a href="${data.cluster_links.ResourceManager}" target="_blank" class="link-button">
+                                        <i class="bi bi-box-arrow-up-right me-2"></i>访问界面
+                                    </a>
+                                </div>
+                            </div>`;
                 }
-                html += '</div>';
+                
+                html += `
+                        </div>
+                        <div class="success-footer">
+                            <div class="success-tip">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                <span>提示：点击链接将在新标签页中打开管理界面</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                
                 document.getElementById('clusterLinks').innerHTML = html;
                 document.getElementById('startDeploy').innerHTML = '<i class="bi bi-check-circle me-2"></i>部署完成';
                 document.getElementById('startDeploy').classList.remove('btn-success');
@@ -357,11 +1609,64 @@ function configYumRepo() {
     });
 }
 
+function clearLogs() {
+    // 显示清空中状态
+    const logElement = document.getElementById('logContent');
+    logElement.textContent = '🔄 正在清空日志...\n';
+    logElement.style.color = '#ffc107';
+    
+    // 清空服务器端日志数组
+    fetch('/api/deploy/auto/clear-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // 清空本地日志显示
+            logElement.textContent = '✅ 日志已清空\n';
+            logElement.style.color = '#28a745';
+            lastLogLength = 0;
+            
+            // 2秒后恢复默认颜色
+            setTimeout(() => {
+                logElement.style.color = '#e6eaf3';
+            }, 2000);
+        } else {
+            logElement.textContent = '❌ 清空日志失败\n';
+            logElement.style.color = '#dc3545';
+            
+            // 2秒后恢复默认颜色
+            setTimeout(() => {
+                logElement.style.color = '#e6eaf3';
+            }, 2000);
+        }
+    })
+    .catch(err => {
+        console.log('清空日志请求失败:', err);
+        logElement.textContent = '❌ 清空日志失败\n';
+        logElement.style.color = '#dc3545';
+        
+        // 2秒后恢复默认颜色
+        setTimeout(() => {
+            logElement.style.color = '#e6eaf3';
+        }, 2000);
+    });
+}
+
 function fetchLog() {
   fetch('/api/log')
     .then(res => res.text())
     .then(log => {
       const logPre = document.getElementById('logContent');
+      
+      // 如果日志内容显示的是清空状态，则不更新
+      if (logPre.textContent.includes('日志已清空') || 
+          logPre.textContent.includes('正在清空日志') ||
+          logPre.textContent.includes('清空日志失败')) {
+        return;
+      }
+      
       const lines = log.split('\n');
       if (lines.length > lastLogLength) {
         const newLines = lines.slice(lastLogLength).join('\n');
@@ -373,6 +1678,9 @@ function fetchLog() {
           logCard.scrollTop = logCard.scrollHeight;
         }
       }
+    })
+    .catch(err => {
+      console.log('获取日志失败:', err);
     });
 }
 setInterval(fetchLog, 2000); // 每2秒刷新一次

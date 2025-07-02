@@ -863,4 +863,28 @@ sudo systemctl status ssh
 ## 📬 联系方式
 
 - 项目主页：[https://github.com/violet27-chf/HadoopDeploy_tool](https://github.com/violet27-chf/HadoopDeploy_tool)
-- 邮箱：violet@kami666.xyz。
+- 邮箱：violet@kami666.xyz
+
+## 📄 许可证
+
+本项目采用 [MIT License](LICENSE) 许可证。
+
+Copyright (c) 2024 violet27-chf
+
+MIT许可证允许您自由使用、修改和分发本软件，但需要保留版权声明和许可证声明。详情请参阅 [LICENSE](LICENSE) 文件。
+
+## 👥 合作者（Contributors）
+
+<p align="center">
+  <a href="https://github.com/violet27-chf" target="_blank">
+    <img src="https://github.com/violet27-chf.png" width="60" style="border-radius:50%;margin:8px;" title="Mr.chen"/>
+  </a>
+</p>
+<p align="center">
+  <a href="https://github.com/tingyiT1" target="_blank">
+    <img src="https://github.com/tingyiT1.png" width="60" style="border-radius:50%;margin:8px;" title="Caelan Hawke Frost"/>
+  </a>
+</p>
+
+- [violet27-chf](https://github.com/violet27-chf)（Mr.chen）
+- [tingyiT1](https://github.com/tingyiT1)（Caelan Hawke Frost）
