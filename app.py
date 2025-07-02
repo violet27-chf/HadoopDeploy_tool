@@ -1283,8 +1283,4 @@ def api_deploy_auto_clear_logs():
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     app.run(debug=True,host='0.0.0.0',port=5000)
-=======
-    app.run(debug=True,host='0.0.0.0',port=5000)
->>>>>>> 0a6b98477671af29fa14b4cbe729545eb6f9d2b1
