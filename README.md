@@ -118,8 +118,10 @@
 
 #### 使用一键部署脚本
 
+```bash
+# 一键安装
 curl -sSL https://raw.githubusercontent.com/violet27-chf/DeployInstall/refs/heads/main/install.sh | bash
-
+```
 ### 方法二：手动安装
 
 #### 1. 克隆项目
