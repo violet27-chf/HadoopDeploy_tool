@@ -119,8 +119,10 @@
 #### 使用一键部署脚本
 
 ```bash
-# 一键安装
-curl https://raw.githubusercontent.com/violet27-chf/DeployInstall/refs/heads/main/install.sh
+# wget命令
+wegt https://raw.githubusercontent.com/violet27-chf/DeployInstall/refs/heads/main/install.sh
+# curl命令
+curl -o install.sh https://raw.githubusercontent.com/violet27-chf/DeployInstall/refs/heads/main/install.sh
 chmod +x install.sh
 ./install.sh
 ```
