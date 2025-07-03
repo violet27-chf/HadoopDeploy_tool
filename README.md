@@ -120,7 +120,9 @@
 
 ```bash
 # 一键安装
-curl -sSL https://raw.githubusercontent.com/violet27-chf/DeployInstall/refs/heads/main/install.sh | bash
+curl https://raw.githubusercontent.com/violet27-chf/DeployInstall/refs/heads/main/install.sh
+chmod +x install.sh
+./install.sh
 ```
 ### 方法二：手动安装
 
