@@ -1511,7 +1511,9 @@ function pollDeployStatus() {
                         <h5 class="links-title"><i class="bi bi-link-45deg me-2"></i>Web UI 管理入口</h5>
                         <div class="links-grid">`;
                 
-                if (data.cluster_links.NameNode) {
+                    if (data.cluster_links.NameNode) {
+                    let urlObj = new URL(data.cluster_links.NameNode);
+                    let namenodeHost = urlObj.host; 
                     html += `
                             <div class="link-card namenode-card">
                                 <div class="link-icon">
@@ -1522,6 +1524,9 @@ function pollDeployStatus() {
                                     <p class="link-desc">HDFS文件系统管理</p>
                                     <a href="${data.cluster_links.NameNode}" target="_blank" class="link-button">
                                         <i class="bi bi-box-arrow-up-right me-2"></i>访问界面
+                                    </a>
+                                    <a href="#" onclick="setHdfsConfigAndOpen('${namenodeHost}');return false;" class="link-button mt-2" style="background:linear-gradient(135deg,#20c997,#007bff);margin-left:0.5rem;">
+                                        <i class="bi bi-folder2-open me-2"></i>管理HDFS
                                     </a>
                                 </div>
                             </div>`;

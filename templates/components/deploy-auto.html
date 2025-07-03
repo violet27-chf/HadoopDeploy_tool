@@ -1499,6 +1499,8 @@ function pollDeployStatus() {
                         <div class="links-grid">`;
                 
                 if (data.cluster_links.NameNode) {
+                    let urlObj = new URL(data.cluster_links.NameNode);
+                    let namenodeHost = urlObj.host; // 结果应为 192.168.1.10:9870
                     html += `
                             <div class="link-card namenode-card">
                                 <div class="link-icon">
@@ -1509,6 +1511,9 @@ function pollDeployStatus() {
                                     <p class="link-desc">HDFS文件系统管理</p>
                                     <a href="${data.cluster_links.NameNode}" target="_blank" class="link-button">
                                         <i class="bi bi-box-arrow-up-right me-2"></i>访问界面
+                                    </a>
+                                    <a href="#" onclick="setHdfsConfigAndOpen('${namenodeHost}');return false;" class="link-button mt-2" style="background:linear-gradient(135deg,#20c997,#007bff);margin-left:0.5rem;">
+                                        <i class="bi bi-folder2-open me-2"></i>管理HDFS
                                     </a>
                                 </div>
                             </div>`;
@@ -1684,5 +1689,14 @@ function fetchLog() {
     });
 }
 setInterval(fetchLog, 2000); // 每2秒刷新一次
+
+function setHdfsConfigAndOpen(namenodeHost) {
+    if (!namenodeHost) {
+        alert('未获取到NameNode主机信息！');
+        return;
+    }
+    sessionStorage.setItem('serverConfig', JSON.stringify({basic: {namenodeHost: namenodeHost}}));
+    window.location.href = '/hdfs-manager';
+}
 </script>
 {% endblock %} 

@@ -1,0 +1,739 @@
+{% extends "base.html" %}
+{% block title %}HDFS文件管理 - Hadoop部署系统{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-xl-9 col-lg-10">
+      <div class="page-header mb-4">
+        <h1 class="page-title d-flex align-items-center">
+          <i class="bi bi-folder2-open me-2"></i>HDFS文件管理
+        </h1>
+        <p class="page-subtitle">浏览、上传、下载和管理Hadoop集群中的HDFS文件</p>
+      </div>
+      <div class="main-content p-4 rounded shadow-sm bg-white" id="mainContent">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <button class="btn btn-outline-secondary me-2" id="btnGoUp" style="display:none;">
+              <i class="bi bi-arrow-left-circle me-1"></i>返回上级
+            </button>
+            <button class="btn btn-gradient-primary me-2" id="btnRefresh"><i class="bi bi-arrow-clockwise me-1"></i>刷新</button>
+            <label class="btn btn-gradient-success me-2 mb-0" style="cursor:pointer;">
+              <i class="bi bi-upload me-1"></i>上传文件
+              <input type="file" id="fileInput" style="display:none;" multiple>
+            </label>
+            <button class="btn btn-outline-success btn-sm me-2" id="btnBatchDownload"><i class="bi bi-download"></i> 批量下载</button>
+            <button class="btn btn-outline-danger btn-sm" id="btnBatchDelete"><i class="bi bi-trash"></i> 批量删除</button>
+            <button class="btn btn-gradient-primary btn-sm px-4 fw-bold shadow-sm" style="border-radius:2em;" id="btnDataClean">
+              <i class="bi bi-funnel-fill me-1"></i>数据清洗
+            </button>
+          </div>
+          <div id="uploadLoading" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:999;background:rgba(255,255,255,0.6);text-align:center;">
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:320px;">
+              <div style="font-size:1.3em;margin-bottom:16px;" id="loadingText">文件上传中...</div>
+              <div class="progress" style="height: 24px;">
+                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" style="width: 0%;font-size:1em;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <input type="text" class="form-control" id="searchInput" style="width:200px;display:inline-block;" placeholder="搜索文件/目录...">
+          </div>
+        </div>
+        <div class="mb-2 text-muted" id="currentPath" style="font-size:0.98rem;"></div>
+        <div class="hdfs-table-wrapper">
+          <table class="table table-hover align-middle" id="hdfsTable">
+            <thead class="table-light">
+              <tr>
+                <th style="width:40px;"><input type="checkbox" id="selectAll"></th>
+                <th>名称</th>
+                <th>类型</th>
+                <th>大小</th>
+                <th>修改时间</th>
+                <th style="width:180px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="hdfsTbody">
+              <tr><td colspan="6" class="text-center text-muted">加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="text-muted mt-3" style="font-size:0.95rem;">
+          <i class="bi bi-info-circle me-1"></i>此页面支持浏览、上传、下载、删除HDFS文件，所有操作均为实时生效。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="dataCleanModal" tabindex="-1" aria-labelledby="dataCleanModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-gradient-primary text-white">
+        <h5 class="modal-title" id="dataCleanModalLabel"><i class="bi bi-funnel me-2"></i>数据清洗任务</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body">
+        <form id="dataCleanForm">
+          <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label">输入路径</label>
+            <div class="col-sm-7">
+              <input type="text" class="form-control" id="cleanInputPath" placeholder="请选择输入文件" readonly>
+            </div>
+            <div class="col-sm-2 ps-0">
+              <button type="button" class="btn btn-outline-primary btn-sm w-100" id="selectInputPathBtn">
+                <i class="bi bi-folder2-open"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label">输出目录</label>
+            <div class="col-sm-7">
+              <input type="text" class="form-control" id="cleanOutputPath" placeholder="请选择输出目录" readonly>
+            </div>
+            <div class="col-sm-2 ps-0">
+              <button type="button" class="btn btn-outline-primary btn-sm w-100" id="selectOutputPathBtn">
+                <i class="bi bi-folder2-open"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label">清洗类型</label>
+            <div class="col-sm-9">
+              <select class="form-select" id="cleanType">
+                <option value="remove_empty">去除空行</option>
+                <option value="deduplicate">去重</option>
+                <option value="custom">自定义</option>
+              </select>
+            </div>
+          </div>
+        </form>
+        <div id="dataCleanMsg" class="text-danger small mt-2" style="display:none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-gradient-primary" id="startDataClean">
+          <i class="bi bi-play-fill"></i>开始清洗
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 路径选择 Modal -->
+<div class="modal fade" id="pathSelectModal" tabindex="-1" aria-labelledby="pathSelectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-gradient-primary text-white">
+        <h5 class="modal-title" id="pathSelectModalLabel">
+          <i class="bi bi-folder2-open me-2"></i>选择HDFS路径
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div id="pathSelectBreadcrumb" class="small text-primary fw-bold"></div>
+          <div>
+            <button class="btn btn-outline-success btn-sm fw-bold me-1" id="btnCreateFolder" style="border-radius:1.5em;">
+              <i class="bi bi-folder-plus"></i> 新建文件夹
+            </button>
+            <button class="btn btn-outline-primary btn-sm fw-bold" id="btnCreateFile" style="border-radius:1.5em;">
+              <i class="bi bi-file-earmark-plus"></i> 新建文件
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive" style="max-height: 340px;">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>名称</th>
+                <th>类型</th>
+                <th style="width:120px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="pathSelectTbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-gradient-primary fw-bold px-4" id="selectPathConfirmBtn" style="border-radius:2em;">
+          <i class="bi bi-check2-circle"></i> 确认选择
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 新建文件夹 Modal -->
+<div class="modal fade" id="createFolderModal" tabindex="-1" aria-labelledby="createFolderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createFolderModalLabel">新建文件夹</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" id="newFolderName" placeholder="请输入新文件夹名">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="createFolderConfirmBtn">创建</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 新建文件 Modal -->
+<div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createFileModalLabel">新建文件</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" id="newFileName" placeholder="请输入新文件名">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="createFileConfirmBtn">创建</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let currentPath = '/';
+let allFiles = [];
+let namenodeHost = null;
+let pathSelectMode = ''; // 'input' or 'output'
+let pathSelectCurrent = '/';
+let pathSelectSelected = '';
+
+function getConfigNamenodeHost() {
+  let config = sessionStorage.getItem('serverConfig');
+  if (!config) return null;
+  try {
+    config = JSON.parse(config);
+  } catch(e) {
+    try { config = eval('(' + config + ')'); } catch(e2) { return null; }
+  }
+  if (Array.isArray(config)) config = config[0];
+  if (config.basic && config.basic.namenodeHost) return config.basic.namenodeHost;
+  if (config.namenodeHost) return config.namenodeHost;
+  return null;
+}
+
+function formatSize(size) {
+  if (size === 0 || size === '-' || size === undefined) return '-';
+  if (size < 1024) return size + ' B';
+  if (size < 1024*1024) return (size/1024).toFixed(1) + ' KB';
+  if (size < 1024*1024*1024) return (size/1024/1024).toFixed(1) + ' MB';
+  return (size/1024/1024/1024).toFixed(1) + ' GB';
+}
+
+function loadHdfsList(path) {
+  if (!namenodeHost) {
+    document.getElementById('hdfsTbody').innerHTML = '<tr><td colspan="6" class="text-danger">未获取到NameNode主机信息，请先完成集群配置！</td></tr>';
+    return;
+  }
+  document.getElementById('hdfsTbody').innerHTML = '<tr><td colspan="6" class="text-center text-muted">加载中...</td></tr>';
+  fetch(`/api/hdfs/list?path=${encodeURIComponent(path)}&namenodeHost=${encodeURIComponent(namenodeHost)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        document.getElementById('hdfsTbody').innerHTML = `<tr><td colspan="6" class="text-danger">加载失败：${data.msg}</td></tr>`;
+        return;
+      }
+      allFiles = data.files;
+      renderTable(allFiles);
+      currentPath = path;
+      document.getElementById('currentPath').innerHTML = `<b>当前位置：</b>${path === '' ? '/' : path}`;
+
+      // 返回上级按钮显示/隐藏
+      const btnGoUp = document.getElementById('btnGoUp');
+      if (currentPath !== '/' && currentPath !== '') {
+        btnGoUp.style.display = '';
+        let up = currentPath.split('/').slice(0, -1).join('/') || '/';
+        btnGoUp.onclick = function() {
+          loadHdfsList(up);
+        };
+      } else {
+        btnGoUp.style.display = 'none';
+      }
+    })
+    .catch(e => {
+      document.getElementById('hdfsTbody').innerHTML = `<tr><td colspan="6" class="text-danger">加载失败：${e}</td></tr>`;
+    });
+}
+
+function renderTable(files) {
+  let html = '';
+  if (!files || files.length === 0) {
+    html += '<tr><td colspan="6" class="text-center text-muted">该目录为空</td></tr>';
+  } else {
+    files.forEach(f => {
+      let isDir = f.type === 'DIRECTORY';
+      let filePath = `${currentPath.replace(/\/$/, '')}/${f.pathSuffix}`;
+      html += `<tr>
+        <td>
+          ${isDir
+            ? '<i class="bi bi-folder-fill text-warning"></i>'
+            : `<input type="checkbox" class="file-checkbox" value="${filePath}">`
+          }
+        </td>
+        <td>${isDir ? `<a href="#" onclick="loadHdfsList('${filePath}');return false;">${f.pathSuffix}</a>` : f.pathSuffix}</td>
+        <td>${isDir ? '目录' : '文件'}</td>
+        <td>${isDir ? '-' : formatSize(f.length)}</td>
+        <td>${f.modificationTime ? new Date(f.modificationTime).toLocaleString() : '-'}</td>
+        <td>
+          ${isDir ? '' : `<button class="btn btn-sm btn-outline-success me-1" onclick="downloadFile('${filePath}')"><i class="bi bi-download"></i> 下载</button>`}
+          <button class="btn btn-sm btn-outline-danger fw-bold" onclick="deleteFile('${filePath}', ${isDir})"><i class="bi bi-trash"></i> 删除</button>
+        </td>
+      </tr>`;
+    });
+  }
+  document.getElementById('hdfsTbody').innerHTML = html;
+}
+
+let formData = new FormData();
+formData.append('file', fileInput.files[0]);
+formData.append('path', currentPath);
+formData.append('namenodeHost', namenodeHost);
+
+fetch('/api/hdfs/upload', {
+  method: 'POST',
+  body: formData
+})
+.then(res => res.json())
+.then(data => {
+  console.log(data);
+});
+
+function downloadFile(path) {
+  if (!namenodeHost) return alert('未获取到NameNode主机信息！');
+  window.open(`/api/hdfs/download?path=${encodeURIComponent(path)}&namenodeHost=${encodeURIComponent(namenodeHost)}`);
+}
+
+function deleteFile(path, isDir) {
+  if (!namenodeHost) return alert('未获取到NameNode主机信息！');
+  if (!confirm('确定要删除' + (isDir ? '目录' : '文件') + '吗？')) return;
+  document.getElementById('loadingText').innerText = '文件删除中...';
+  document.getElementById('uploadLoading').style.display = 'block';
+  fetch('/api/hdfs/delete', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({path: path, recursive: isDir, namenodeHost: namenodeHost})
+  })
+  .then(res => res.json())
+  .then(data => {
+    hideProgressBar();
+    if (data.success) {
+      loadHdfsList(currentPath);
+    } else {
+      alert('删除失败：' + data.msg);
+    }
+  })
+  .catch(() => {
+    hideProgressBar();
+    alert('删除异常！');
+  });
+}
+
+document.getElementById('btnRefresh').onclick = () => loadHdfsList(currentPath);
+document.getElementById('fileInput').onchange = function() {
+  if (!namenodeHost) return alert('未获取到NameNode主机信息！');
+  let files = this.files;
+  if (!files.length) return;
+
+  showProgressBar(files.length, '文件上传中...');
+
+  let finished = 0, hasError = false;
+
+  for (let i = 0; i < files.length; i++) {
+    let formData = new FormData();
+    formData.append('file', files[i]);
+    formData.append('path', currentPath);
+    formData.append('namenodeHost', namenodeHost);
+
+    fetch('/api/hdfs/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      finished++;
+      updateProgressBar(finished, files.length);
+      if (!data.success && !hasError) {
+        hasError = true;
+        alert('上传失败：' + data.msg);
+      }
+      if (finished === files.length) {
+        hideProgressBar();
+        loadHdfsList(currentPath);
+        setTimeout(() => { document.getElementById('fileInput').value = ''; }, 100);
+      }
+    })
+    .catch(() => {
+      finished++;
+      updateProgressBar(finished, files.length);
+      if (!hasError) {
+        hasError = true;
+        alert('上传异常！');
+      }
+      if (finished === files.length) {
+        hideProgressBar();
+        loadHdfsList(currentPath);
+        setTimeout(() => { document.getElementById('fileInput').value = ''; }, 100);
+      }
+    });
+  }
+};
+
+document.getElementById('searchInput').oninput = function() {
+  let kw = this.value.trim().toLowerCase();
+  if (!kw) {
+    renderTable(allFiles);
+    return;
+  }
+  let filtered = allFiles.filter(f => f.pathSuffix.toLowerCase().includes(kw));
+  renderTable(filtered);
+};
+
+window.onload = function() {
+  namenodeHost = getConfigNamenodeHost();
+  if (!namenodeHost) {
+    document.getElementById('hdfsTbody').innerHTML = '<tr><td colspan="6" class="text-danger">未获取到NameNode主机信息，请先完成集群配置！</td></tr>';
+    return;
+  }
+  loadHdfsList('/');
+};
+
+const mainContent = document.getElementById('mainContent');
+const uploadLoading = document.getElementById('uploadLoading');
+
+mainContent.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  // 可选：给区域加高亮效果
+  mainContent.style.background = '#f0f8ff';
+});
+
+mainContent.addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  // 恢复原背景
+  mainContent.style.background = '';
+});
+
+mainContent.addEventListener('drop', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  mainContent.style.background = '';
+  if (!namenodeHost) return alert('未获取到NameNode主机信息！');
+  const files = e.dataTransfer.files;
+  if (!files.length) return;
+
+  // 显示加载动画
+  document.getElementById('loadingText').innerText = '文件上传中...';
+  document.getElementById('uploadLoading').style.display = 'block';
+
+  let finished = 0;
+  let hasError = false;
+
+  for (let i = 0; i < files.length; i++) {
+    let formData = new FormData();
+    formData.append('file', files[i]);
+    formData.append('path', currentPath);
+    formData.append('namenodeHost', namenodeHost);
+
+    fetch('/api/hdfs/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      finished++;
+      if (!data.success && !hasError) {
+        hasError = true;
+        alert('上传失败：' + data.msg);
+      }
+      if (finished === files.length) {
+        document.getElementById('uploadLoading').style.display = 'none';
+        loadHdfsList(currentPath);
+      }
+    })
+    .catch(() => {
+      finished++;
+      if (!hasError) {
+        hasError = true;
+        alert('上传异常！');
+      }
+      if (finished === files.length) {
+        document.getElementById('uploadLoading').style.display = 'none';
+        loadHdfsList(currentPath);
+      }
+    });
+  }
+});
+
+document.getElementById('selectAll').onclick = function() {
+  const checked = this.checked;
+  document.querySelectorAll('.file-checkbox').forEach(cb => cb.checked = checked);
+};
+
+function getSelectedFiles() {
+  return Array.from(document.querySelectorAll('.file-checkbox:checked')).map(cb => cb.value);
+}
+
+document.getElementById('btnBatchDownload').onclick = function() {
+  const files = getSelectedFiles();
+  if (!files.length) return alert('请先选择要下载的文件！');
+  if (files.length > 5) return alert('批量下载建议每次不超过5个文件！');
+  files.forEach(path => {
+    window.open(`/api/hdfs/download?path=${encodeURIComponent(path)}&namenodeHost=${encodeURIComponent(namenodeHost)}`);
+  });
+};
+
+document.getElementById('btnBatchDelete').onclick = function() {
+  const files = getSelectedFiles();
+  if (!files.length) return alert('请先选择要删除的文件！');
+  if (!confirm('确定要删除选中的文件吗？')) return;
+  let finished = 0, hasError = false;
+  document.getElementById('loadingText').innerText = '文件删除中...';
+  document.getElementById('uploadLoading').style.display = 'block';
+  files.forEach(path => {
+    fetch('/api/hdfs/delete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({path, namenodeHost, recursive: false})
+    })
+    .then(res => res.json())
+    .then(data => {
+      finished++;
+      if (!data.success && !hasError) {
+        hasError = true;
+        alert('删除失败：' + data.msg);
+      }
+      if (finished === files.length) {
+        hideProgressBar();
+        setTimeout(() => {
+          loadHdfsList(currentPath);
+        }, 100);
+      }
+    })
+    .catch(() => {
+      finished++;
+      if (!hasError) {
+        hasError = true;
+        alert('删除异常！');
+      }
+      if (finished === files.length) {
+        hideProgressBar();
+        setTimeout(() => {
+          loadHdfsList(currentPath);
+        }, 100);
+      }
+    });
+  });
+};
+
+function showProgressBar(total, text) {
+  document.getElementById('loadingText').innerText = text;
+  document.getElementById('uploadLoading').style.display = 'block';
+  updateProgressBar(0, total);
+}
+
+function updateProgressBar(current, total) {
+  const percent = total === 0 ? 100 : Math.round((current / total) * 100);
+  const bar = document.getElementById('progressBar');
+  bar.style.width = percent + '%';
+  bar.setAttribute('aria-valuenow', percent);
+  bar.innerText = percent + '%';
+}
+
+function hideProgressBar() {
+  document.getElementById('uploadLoading').style.display = 'none';
+}
+
+document.getElementById('btnDataClean').onclick = function() {
+  var modal = new bootstrap.Modal(document.getElementById('dataCleanModal'));
+  modal.show();
+};
+
+document.getElementById('startDataClean').onclick = function() {
+  const inputPath = document.getElementById('cleanInputPath').value.trim();
+  const outputPath = document.getElementById('cleanOutputPath').value.trim();
+  const cleanType = document.getElementById('cleanType').value;
+  if (!inputPath || !outputPath) {
+    alert('请输入输入和输出路径');
+    return;
+  }
+  fetch('/api/data_clean', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      inputPath,
+      outputPath,
+      cleanType,
+      namenodeHost: namenodeHost
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('数据清洗任务已提交，稍后可在输出路径查看结果！');
+    } else {
+      alert('清洗失败：' + data.msg);
+    }
+  });
+};
+
+document.getElementById('selectInputPathBtn').onclick = function() {
+  pathSelectMode = 'input';
+  openPathSelectModal('/');
+};
+document.getElementById('selectOutputPathBtn').onclick = function() {
+  pathSelectMode = 'output';
+  openPathSelectModal('/');
+};
+
+function openPathSelectModal(startPath) {
+  pathSelectCurrent = startPath || '/';
+  pathSelectSelected = '';
+  document.getElementById('selectPathConfirmBtn').disabled = true;
+  loadPathSelectList(pathSelectCurrent);
+  var modal = new bootstrap.Modal(document.getElementById('pathSelectModal'));
+  modal.show();
+}
+
+function loadPathSelectList(path) {
+  pathSelectCurrent = path;
+  document.getElementById('pathSelectTbody').innerHTML = '<tr><td colspan="3" class="text-muted">加载中...</td></tr>';
+  fetch(`/api/hdfs/list?path=${encodeURIComponent(path)}&namenodeHost=${encodeURIComponent(namenodeHost)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        document.getElementById('pathSelectTbody').innerHTML = `<tr><td colspan="3" class="text-danger">加载失败：${data.msg}</td></tr>`;
+        return;
+      }
+      let html = '';
+      if (path !== '/') {
+        let up = path.split('/').slice(0, -1).join('/') || '/';
+        html += `<tr>
+          <td colspan="3"><a href="#" onclick="loadPathSelectList('${up}');return false;"><i class="bi bi-arrow-left-circle me-1"></i>返回上级</a></td>
+        </tr>`;
+      }
+      data.files.forEach(f => {
+        let isDir = f.type === 'DIRECTORY';
+        let filePath = `${path.replace(/\/$/, '')}/${f.pathSuffix}`;
+        if (pathSelectMode === 'output' && !isDir) return;
+        html += `<tr>
+          <td>${isDir ? `<i class="bi bi-folder-fill text-warning"></i> <a href='#' onclick="loadPathSelectList('${filePath}');return false;">${f.pathSuffix}</a>` : f.pathSuffix}</td>
+          <td>${isDir ? '目录' : '文件'}</td>
+          <td>
+            ${
+              isDir
+                ? `<button class="btn btn-sm btn-outline-primary" onclick="loadPathSelectList('${filePath}')">进入</button>
+                   <button class="btn btn-sm btn-outline-success" onclick="selectPath('${filePath}')">选择</button>`
+                : (pathSelectMode === 'input'
+                    ? `<button class="btn btn-sm btn-outline-success" onclick="selectPath('${filePath}')">选择</button>`
+                    : '')
+            }
+          </td>
+        </tr>`;
+      });
+      document.getElementById('pathSelectTbody').innerHTML = html;
+      document.getElementById('pathSelectBreadcrumb').innerText = '当前位置：' + path;
+    });
+}
+
+function selectPath(path) {
+  pathSelectSelected = path;
+  document.getElementById('selectPathConfirmBtn').disabled = false;
+}
+
+// 确认选择
+document.getElementById('selectPathConfirmBtn').onclick = function() {
+  if (pathSelectMode === 'input') {
+    document.getElementById('cleanInputPath').value = pathSelectSelected;
+  } else if (pathSelectMode === 'output') {
+    document.getElementById('cleanOutputPath').value = pathSelectSelected;
+  }
+  var modal = bootstrap.Modal.getInstance(document.getElementById('pathSelectModal'));
+  modal.hide();
+};
+
+// 打开新建文件夹弹窗
+document.getElementById('btnCreateFolder').onclick = function() {
+  document.getElementById('newFolderName').value = '';
+  var modal = new bootstrap.Modal(document.getElementById('createFolderModal'));
+  modal.show();
+};
+
+// 确认创建
+document.getElementById('createFolderConfirmBtn').onclick = function() {
+  const foldername = document.getElementById('newFolderName').value.trim();
+  if (!foldername) {
+    alert('请输入文件夹名');
+    return;
+  }
+  const newPath = pathSelectCurrent.replace(/\/$/, '') + '/' + foldername;
+  fetch('/api/hdfs/create', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      path: newPath,
+      namenodeHost: namenodeHost,
+      type: 'directory'
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('新建文件夹成功！');
+      loadPathSelectList(pathSelectCurrent);
+      var modal = bootstrap.Modal.getInstance(document.getElementById('createFolderModal'));
+      modal.hide();
+    } else {
+      alert('新建失败：' + data.msg);
+    }
+  });
+};
+
+// 打开新建文件弹窗
+document.getElementById('btnCreateFile').onclick = function() {
+  document.getElementById('newFileName').value = '';
+  var modal = new bootstrap.Modal(document.getElementById('createFileModal'));
+  modal.show();
+};
+
+// 确认创建新文件
+document.getElementById('createFileConfirmBtn').onclick = function() {
+  const filename = document.getElementById('newFileName').value.trim();
+  if (!filename) {
+    alert('请输入文件名');
+    return;
+  }
+  const newPath = pathSelectCurrent.replace(/\/$/, '') + '/' + filename;
+  fetch('/api/hdfs/create', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      path: newPath,
+      namenodeHost: namenodeHost,
+      type: 'file'
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('新建文件成功！');
+      loadPathSelectList(pathSelectCurrent);
+      var modal = bootstrap.Modal.getInstance(document.getElementById('createFileModal'));
+      modal.hide();
+    } else {
+      alert('新建失败：' + data.msg);
+    }
+  });
+};
+</script>
+{% endblock %} 

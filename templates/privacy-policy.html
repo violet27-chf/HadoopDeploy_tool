@@ -1,181 +1,1278 @@
 {% extends "base.html" %}
 
-{% block title %}隐私政策{% endblock %}
+{% block title %}隐私政策 - Hadoop部署系统{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-lg border-0">
-        <div class="card-body p-5">
-            <h1 class="mb-4 fw-bold text-primary"><i class="bi bi-shield-lock me-2"></i>隐私政策</h1>
-            <hr>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">1. 信息收集</h2>
-                <ul class="ps-4">
-                    <li>您提供的个人信息（如姓名、联系方式）</li>
-                    <li>设备信息（IP地址、浏览器类型）</li>
-                    <li>使用数据（访问时间、页面浏览）</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">2. 信息使用</h2>
-                <ul class="ps-4">
-                    <li>提供和维护服务</li>
-                    <li>改进用户体验</li>
-                    <li>安全保障</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">3. 数据保护</h2>
-                <ul class="ps-4">
-                    <li>加密传输数据</li>
-                    <li>限制数据访问权限</li>
-                    <li>定期安全评估</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">4. 您的权利</h2>
-                <ul class="ps-4">
-                    <li>访问我们持有的您的数据</li>
-                    <li>要求更正或删除数据</li>
-                    <li>撤回同意</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">5. 第三方服务数据</h2>
-                <ul class="ps-4">
-                    <li>本工具支持通过第三方端口映射服务（如ChmlFrp）进行公网部署</li>
-                    <li>使用第三方服务时，您的数据可能被传输到第三方服务器</li>
-                    <li>第三方服务的数据收集、使用和保护政策不在本工具控制范围内</li>
-                    <li>建议在使用第三方服务前仔细阅读其隐私政策</li>
-                    <li>本地部署方式不会涉及第三方数据传输，提供更好的隐私保护</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">6. 部署环境数据</h2>
-                <ul class="ps-4">
-                    <li>部署过程中可能涉及服务器配置信息、网络地址等敏感数据</li>
-                    <li>这些数据仅用于部署目的，不会用于其他用途</li>
-                    <li>建议在公网部署时使用临时或测试环境</li>
-                    <li>部署完成后，建议及时清理敏感配置信息</li>
-                    <li>本工具不会永久存储您的服务器访问凭证</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">7. 数据安全措施</h2>
-                <ul class="ps-4">
-                    <li>采用加密传输协议保护数据传输安全</li>
-                    <li>实施访问控制和身份验证机制</li>
-                    <li>定期进行安全审计和漏洞扫描</li>
-                    <li>建立数据备份和恢复机制</li>
-                    <li>对敏感数据进行脱敏处理</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">8. 数据保留</h2>
-                <ul class="ps-4">
-                    <li>部署日志和配置信息仅在部署期间临时存储</li>
-                    <li>部署完成后，相关数据将被自动清理</li>
-                    <li>用户主动删除的数据将立即从系统中移除</li>
-                    <li>第三方服务的数据保留政策请参考对应服务提供商</li>
-                    <li>建议定期清理本地缓存和临时文件</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">9. 跨境数据传输</h2>
-                <ul class="ps-4">
-                    <li>使用第三方服务时，数据可能传输到境外服务器</li>
-                    <li>跨境数据传输受当地法律法规约束</li>
-                    <li>建议评估跨境数据传输的安全风险</li>
-                    <li>本地部署可避免跨境数据传输问题</li>
-                    <li>如对数据跨境传输有疑虑，请选择本地部署方式</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">10. 隐私保护建议</h2>
-                <ul class="ps-4">
-                    <li>优先选择本地部署方式以获得最佳隐私保护</li>
-                    <li>使用第三方服务时，建议使用临时或测试环境</li>
-                    <li>定期更新系统和软件版本，及时修复安全漏洞</li>
-                    <li>妥善保管服务器访问凭证和敏感信息</li>
-                    <li>如发现隐私泄露问题，请立即联系技术支持</li>
-                </ul>
-            </section>
-            <p class="text-muted mt-4">最后更新日期：2025-06-28</p>
+<div class="privacy-page-wrapper">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <!-- 页面头部 -->
+                <div class="page-header mb-4">
+                    <div class="header-content">
+                        <div class="header-left">
+                            <h1 class="page-title">
+                                <i class="bi bi-shield-lock"></i>
+                                隐私政策
+                            </h1>
+                            <p class="page-subtitle">我们重视您的隐私，承诺保护您的个人信息安全</p>
+                        </div>
+                        <div class="header-right">
+                            <div class="last-updated">
+                                <i class="bi bi-calendar-check"></i>
+                                <span>最后更新：2025-06-28</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区域 -->
+                <div class="main-content">
+                    <!-- 隐私政策概述卡片 -->
+                    <div class="overview-card mb-4">
+                        <div class="overview-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h6 class="overview-title">隐私保护承诺</h6>
+                            <p class="overview-text">我们采用行业标准的安全措施保护您的数据，包括访问控制和定期安全审计。您的隐私安全是我们的首要任务。</p>
+                        </div>
+                    </div>
+
+                    <!-- 隐私政策内容 -->
+                    <div class="privacy-content">
+                        <!-- 信息收集 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-collection"></i>
+                                </div>
+                                <h3 class="section-title">1. 信息收集</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <p class="content-intro">我们收集以下类型的信息以提供和改进服务：</p>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <div class="info-icon">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                            <div class="info-text">
+                                                <h6>个人信息</h6>
+                                                <p>您提供的姓名、联系方式等基本信息</p>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon">
+                                                <i class="bi bi-device-hdd"></i>
+                                            </div>
+                                            <div class="info-text">
+                                                <h6>设备信息</h6>
+                                                <p>IP地址、浏览器类型、操作系统等</p>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon">
+                                                <i class="bi bi-graph-up"></i>
+                                            </div>
+                                            <div class="info-text">
+                                                <h6>使用数据</h6>
+                                                <p>访问时间、页面浏览、功能使用情况</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 信息使用 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-gear"></i>
+                                </div>
+                                <h3 class="section-title">2. 信息使用</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <p class="content-intro">收集的信息将用于以下目的：</p>
+                                    <div class="usage-list">
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>提供和维护Hadoop部署服务</span>
+                                        </div>
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>改进用户体验和功能优化</span>
+                                        </div>
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>安全保障和系统监控</span>
+                                        </div>
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>技术支持和问题排查</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 数据保护 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-lock"></i>
+                                </div>
+                                <h3 class="section-title">3. 数据保护</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <p class="content-intro">我们采用多层次的安全措施保护您的数据：</p>
+                                    <div class="security-grid">
+
+                                        <div class="security-item">
+                                            <div class="security-icon">
+                                                <i class="bi bi-person-check"></i>
+                                            </div>
+                                            <h6>访问控制</h6>
+                                            <p>严格的权限管理和身份验证</p>
+                                        </div>
+                                        <div class="security-item">
+                                            <div class="security-icon">
+                                                <i class="bi bi-search"></i>
+                                            </div>
+                                            <h6>安全审计</h6>
+                                            <p>定期进行安全评估和漏洞扫描</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 您的权利 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-person-gear"></i>
+                                </div>
+                                <h3 class="section-title">4. 您的权利</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <p class="content-intro">您对您的个人信息拥有以下权利：</p>
+                                    <div class="rights-list">
+                                        <div class="right-item">
+                                            <div class="right-icon">
+                                                <i class="bi bi-eye"></i>
+                                            </div>
+                                            <div class="right-content">
+                                                <h6>访问权</h6>
+                                                <p>查看我们持有的您的个人信息</p>
+                                            </div>
+                                        </div>
+                                        <div class="right-item">
+                                            <div class="right-icon">
+                                                <i class="bi bi-pencil"></i>
+                                            </div>
+                                            <div class="right-content">
+                                                <h6>更正权</h6>
+                                                <p>要求更正不准确或过时的信息</p>
+                                            </div>
+                                        </div>
+                                        <div class="right-item">
+                                            <div class="right-icon">
+                                                <i class="bi bi-trash"></i>
+                                            </div>
+                                            <div class="right-content">
+                                                <h6>删除权</h6>
+                                                <p>要求删除您的个人信息</p>
+                                            </div>
+                                        </div>
+                                        <div class="right-item">
+                                            <div class="right-icon">
+                                                <i class="bi bi-arrow-return-left"></i>
+                                            </div>
+                                            <div class="right-content">
+                                                <h6>撤回权</h6>
+                                                <p>随时撤回您的同意</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 第三方服务 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-link-45deg"></i>
+                                </div>
+                                <h3 class="section-title">5. 第三方服务数据</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="warning-box">
+                                        <div class="warning-icon">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="warning-content">
+                                            <h6>重要提醒</h6>
+                                            <p>本工具支持通过第三方端口映射服务进行公网部署，使用第三方服务时请注意数据安全。</p>
+                                        </div>
+                                    </div>
+                                    <div class="third-party-details">
+
+                                        <div class="detail-item">
+                                            <i class="bi bi-arrow-right"></i>
+                                            <span>第三方服务的数据收集、使用和保护政策不在本工具控制范围内</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="bi bi-arrow-right"></i>
+                                            <span>建议在使用第三方服务前仔细阅读其隐私政策</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 部署环境数据 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-server"></i>
+                                </div>
+                                <h3 class="section-title">6. 部署环境数据</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="info-box">
+                                        <div class="info-icon">
+                                            <i class="bi bi-info-circle"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <h6>部署数据说明</h6>
+                                            <p>部署过程中涉及服务器配置信息、网络地址等敏感数据，我们承诺安全处理。</p>
+                                        </div>
+                                    </div>
+                                    <div class="deployment-details">
+                                        <div class="detail-item">
+                                            <i class="bi bi-check2"></i>
+                                            <span>这些数据仅用于部署目的，不会用于其他用途</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="bi bi-check2"></i>
+                                            <span>建议在公网部署时使用临时或测试环境</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="bi bi-check2"></i>
+                                            <span>部署完成后，建议及时清理敏感配置信息</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="bi bi-check2"></i>
+                                            <span>本工具不会永久存储您的服务器访问凭证</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 数据安全措施 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <h3 class="section-title">7. 数据安全措施</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="security-measures">
+                                        <div class="measure-item">
+                                            <div class="measure-icon">
+                                                <i class="bi bi-person-badge"></i>
+                                            </div>
+                                            <div class="measure-content">
+                                                <h6>访问控制</h6>
+                                                <p>实施访问控制和身份验证机制</p>
+                                            </div>
+                                        </div>
+                                        <div class="measure-item">
+                                            <div class="measure-icon">
+                                                <i class="bi bi-search-heart"></i>
+                                            </div>
+                                            <div class="measure-content">
+                                                <h6>安全审计</h6>
+                                                <p>定期进行安全审计和漏洞扫描</p>
+                                            </div>
+                                        </div>
+                                        <div class="measure-item">
+                                            <div class="measure-icon">
+                                                <i class="bi bi-cloud-arrow-up"></i>
+                                            </div>
+                                            <div class="measure-content">
+                                                <h6>数据备份</h6>
+                                                <p>建立数据备份和恢复机制</p>
+                                            </div>
+                                        </div>
+                                        <div class="measure-item">
+                                            <div class="measure-icon">
+                                                <i class="bi bi-mask"></i>
+                                            </div>
+                                            <div class="measure-content">
+                                                <h6>数据脱敏</h6>
+                                                <p>对敏感数据进行脱敏处理</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 数据保留 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <h3 class="section-title">8. 数据保留</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="retention-timeline">
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="bi bi-hourglass-split"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6>部署期间</h6>
+                                                <p>部署日志和配置信息仅在部署期间临时存储</p>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="bi bi-check-circle"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6>部署完成</h6>
+                                                <p>部署完成后，相关数据将被自动清理</p>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="bi bi-trash"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6>用户删除</h6>
+                                                <p>用户主动删除的数据将立即从系统中移除</p>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="bi bi-gear"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6>定期清理</h6>
+                                                <p>建议定期清理本地缓存和临时文件</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <!-- 隐私保护建议 -->
+                        <div class="policy-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-lightbulb"></i>
+                                </div>
+                                <h3 class="section-title">9. 隐私保护建议</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="recommendations">
+                                        <div class="recommendation-item">
+                                            <div class="recommendation-icon">
+                                                <i class="bi bi-house-check"></i>
+                                            </div>
+                                            <div class="recommendation-content">
+                                                <h6>优先本地部署</h6>
+                                                <p>选择本地部署方式以获得最佳隐私保护</p>
+                                            </div>
+                                        </div>
+                                        <div class="recommendation-item">
+                                            <div class="recommendation-icon">
+                                                <i class="bi bi-shield-check"></i>
+                                            </div>
+                                            <div class="recommendation-content">
+                                                <h6>使用测试环境</h6>
+                                                <p>使用第三方服务时，建议使用临时或测试环境</p>
+                                            </div>
+                                        </div>
+                                        <div class="recommendation-item">
+                                            <div class="recommendation-icon">
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                            </div>
+                                            <div class="recommendation-content">
+                                                <h6>定期更新</h6>
+                                                <p>定期更新系统和软件版本，及时修复安全漏洞</p>
+                                            </div>
+                                        </div>
+                                        <div class="recommendation-item">
+                                            <div class="recommendation-icon">
+                                                <i class="bi bi-key"></i>
+                                            </div>
+                                            <div class="recommendation-content">
+                                                <h6>妥善保管凭证</h6>
+                                                <p>妥善保管服务器访问凭证和敏感信息</p>
+                                            </div>
+                                        </div>
+                                        <div class="recommendation-item">
+                                            <div class="recommendation-icon">
+                                                <i class="bi bi-telephone"></i>
+                                            </div>
+                                            <div class="recommendation-content">
+                                                <h6>及时联系</h6>
+                                                <p>如发现隐私泄露问题，请立即联系技术支持</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 联系信息 -->
+                        <div class="contact-section">
+                            <div class="contact-card">
+                                <div class="contact-header">
+                                    <i class="bi bi-envelope"></i>
+                                    <h4>联系我们</h4>
+                                </div>
+                                <p>如果您对本隐私政策有任何疑问或需要行使您的权利，请通过以下方式联系我们：</p>
+                                <div class="contact-info">
+                                    <div class="contact-item">
+                                        <i class="bi bi-envelope-fill"></i>
+                                        <span>邮箱：vioelt@kami666.xyz</span>
+                                    </div>
+                                    <div class="contact-item">
+                                        <i class="bi bi-github"></i>
+                                        <span>GitHub：https://github.com/violet27-chf/HadoopDeploy_tool</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* 响应式隐私政策样式 */
-    @media (max-width: 768px) {
-        .container {
-            padding: 0 1rem;
-        }
-        
-        .card-body {
-            padding: 2rem 1.5rem !important;
-        }
-        
-        h1 {
-            font-size: 1.75rem;
-            text-align: center;
-        }
-        
-        .h5 {
+/* 全局页面样式 */
+.privacy-page-wrapper {
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+/* 页面头部样式 */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.page-title {
+    color: #2c3e50;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.page-title i {
+    color: #667eea;
+    font-size: 2rem;
+}
+
+.page-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+.last-updated {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+}
+
+.last-updated i {
+    color: #28a745;
+}
+
+/* 主内容区域 */
+.main-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 概述卡片 */
+.overview-card {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border: 1px solid #81c784;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+}
+
+.overview-icon {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.overview-icon i {
+    font-size: 1.3rem;
+}
+
+.overview-content {
+    flex: 1;
+}
+
+.overview-title {
+    color: #2e7d32;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.overview-text {
+    color: #1b5e20;
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* 政策章节样式 */
+.policy-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.section-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.section-icon i {
+    font-size: 1.1rem;
+}
+
+.section-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+/* 内容卡片 */
+.content-card {
+    background: #f8f9fa;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.content-intro {
+    color: #495057;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+/* 信息网格 */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.info-item .info-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.info-item .info-text h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.info-item .info-text p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 使用列表 */
+.usage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.usage-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.usage-item i {
+    color: #28a745;
+    margin-right: 0.75rem;
             font-size: 1.1rem;
         }
         
-        ul {
+.usage-item span {
+    color: #495057;
+    font-weight: 500;
+}
+
+/* 安全网格 */
+.security-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.security-item {
+    text-align: center;
+    background: white;
+    padding: 1.5rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.security-item .security-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+}
+
+.security-item h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.security-item p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 权利列表 */
+.rights-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.right-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.right-item .right-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.right-item .right-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.right-item .right-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 警告框 */
+.warning-box {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.warning-icon {
+    background: #ffc107;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.warning-content h6 {
+    color: #856404;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.warning-content p {
+    color: #856404;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 信息框 */
+.info-box {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border: 1px solid #17a2b8;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-box .info-icon {
+    background: #17a2b8;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.info-box .info-content h6 {
+    color: #0c5460;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.info-box .info-content p {
+    color: #0c5460;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 详情列表 */
+.third-party-details,
+.deployment-details,
+.cross-border-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.detail-item i {
+    color: #667eea;
+    margin-right: 0.75rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.detail-item span {
+    color: #495057;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 安全措施 */
+.security-measures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.measure-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.measure-item .measure-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.measure-item .measure-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.measure-item .measure-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 时间线 */
+.retention-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+    position: relative;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 25px;
+    top: 50px;
+    width: 2px;
+    height: 20px;
+    background: #e9ecef;
+}
+
+.timeline-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.timeline-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.timeline-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 跨境信息 */
+.cross-border-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.info-alert {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.alert-icon {
+    background: #ffc107;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.alert-content h6 {
+    color: #856404;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.alert-content p {
+    color: #856404;
+    margin: 0;
             font-size: 0.9rem;
-        }
-        
-        li {
-            margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+/* 建议列表 */
+.recommendations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.recommendation-item .recommendation-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.recommendation-item .recommendation-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.recommendation-item .recommendation-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 联系部分 */
+.contact-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f8f9fa;
+}
+
+.contact-card {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 1px solid #90caf9;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+}
+
+.contact-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.contact-header i {
+    color: #1976d2;
+    font-size: 1.5rem;
+}
+
+.contact-header h4 {
+    color: #1565c0;
+    font-weight: 600;
+    margin: 0;
+}
+
+.contact-card p {
+    color: #0d47a1;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #0d47a1;
+    font-weight: 500;
+}
+
+.contact-item i {
+    color: #1976d2;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .privacy-page-wrapper {
+        padding: 1rem 0;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+    }
+    
+    .info-grid,
+    .security-grid,
+    .rights-list,
+    .security-measures,
+    .recommendations {
+        grid-template-columns: 1fr;
+    }
+    
+    .overview-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .overview-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .section-icon {
+        margin-right: 0;
         }
     }
     
     @media (max-width: 576px) {
-        .card-body {
-            padding: 1.5rem 1rem !important;
+    .header-content {
+        padding: 1rem;
         }
         
-        h1 {
+    .page-title {
             font-size: 1.5rem;
         }
         
-        .h5 {
+    .page-subtitle {
             font-size: 1rem;
         }
         
-        ul {
-            font-size: 0.85rem;
-            padding-left: 1rem;
-        }
-        
-        .ps-4 {
-            padding-left: 1rem !important;
-        }
+    .main-content {
+        padding: 1rem;
     }
     
-    @media (max-width: 480px) {
-        .card-body {
-            padding: 1rem 0.75rem !important;
-        }
-        
-        h1 {
-            font-size: 1.35rem;
-        }
-        
-        .h5 {
-            font-size: 0.95rem;
-        }
-        
-        ul {
-            font-size: 0.8rem;
-        }
-        
-        .bi {
+    .content-card {
+        padding: 1rem;
+    }
+    
+    .info-item,
+    .right-item,
+    .measure-item,
+    .recommendation-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .info-item .info-icon,
+    .right-item .right-icon,
+    .measure-item .measure-icon,
+    .recommendation-item .recommendation-icon {
+        margin-right: 0;
+        margin-bottom: 0.75rem;
+    }
+    
+    .contact-card {
+        padding: 1.5rem;
+    }
+    
+    .contact-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.3rem;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+    }
+    
+    .content-intro {
+        font-size: 0.9rem;
+    }
+    
+    .info-item .info-text h6,
+    .right-item .right-content h6,
+    .measure-item .measure-content h6,
+    .recommendation-item .recommendation-content h6 {
             font-size: 0.9rem;
+        }
+    
+    .info-item .info-text p,
+    .right-item .right-content p,
+    .measure-item .measure-content p,
+    .recommendation-item .recommendation-content p {
+        font-size: 0.8rem;
         }
     }
 </style>

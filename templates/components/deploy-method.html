@@ -68,6 +68,10 @@
             </div>
         </div>
     </div>
+    <button class="btn btn-outline-secondary btn-sm rounded-pill mt-3" style="opacity:0.85;" onclick="goToHdfsManager()">
+        <i class="bi bi-folder2-open me-1"></i>
+        我已安装好 Hadoop，前往文件管理
+    </button>
 </div>
 
 <style>
@@ -245,6 +249,27 @@
             route = '/deploy/auto';
         }
         window.location.href = `${route}?method=${method}&config=${encodeURIComponent(config)}`;
+    }
+    function goToHdfsManager() {
+        const config = sessionStorage.getItem('serverConfig');
+        const hostJson = JSON.parse(config);
+        let host = '';
+        if (Array.isArray(hostJson)) {
+            host = hostJson[0].hostname;
+        } else if (hostJson.basic && hostJson.basic.namenodeHost) {
+            host = hostJson.basic.namenodeHost;
+        };
+        
+        if (!/:\d+$/.test(host)) { // 如果没有端口才拼接
+            host = host + ':9870';
+        };
+        const newConfig = {
+            basic: {
+                namenodeHost: host
+            }
+        };
+        sessionStorage.setItem('serverConfig', JSON.stringify(newConfig));
+        window.location.href = '/hdfs-manager';
     }
 </script>
 {% endblock %}

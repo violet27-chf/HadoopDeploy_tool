@@ -1,167 +1,201 @@
 {% extends "base.html" %}
 
-{% block title %}文档中心{% endblock %}
+{% block title %}文档中心 - Hadoop部署系统{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="/static/css/main.css">
-<h1 class="doc-title">文档中心</h1>
-<hr>
-<div class="doc-content">
-    <main>
+<div class="doc-page-wrapper">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-11">
+        <!-- 顶部大卡片 -->
+        <div class="page-header mb-4">
+          <div class="header-content">
+            <div class="header-left">
+              <h1 class="page-title">
+                <i class="bi bi-journal-bookmark"></i>
+                文档中心
+              </h1>
+              <p class="page-subtitle">HadoopDeploy Tool 全功能文档与使用指南</p>
+            </div>
+            <div class="header-right">
+              <div class="last-updated">
+                <i class="bi bi-calendar-check"></i>
+                <span>最后更新：2025-06-28</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 主内容卡片区 -->
+        <div class="main-content">
         <!-- 项目简介与特性 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-info-circle"></i>
             <h2>项目简介</h2>
+            </div>
             <p>HadoopDeploy_tool 是一款开源的 Hadoop 集群自动部署与管理平台，支持全自动、半自动、手动三种部署模式，集成 SSH 免密、Web 可视化、进度与日志同步、集群 Web UI 直达等特性。</p>
-            <ul>
-                <li>全自动部署与一键配置</li>
-                <li>SSH 免密互信自动分发</li>
-                <li>Web 可视化界面与实时进度</li>
-                <li>自定义 Hadoop/Java 包上传</li>
-                <li>多模式灵活切换</li>
-                <li>部署日志与步骤同步高亮</li>
+            <ul class="feature-list">
+              <li><i class="bi bi-lightning-charge"></i> 全自动部署与一键配置</li>
+              <li><i class="bi bi-link-45deg"></i> SSH 免密互信自动分发</li>
+              <li><i class="bi bi-bar-chart"></i> Web 可视化界面与实时进度</li>
+              <li><i class="bi bi-upload"></i> 自定义 Hadoop/Java 包上传</li>
+              <li><i class="bi bi-toggle2-on"></i> 多模式灵活切换</li>
+              <li><i class="bi bi-list-check"></i> 部署日志与步骤同步高亮</li>
             </ul>
-        </section>
+          </div>
         <!-- 系统要求 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-gear"></i>
             <h2>系统要求</h2>
-            <ul>
-                <li>操作系统：Linux (推荐 CentOS 7+/Ubuntu 18.04+)</li>
-                <li>Python 版本：3.8 及以上</li>
-                <li>内存：4GB 及以上（推荐 8GB+）</li>
-                <li>磁盘空间：10GB 及以上</li>
-                <li>网络：稳定的互联网连接</li>
+            </div>
+            <ul class="require-list">
+              <li><i class="bi bi-hdd-network"></i> 操作系统：Linux (推荐 CentOS 7+/Ubuntu 18.04+)</li>
+              <li><i class="bi bi-cpu"></i> Python 版本：3.8 及以上</li>
+              <li><i class="bi bi-memory"></i> 内存：4GB 及以上（推荐 8GB+）</li>
+              <li><i class="bi bi-device-hdd"></i> 磁盘空间：10GB 及以上</li>
+              <li><i class="bi bi-wifi"></i> 网络：稳定的互联网连接</li>
             </ul>
-        </section>
+          </div>
         <!-- 安装与快速开始 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-rocket-takeoff"></i>
             <h2>安装与快速开始</h2>
-            <ol>
-                <li>克隆仓库：<code>git clone https://github.com/violet27-chf/HadoopDeploy_tool.git</code></li>
-                <li>进入目录并创建虚拟环境：<code>cd HadoopDeploy_tool && python3 -m venv toolsvenv && source toolsvenv/bin/activate</code></li>
-                <li>安装依赖：<code>pip install -r requirements.txt</code></li>
-                <li>启动服务：<code>python app.py</code></li>
-                <li>浏览器访问 <code>http://localhost:5000</code>，开始部署</li>
+            </div>
+            <ol class="step-timeline">
+              <li><span class="step-index">1</span> 克隆仓库：<code>git clone https://github.com/violet27-chf/HadoopDeploy_tool.git</code></li>
+              <li><span class="step-index">2</span> 进入目录并创建虚拟环境：<code>cd HadoopDeploy_tool && python3 -m venv toolsvenv && source toolsvenv/bin/activate</code></li>
+              <li><span class="step-index">3</span> 安装依赖：<code>pip install -r requirements.txt</code></li>
+              <li><span class="step-index">4</span> 启动服务：<code>python app.py</code></li>
+              <li><span class="step-index">5</span> 浏览器访问 <code>http://localhost:5000</code>，开始部署</li>
             </ol>
-        </section>
+          </div>
         <!-- 使用指南 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-list-task"></i>
             <h2>使用指南</h2>
-            <ul>
-                <li>选择部署模式（全自动/半自动/手动）</li>
-                <li>填写服务器信息，支持多节点</li>
-                <li>（可选）上传 Hadoop/Java 安装包</li>
-                <li>点击"开始部署"，实时查看进度与日志</li>
-                <li>部署完成后，页面下方显示 Hadoop 集群 Web UI 入口</li>
+            </div>
+            <ul class="guide-list">
+              <li><i class="bi bi-ui-checks"></i> 选择部署模式（全自动/半自动/手动）</li>
+              <li><i class="bi bi-server"></i> 填写服务器信息，支持多节点</li>
+              <li><i class="bi bi-upload"></i> （可选）上传 Hadoop/Java 安装包</li>
+              <li><i class="bi bi-play-circle"></i> 点击"开始部署"，实时查看进度与日志</li>
+              <li><i class="bi bi-link-45deg"></i> 部署完成后，页面下方显示 Hadoop 集群 Web UI 入口</li>
             </ul>
-        </section>
+          </div>
         <!-- 配置说明 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-sliders"></i>
             <h2>配置说明</h2>
+            </div>
             <p>所有部署参数可在 Web 界面填写，支持多节点、端口、Hadoop/Java 版本、副本数等。无需手动编辑配置文件。</p>
-        </section>
+          </div>
         <!-- 部署方式指南 -->
-        <section class="mb-5">
-            <h2>部署方式指南</h2>
-            
-            <!-- 本地部署 -->
-            <div class="card mb-4 border-primary">
-                <div class="card-header bg-primary text-white">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-diagram-3"></i>
+              <h2>部署方式指南</h2>
+            </div>
+            <div class="row g-2">
+              <div class="col-12">
+                <div class="card border-primary h-100 mb-2">
+                  <div class="card-header bg-primary text-white">
                     <h3 class="h5 mb-0"><i class="bi bi-laptop me-2"></i>本地部署（推荐）</h3>
-                </div>
-                <div class="card-body">
+                  </div>
+                  <div class="card-body">
                     <h4>优势特点</h4>
                     <ul>
-                        <li>✅ 无需端口映射，直接访问</li>
-                        <li>✅ 网络延迟低，响应速度快</li>
-                        <li>✅ 功能完整，体验最佳</li>
-                        <li>✅ 支持所有部署模式</li>
-                        <li>✅ 实时日志和进度监控</li>
-                        <li>✅ 集群Web UI直达</li>
+                      <li>✅ 无需端口映射，直接访问</li>
+                      <li>✅ 网络延迟低，响应速度快</li>
+                      <li>✅ 功能完整，体验最佳</li>
+                      <li>✅ 支持所有部署模式</li>
+                      <li>✅ 实时日志和进度监控</li>
+                      <li>✅ 集群Web UI直达</li>
                     </ul>
                     <h4>适用场景</h4>
                     <p>内网环境、开发测试、学习体验、生产环境部署</p>
                     <h4>快速开始</h4>
                     <ol>
-                        <li>在本地机器上安装并启动HadoopDeploy Tool</li>
-                        <li>确保目标服务器在同一网络环境</li>
-                        <li>直接填写服务器IP地址进行部署</li>
+                      <li>在本地机器上安装并启动HadoopDeploy Tool</li>
+                      <li>确保目标服务器在同一网络环境</li>
+                      <li>直接填写服务器IP地址进行部署</li>
                     </ol>
+                  </div>
                 </div>
-            </div>
-
-            <!-- 公网部署 -->
-            <div class="card mb-4 border-warning">
-                <div class="card-header bg-warning text-dark">
+              </div>
+              <div class="col-12">
+                <div class="card border-warning h-100 mb-2">
+                  <div class="card-header bg-warning text-dark">
                     <h3 class="h5 mb-0"><i class="bi bi-globe me-2"></i>公网部署</h3>
-                </div>
-                <div class="card-body">
+                  </div>
+                  <div class="card-body">
                     <h4>特点说明</h4>
                     <ul>
-                        <li>🔧 需要配置端口映射</li>
-                        <li>🔧 网络延迟相对较高</li>
-                        <li>🔧 功能可能受限</li>
-                        <li>🔧 需要稳定的网络连接</li>
-                        <li>🔧 依赖第三方服务</li>
-                        <li>🔧 可能存在安全风险</li>
+                      <li>🔧 需要配置端口映射</li>
+                      <li>🔧 网络延迟相对较高</li>
+                      <li>🔧 功能可能受限</li>
+                      <li>🔧 需要稳定的网络连接</li>
+                      <li>🔧 依赖第三方服务</li>
+                      <li>🔧 可能存在安全风险</li>
                     </ul>
                     <h4>适用场景</h4>
                     <p>远程部署、演示展示、临时使用</p>
-                    
                     <h4>ChmlFrp端口映射配置</h4>
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>推荐使用：</strong><a href="https://www.chmlfrp.cn/" target="_blank" class="alert-link">ChmlFrp</a> 进行端口映射配置
+                      <i class="bi bi-info-circle me-2"></i>
+                      <strong>推荐使用：</strong><a href="https://www.chmlfrp.cn/" target="_blank" class="alert-link">ChmlFrp</a> 进行端口映射配置
                     </div>
-                    
                     <h5>配置步骤</h5>
                     <ol>
-                        <li><strong>注册账号：</strong>访问 <a href="https://www.chmlfrp.cn/" target="_blank">ChmlFrp官网</a> 并注册账号</li>
-                        <li><strong>下载客户端：</strong>在"客户端下载"页面选择与您操作系统匹配的版本（Windows/Linux/Mac）</li>
-                        <li><strong>创建隧道：</strong>登录管理面板，点击"添加隧道"，填写如下参数：
-                            <ul>
-                                <li>本地IP：虚拟机的内网IP地址</li>
-                                <li>本地端口：22（SSH端口）</li>
-                                <li>隧道类型：TCP</li>
-                                <li>远程端口：自动分配或自定义</li>
-                                <li>中转节点：选择延迟低的节点</li>
-                            </ul>
-                        </li>
-                        <li><strong>下载配置文件：</strong>在隧道详情页下载 <code>frpc.ini</code> 配置文件</li>
-                        <li><strong>启动客户端：</strong>将 <code>frpc.exe</code>（或 <code>frpc</code>）与 <code>frpc.ini</code> 放在同一目录，命令行运行：
-                            <br><code>frpc.exe -c frpc.ini</code>
-                        </li>
-                        <li><strong>公网SSH连接：</strong>使用分配的公网IP和端口，示例：
-                            <br><code>ssh 用户名@公网IP -p 分配端口</code>
-                        </li>
+                      <li><strong>注册账号：</strong>访问 <a href="https://www.chmlfrp.cn/" target="_blank">ChmlFrp官网</a> 并注册账号</li>
+                      <li><strong>下载客户端：</strong>在"客户端下载"页面选择与您操作系统匹配的版本（Windows/Linux/Mac）</li>
+                      <li><strong>创建隧道：</strong>登录管理面板，点击"添加隧道"，填写如下参数：
+                        <ul>
+                          <li>本地IP：虚拟机的内网IP地址</li>
+                          <li>本地端口：22（SSH端口）</li>
+                          <li>隧道类型：TCP</li>
+                          <li>远程端口：自动分配或自定义</li>
+                          <li>中转节点：选择延迟低的节点</li>
+                        </ul>
+                      </li>
+                      <li><strong>下载配置文件：</strong>在隧道详情页下载 <code>frpc.ini</code> 配置文件</li>
+                      <li><strong>启动客户端：</strong>将 <code>frpc.exe</code>（或 <code>frpc</code>）与 <code>frpc.ini</code> 放在同一目录，命令行运行：
+                        <br><code>frpc.exe -c frpc.ini</code>
+                      </li>
+                      <li><strong>公网SSH连接：</strong>使用分配的公网IP和端口，示例：
+                        <br><code>ssh 用户名@公网IP -p 分配端口</code>
+                      </li>
                     </ol>
-
                     <h5>高级配置</h5>
                     <ul>
-                        <li>设置开机自启动</li>
-                        <li>配置多个隧道</li>
-                        <li>设置访问控制</li>
+                      <li>设置开机自启动</li>
+                      <li>配置多个隧道</li>
+                      <li>设置访问控制</li>
                     </ul>
-
                     <h5>故障排查</h5>
                     <ul>
-                        <li>检查防火墙设置</li>
-                        <li>验证端口占用情况</li>
-                        <li>确认网络连接状态</li>
-                        <li>查看客户端日志</li>
+                      <li>检查防火墙设置</li>
+                      <li>验证端口占用情况</li>
+                      <li>确认网络连接状态</li>
+                      <li>查看客户端日志</li>
                     </ul>
-
                     <h5>注意事项</h5>
                     <ul>
-                        <li>务必保证本地22端口未被占用，且虚拟机网络为桥接或能被宿主机访问</li>
-                        <li>建议优先选择延迟低的中转节点，提升连接速度</li>
-                        <li>如需映射Web端口（如5000），可新建隧道，端口填写5000</li>
-                        <li>更多帮助请参考 <a href="https://docs.chcat.cn/docs/chmlfrp/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/tutorial" target="_blank">官方帮助文档</a></li>
+                      <li>务必保证本地22端口未被占用，且虚拟机网络为桥接或能被宿主机访问</li>
+                      <li>建议优先选择延迟低的中转节点，提升连接速度</li>
+                      <li>如需映射Web端口（如5000），可新建隧道，端口填写5000</li>
+                      <li>更多帮助请参考 <a href="https://docs.chcat.cn/docs/chmlfrp/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/tutorial" target="_blank">官方帮助文档</a></li>
                     </ul>
+                  </div>
                 </div>
+              </div>
             </div>
-
             <!-- 部署方式对比 -->
-            <div class="card border-info">
+            <div class="card border-info mt-4">
                 <div class="card-header bg-info text-white">
                     <h3 class="h5 mb-0"><i class="bi bi-bar-chart me-2"></i>部署方式对比</h3>
                 </div>
@@ -194,177 +228,258 @@
                     </div>
                 </div>
             </div>
-        </section>
+          </div>
         <!-- 常见问题 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-question-circle"></i>
             <h2>常见问题</h2>
-            <ul>
+            </div>
+            <ul class="faq-list">
                 <li><b>虚拟环境激活失败：</b> 检查 Python 版本与命令</li>
                 <li><b>依赖安装失败：</b> 升级 pip，或使用国内镜像源</li>
                 <li><b>端口被占用：</b> 修改 app.py 中的端口号</li>
                 <li><b>文件上传失败：</b> 检查格式、大小和网络</li>
                 <li><b>部署失败：</b> 检查服务器连接、权限和日志</li>
             </ul>
-        </section>
+          </div>
         <!-- 贡献指南 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-git"></i>
             <h2>贡献指南</h2>
-            <ol>
+            </div>
+            <ol class="contribute-list">
                 <li>Fork 项目并创建特性分支</li>
                 <li>提交更改并推送到分支</li>
                 <li>提交 Pull Request</li>
                 <li>欢迎代码、文档、测试等各类贡献</li>
             </ol>
-        </section>
+          </div>
         <!-- 联系我们 -->
-        <section class="mb-5">
+          <div class="doc-section-card mb-4">
+            <div class="section-header">
+              <i class="bi bi-envelope"></i>
             <h2>联系我们</h2>
-            <ul>
-                <li>项目成员：violet</li>
-                <li>GitHub 仓库：<a href="https://github.com/violet27-chf/HadoopDeploy_tool" target="_blank">https://github.com/violet27-chf/HadoopDeploy_tool</a></li>
-                <li>问题反馈：<a href="https://github.com/violet27-chf/HadoopDeploy_tool/issues" target="_blank">提交 Issue</a></li>
+            </div>
+            <ul class="contact-list">
+              <li><i class="bi bi-person"></i> 项目成员：violet</li>
+              <li><i class="bi bi-github"></i> GitHub 仓库：<a href="https://github.com/violet27-chf/HadoopDeploy_tool" target="_blank">https://github.com/violet27-chf/HadoopDeploy_tool</a></li>
+              <li><i class="bi bi-bug"></i> 问题反馈：<a href="https://github.com/violet27-chf/HadoopDeploy_tool/issues" target="_blank">提交 Issue</a></li>
             </ul>
-        </section>
+          </div>
         <div class="alert alert-warning mt-4">
             <i class="bi bi-exclamation-triangle-fill"></i> 注意：生产环境部署前请务必阅读安全配置章节。
+          </div>
+          <a href="/" class="btn btn-primary mt-4"><i class="bi bi-house-door"></i> 返回首页</a>
         </div>
-    </main>
+      </div>
+    </div>
+  </div>
 </div>
-<a href="/" class="btn btn-primary mt-4">返回首页</a>
-{% endblock %}
 
 <style>
-    /* 响应式文档样式 */
-    @media (max-width: 768px) {
-        .doc-title {
+.doc-page-wrapper {
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+.page-header {
+  margin-bottom: 2rem;
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.page-title {
+  color: #2c3e50;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.page-title i {
+  color: #667eea;
             font-size: 2rem;
-            text-align: center;
+}
+.page-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 400;
+}
+.last-updated {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+  background: rgba(108, 117, 125, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+}
+.last-updated i {
+  color: #28a745;
+}
+.main-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        .doc-content {
-            padding: 0 1rem;
-        }
-        
-        .doc-content h2 {
+.doc-section-card {
+  background: #f8f9fa;
+  border-radius: 1rem;
+  padding: 1.5rem 2rem 1.5rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(33, 150, 243, 0.07);
+  border: 1px solid #e3eafc;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+.section-header i {
+  color: #667eea;
             font-size: 1.5rem;
-            margin-top: 2rem;
+}
+.section-header h2 {
+  color: #2c3e50;
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+}
+.feature-list, .require-list, .guide-list, .faq-list, .contact-list {
+  list-style: none;
+  padding-left: 0;
+}
+.feature-list li, .require-list li, .guide-list li, .faq-list li, .contact-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  margin-bottom: 0.7rem;
         }
-        
-        .doc-content h3 {
-            font-size: 1.25rem;
-        }
-        
-        .doc-content h4 {
+.feature-list i, .require-list i, .guide-list i, .contact-list i {
+  color: #667eea;
             font-size: 1.1rem;
         }
-        
-        .doc-content h5 {
+.step-timeline {
+  list-style: none;
+  padding-left: 0;
+}
+.step-timeline li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
             font-size: 1rem;
         }
-        
-        .card-body {
-            padding: 1.25rem;
+.step-index {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 2rem;
+  font-weight: bold;
+  margin-right: 1rem;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.12);
+}
+.step-timeline code {
+  background: #f3f6fd;
+  color: #3b3b3b;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  margin-left: 0.5rem;
+  font-size: 0.98em;
         }
-        
-        .card-body ul, .card-body ol {
-            padding-left: 1.25rem;
+.card-header {
+  border-radius: 1rem 1rem 0 0;
         }
-        
-        .card-body li {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(33, 150, 243, 0.07);
+}
+.card-body code, .main-content code {
+  background: #f3f6fd;
+  color: #3b3b3b;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.98em;
         }
-        
-        .card-body code {
-            font-size: 0.85rem;
-            word-break: break-all;
+.contribute-list {
+  padding-left: 1.5rem;
         }
-        
-        .alert {
-            padding: 1rem;
-            font-size: 0.9rem;
-        }
-        
-        .btn {
-            width: 100%;
-            margin-top: 1rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .doc-title {
-            font-size: 1.75rem;
-        }
-        
-        .doc-content {
-            padding: 0 0.75rem;
-        }
-        
-        .doc-content h2 {
-            font-size: 1.35rem;
-        }
-        
-        .doc-content h3 {
-            font-size: 1.15rem;
-        }
-        
-        .doc-content h4 {
+.alert {
+  border-radius: 1rem;
             font-size: 1rem;
         }
-        
-        .doc-content h5 {
-            font-size: 0.9rem;
+.btn {
+  border-radius: 2rem;
+  font-weight: 600;
+  padding: 0.6rem 2rem;
+  font-size: 1.1rem;
         }
-        
-        .card-body {
+@media (max-width: 768px) {
+  .doc-page-wrapper {
+    padding: 1rem 0;
+  }
+  .main-content {
             padding: 1rem;
         }
-        
-        .card-body ul, .card-body ol {
-            padding-left: 1rem;
+  .doc-section-card {
+    padding: 1rem 1rem 1rem 1rem;
         }
-        
-        .card-body li {
-            font-size: 0.85rem;
+}
+@media (max-width: 576px) {
+  .page-header {
+    padding: 1rem;
         }
-        
-        .card-body code {
-            font-size: 0.8rem;
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
         }
-        
-        .alert {
-            padding: 0.75rem;
-            font-size: 0.85rem;
+  .main-content {
+    padding: 0.5rem;
+  }
+  .doc-section-card {
+    padding: 0.7rem 0.7rem 0.7rem 0.7rem;
         }
-        
-        .card-header h3 {
-            font-size: 0.9rem;
+  .section-header h2 {
+    font-size: 1.1rem;
         }
-        
-        .card-header .bi {
-            font-size: 0.9rem;
+  .feature-list li, .require-list li, .guide-list li, .faq-list li, .contact-list li {
+    font-size: 0.95rem;
         }
-    }
-    
-    @media (max-width: 480px) {
-        .doc-title {
-            font-size: 1.5rem;
+  .step-timeline li {
+    font-size: 0.95rem;
         }
-        
-        .doc-content h2 {
-            font-size: 1.25rem;
+  .step-index {
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    font-size: 0.95rem;
         }
-        
-        .card-body li {
-            font-size: 0.8rem;
-        }
-        
-        .card-body code {
-            font-size: 0.75rem;
-        }
-        
-        .alert {
-            font-size: 0.8rem;
+  .btn {
+    font-size: 1rem;
+    padding: 0.5rem 1.2rem;
         }
     }
 </style>
+{% endblock %}

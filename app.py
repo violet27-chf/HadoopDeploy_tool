@@ -1,4 +1,4 @@
-from flask import Flask, config, render_template, request, flash, jsonify, send_from_directory, abort, Response
+from flask import Flask, config, render_template, request, flash, jsonify, send_from_directory, abort, Response, send_file
 from flask_cors import CORS
 import paramiko
 import subprocess
@@ -9,6 +9,8 @@ import json
 import threading
 import time
 import os
+import requests
+from io import BytesIO
 
 app = Flask(__name__)
 CORS(app)
@@ -34,6 +36,9 @@ semi_auto_deploy_status = {
     'message': '',
     'log': [],
 }
+
+WEBHDFS_URL = 'http://localhost:9870/webhdfs/v1'
+WEBHDFS_USER = 'hadoop'  # 可根据实际情况修改
 
 @app.route('/')
 def index():
@@ -86,6 +91,10 @@ def documentation():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/hdfs-manager')
+def hdfs_manager():
+    return render_template('hdfs-manager.html')   
 
 @app.route('/api/scan_hosts', methods=['POST'])
 def scan_hosts():
@@ -281,6 +290,10 @@ def generate_hdfs_site(replication=3, namenode_dir="/opt/hadoop/data/dfs/namenod
         <name>dfs.datanode.data.dir</name>
         <value>file:{datanode_dir}</value>
     </property>
+    <property>
+        <name>dfs.webhdfs.enabled</name>
+        <value>true</value>
+    </property>
 </configuration>
 """
 
@@ -342,15 +355,10 @@ def generate_mapred_site(map_memory=2048, map_cores=2):
 
 def generate_workers(servers, datanodeCount=3):
     workers = []
-    for count in range(len(servers)):
-        if count == 0:
-            hostname = 'master'
-            workers.append(hostname)
-        elif count <= len(servers):
-            hostname = f'slave{count}'
-            workers.append(hostname)
-        if len(workers) >= datanodeCount:
-            break
+    for server in servers:
+        workers.append(server['hostname'])
+    if len(workers) < datanodeCount:
+        datanodeCount = len(workers)
     return workers
 
 def get_node_color(server_index, total_servers):
@@ -390,7 +398,8 @@ def auto_deploy_task(config):
     ]
     if isinstance(config, str):
         config = ast.literal_eval(config)
-    servers = config if isinstance(config, list) else [config]
+    servers = config.get('servers', []) if isinstance(config, dict) else config
+    auto_deploy_status['log'].append("--------------------------------全自动部署开始--------------------------------")
     auto_deploy_status['step'] = 1
     auto_deploy_status['progress'] = 10
     auto_deploy_status['log'].append("[1/6] 🚀 开始环境检测与SSH免密配置...")
@@ -403,7 +412,6 @@ def auto_deploy_task(config):
         username = server['username']
         password = server['password']
         port = int(server.get('port', 22))
-        auto_deploy_status['log'].append("--------------------------------半自动部署开始--------------------------------")
         auto_deploy_status['log'].append(format_node_log("[1/6] 🔗 正在连接节点", f"(用户: {username}, 端口: {port})...", ip, i, len(servers)))
         ssh = ssh_client(ip, username, password, port)
         auto_deploy_status['log'].append(format_node_log("[1/6] ✅ 节点", "SSH连接成功，开始配置SSH密钥...", ip, i, len(servers)))
@@ -497,7 +505,7 @@ def auto_deploy_task(config):
                 auto_deploy_status['log'].append(format_node_log("[3/6] ✅ 节点", "Hadoop下载完成", server['hostname'], i, len(servers)))
         else:
             auto_deploy_status['log'].append(format_node_log("[3/6] ✅ 节点", "Hadoop安装包已存在且校验通过", server['hostname'], i, len(servers)))
-        
+
         auto_deploy_status['log'].append(format_node_log("[3/6] 📂 节点", "开始解压Hadoop...", server['hostname'], i, len(servers)))
         #确保有tar命令
         ssh.exec_command("yum install -y tar && source /etc/profile")
@@ -537,7 +545,9 @@ def auto_deploy_task(config):
         ssh.exec_command(f"echo '{workers_content}' > /opt/hadoop/etc/hadoop/workers")
 
         auto_deploy_status['log'].append(format_node_log("[4/6] 📄 节点", "配置hadoop-env.sh", server['hostname'], i, len(servers)))
-        ssh.exec_command(f"echo 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.312.b07-2.el8_5.x86_64' > /opt/hadoop/etc/hadoop/hadoop-env.sh")
+        stdin, stdout, stderr = ssh.exec_command(f"source ~/.hadoop_env && dirname $(dirname $(readlink -f $(which java)))")
+        java_home = stdout.read().decode().strip()
+        ssh.exec_command(f"echo 'export JAVA_HOME={java_home}' > /opt/hadoop/etc/hadoop/hadoop-env.sh")
 
         auto_deploy_status['log'].append(format_node_log("[4/6] 🔧 节点", "配置环境变量", server['hostname'], i, len(servers)))
         env_content = f"""
@@ -610,28 +620,33 @@ export YARN_NODEMANAGER_USER=root"""
     # 首先创建必要的目录
     ssh.exec_command("source ~/.hadoop_env && mkdir -p /opt/hadoop/data/dfs/namenode")
     ssh.exec_command("source ~/.hadoop_env && mkdir -p /opt/hadoop/data/dfs/datanode")
-    
-    # 检查namenode current目录是否存在且包含VERSION文件
-    stdin, stdout, stderr = ssh.exec_command("source ~/.hadoop_env && ls -la /opt/hadoop/data/dfs/namenode/current/ 2>/dev/null", timeout=30)
+
+    stdin, stdout, stderr = ssh.exec_command(
+        "source ~/.hadoop_env && (test -f /opt/hadoop/data/dfs/namenode/current/VERSION || test -f /data/hadoop/data/dfs/namenode/current/VERSION) && echo 'EXIST' || echo 'NOT_EXIST'",
+        timeout=30
+    )
     namenode_exists = stdout.read().decode().strip()
+    err = stderr.read().decode().strip()
+    if err:
+        auto_deploy_status['log'].append(f"[调试] 检查VERSION文件时stderr: {err}")
     
-    if namenode_exists and "VERSION" in namenode_exists:
-        auto_deploy_status['log'].append(f"[5/6] ✅ 主节点 {servers[0]['hostname']} namenode已初始化，跳过格式化步骤")
+    if namenode_exists == "EXIST":
+        auto_deploy_status['log'].append(f"[6/7] ✅ 主节点 {servers[0]['hostname']} namenode已初始化，跳过格式化步骤")
     else:
-        auto_deploy_status['log'].append(f"[5/6] 🔧 主节点 {servers[0]['hostname']} namenode未初始化，开始格式化...")
+        # 进行格式化
+        auto_deploy_status['log'].append(f"[6/7] 🔧 主节点 {servers[0]['hostname']} namenode未初始化，开始格式化...")
         stdin, stdout, stderr = ssh.exec_command("source ~/.hadoop_env && hadoop namenode -format", timeout=120)
-        # 等待namenode初始化完成
         exit_code = stdout.channel.recv_exit_status()
         if exit_code != 0:
-            auto_deploy_status['log'].append(f"[5/6] ❌ 主节点 {servers[0]['hostname']} namenode格式化失败...")
+            auto_deploy_status['log'].append(f"[6/7] ❌ 主节点 {servers[0]['hostname']} namenode格式化失败")
             auto_deploy_status['steps'][4]['status'] = 'error'
             return
-        auto_deploy_status['log'].append(f"[5/6] ✅ 主节点 {servers[0]['hostname']} namenode格式化完成")
+        auto_deploy_status['log'].append(f"[6/7] ✅ 主节点 {servers[0]['hostname']} namenode格式化完成")
     
     # 启动Hadoop集群服务
     ssh = ssh_client(servers[0]['hostname'], servers[0]['username'], servers[0]['password'], int(servers[0].get('port', 22)))
     auto_deploy_status['log'].append(f"[5/6] 🚀 从主节点 {servers[0]['hostname']} 启动Hadoop集群服务...")
-    stdin,stdout,stderr = ssh.exec_command("source ~/.hadoop_env && start-all.sh")
+    stdin,stdout,stderr = ssh.exec_command("source ~/.hadoop_env && /opt/hadoop/sbin/start-all.sh")
     stdout.channel.recv_exit_status()
     auto_deploy_status['log'].append(f"[5/6] ✅ Hadoop集群服务启动完成")
     auto_deploy_status['steps'][4]['status'] = 'done'
@@ -641,6 +656,7 @@ export YARN_NODEMANAGER_USER=root"""
     auto_deploy_status['log'].append("[6/6] 🔍 开始验证Hadoop集群运行状态...")
     auto_deploy_status['log'].append(f"[6/6] 🔍 测试HDFS文件系统访问 (主节点: {servers[0]['hostname']})...")
     stdin,stdout,stderr = ssh.exec_command("source ~/.hadoop_env && hdfs dfs -ls /",timeout=120)
+    ssh.exec_command("source ~/.hadoop_env && hdfs dfs -chmod -R 777 /")
     exit_code = stdout.channel.recv_exit_status()
     if exit_code != 0:
         auto_deploy_status['log'].append(f"[6/6] ❌ HDFS文件系统验证失败，请检查集群状态")
@@ -953,6 +969,7 @@ def semi_auto_deploy_task(config):
                 else:
                     semi_auto_deploy_status['log'].append(format_node_log("[3/7] ✅ 节点", "Hadoop下载完成", server['hostname'], i, len(servers)))
             else:
+                ssh.exec_command(f"rm -rf {hadoopHome}")
                 semi_auto_deploy_status['log'].append(format_node_log("[3/7] ✅ 节点", f"Hadoop安装包{hadoop_version}已存在且校验通过", server['hostname'], i, len(servers)))
             semi_auto_deploy_status['log'].append(format_node_log("[3/7] 📂 节点", "开始解压Hadoop...", server['hostname'], i, len(servers)))
             ssh.exec_command("yum install -y tar && source /etc/profile")
@@ -980,7 +997,7 @@ def semi_auto_deploy_task(config):
 
         namenodeHost = basic.get('namenodeHost')
         dataDir = basic.get('dataDir')
-        ssh.exec_command(f"mkdir -p {dataDir}")
+        ssh.exec_command(f"rm -rf {dataDir} && mkdir -p {dataDir}")
         semi_auto_deploy_status['log'].append(format_node_log("[4/7] 📄 节点", f"配置core-site.xml (主节点: {namenodeHost})", server['hostname'], i, len(servers)))
         ssh.exec_command(f"echo '{generate_core_site(namenodeHost, dataDir)}' > {hadoopHome}/etc/hadoop/core-site.xml")
 
@@ -1022,7 +1039,7 @@ export HDFS_SECONDARYNAMENODE_USER=root
 export YARN_RESOURCEMANAGER_USER=root
 export YARN_NODEMANAGER_USER=root"""
         ssh.exec_command(f"echo '{env_content}' > ~/.hadoop_env && source ~/.hadoop_env")
-        semi_auto_deploy_status['log'].append(format_node_log("[4/7] ✅ 节点", "Hadoop配置完成", server['hostname'], i, len(servers)))
+        auto_deploy_status['log'].append(format_node_log("[4/7] ✅ 节点", "Hadoop配置完成", server['hostname'], i, len(servers)))
         ssh.close()
     
     semi_auto_deploy_status['log'].append(f"[4/6] ✅ Hadoop配置完成！共配置 {datanodeCount} 个DataNode")
@@ -1199,15 +1216,20 @@ export YARN_NODEMANAGER_USER=root"""
     semi_auto_deploy_status['log'].append(f"[6/7] 🔍 检查主节点 {servers[0]['hostname']} 的namenode状态...")
     
     # 首先创建必要的目录
-    # ssh.exec_command(f"source ~/.hadoop_env && mkdir -p {hadoopHome}/data/dfs/namenode")
-    # ssh.exec_command(f"source ~/.hadoop_env && mkdir -p {hadoopHome}/data/dfs/datanode")
+    ssh.exec_command(f"source ~/.hadoop_env && mkdir -p {hadoopHome}/data/dfs/namenode")
+    ssh.exec_command(f"source ~/.hadoop_env && mkdir -p {hadoopHome}/data/dfs/datanode")
     
     # 检查VERSION文件是否存在
-    print("数据目录",dataDir)
-    stdin, stdout, stderr = ssh.exec_command(f"source ~/.hadoop_env && test -f {dataDir}/data/dfs/namenode/current/VERSION && echo 'EXIST' || echo 'NOT_EXIST'", timeout=30)
-    namenode_status = stdout.read().decode().strip()
+    stdin, stdout, stderr = ssh.exec_command(
+        f"source ~/.hadoop_env && (test -f {hadoopHome}/data/dfs/namenode/current/VERSION && echo 'EXIST' || echo 'NOT_EXIST'",
+        timeout=30
+    )
+    namenode_exists = stdout.read().decode().strip()
+    err = stderr.read().decode().strip()
+    if err:
+        semi_auto_deploy_status['log'].append(f"[调试] 检查VERSION文件时错误: {err}")
 
-    if namenode_status == "EXIST":
+    if namenode_exists == "EXIST":
         semi_auto_deploy_status['log'].append(f"[6/7] ✅ 主节点 {servers[0]['hostname']} namenode已初始化，跳过格式化步骤")
     else:
         # 进行格式化
@@ -1234,6 +1256,7 @@ export YARN_NODEMANAGER_USER=root"""
     semi_auto_deploy_status['steps'][6]['status'] = 'doing'
     semi_auto_deploy_status['log'].append("[7/7] 🔍 开始验证Hadoop集群运行状态...")
     semi_auto_deploy_status['log'].append(f"[7/7] 🔍 测试HDFS文件系统访问 (主节点: {servers[0]['hostname']})...")
+    ssh.exec_command(f"source ~/.hadoop_env && hdfs dfs -chmod -R 777 /")
     stdin,stdout,stderr = ssh.exec_command("source ~/.hadoop_env && hdfs dfs -ls /",timeout=120)
     exit_code = stdout.channel.recv_exit_status()
     if exit_code != 0:
@@ -1281,6 +1304,146 @@ def api_deploy_auto_clear_logs():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+def get_webhdfs_url(path, namenode_host=None):
+    host = namenode_host or 'localhost'
+    if host.startswith('http://'):
+        host = host[len('http://'):]
+    elif host.startswith('https://'):
+        host = host[len('https://'):]
+    
+    # 确保路径格式正确，避免双斜杠
+    if path.startswith('/'):
+        path = path[1:]  # 移除开头的斜杠
+    return f'http://{host}/webhdfs/v1/{path}'
+
+@app.route('/api/hdfs/list')
+def hdfs_list():
+    path = request.args.get('path', '/')
+    namenode_host = request.args.get('namenodeHost')
+    url = get_webhdfs_url(path, namenode_host) + f'?op=LISTSTATUS&user.name=hadoop'
+    try:
+        resp = requests.get(url, timeout=5)
+        resp.raise_for_status()
+        data = resp.json()
+        return jsonify({'success': True, 'files': data['FileStatuses']['FileStatus']})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)})
+
+def replace_master_with_ip(url, ip):
+    # 替换URL中的主机名为IP
+    if url.find('master') != -1:
+        return re.sub(r'//master(:\d+)?', f'//{ip}\\1', url)
+    else:
+        return re.sub(r'//slave(:\d+)?', f'//{ip}\\1', url)
+
+@app.route('/api/hdfs/upload', methods=['POST'])
+def hdfs_upload():
+    file = request.files.get('file')
+    hdfs_path = request.form.get('path', '/')
+    namenode_host = request.form.get('namenodeHost')
+    if not file:
+        return jsonify({'success': False, 'msg': '请选择文件'})
+    # 正确处理路径拼接，避免双斜杠
+    if hdfs_path == '/':
+        full_path = f'/{file.filename}'
+    else:
+        full_path = f'{hdfs_path}/{file.filename}'
+    url = get_webhdfs_url(full_path, namenode_host) + f'?op=CREATE&overwrite=true&user.name=hadoop'
+    if namenode_host:
+        url = replace_master_with_ip(url, namenode_host.split(':')[0])
+    try:
+        resp = requests.put(url, allow_redirects=False)
+        if resp.status_code in (307, 201):
+            upload_url = resp.headers['Location'] if 'Location' in resp.headers else url
+            # 对跳转地址也做主机名替换
+            if namenode_host:
+                upload_url = replace_master_with_ip(upload_url, namenode_host.split(':')[0])
+            resp2 = requests.put(upload_url, data=file.stream, headers={'Content-Type': 'application/octet-stream'})
+            resp2.raise_for_status()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'msg': resp.text})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)})
+
+@app.route('/api/hdfs/download')
+def hdfs_download():
+    hdfs_path = request.args.get('path', '/')
+    namenode_host = request.args.get('namenodeHost')
+    url = get_webhdfs_url(hdfs_path, namenode_host) + f'?op=OPEN&user.name=hadoop'
+    if namenode_host:
+        url = replace_master_with_ip(url, namenode_host.split(':')[0])
+    try:
+        resp = requests.get(url, allow_redirects=False, stream=True)
+        # 检查是否需要跳转
+        if resp.status_code == 307 and 'Location' in resp.headers:
+            download_url = resp.headers['Location']
+            if namenode_host:
+                download_url = replace_master_with_ip(download_url, namenode_host.split(':')[0])
+            resp2 = requests.get(download_url, stream=True)
+            resp2.raise_for_status()
+            file_data = BytesIO(resp2.content)
+        else:
+            resp.raise_for_status()
+            file_data = BytesIO(resp.content)
+        return send_file(file_data, download_name=hdfs_path.split('/')[-1], as_attachment=True)
+    except Exception as e:
+        return f'下载失败: {e}', 500
+
+@app.route('/api/hdfs/delete', methods=['POST'])
+def hdfs_delete():
+    data = request.get_json()
+    path = data.get('path')
+    recursive = data.get('recursive', False)
+    namenode_host = data.get('namenodeHost')
+    if not path:
+        return jsonify({'success': False, 'msg': '参数错误'})
+    url = get_webhdfs_url(path, namenode_host) + f'?op=DELETE&recursive={'true' if recursive else 'false'}&user.name=hadoop'
+    try:
+        resp = requests.delete(url)
+        resp.raise_for_status()
+        result = resp.json()
+        if result.get('boolean'):
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'msg': '删除失败'})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)})
+
+@app.route('/api/hdfs/create', methods=['POST'])
+def hdfs_create():
+    data = request.get_json()
+    path = data.get('path')
+    namenode_host = data.get('namenodeHost')
+    type_ = data.get('type', 'file')
+    if not path or not namenode_host:
+        return jsonify({'success': False, 'msg': '参数错误'})
+    if type_ == 'directory':
+        url = get_webhdfs_url(path, namenode_host) + f'?op=MKDIRS&user.name=hadoop'
+        try:
+            resp = requests.put(url)
+            resp.raise_for_status()
+            return jsonify({'success': True})
+        except Exception as e:
+            return jsonify({'success': False, 'msg': str(e)})
+    else:  # 新建空文件
+        url = get_webhdfs_url(path, namenode_host) + f'?op=CREATE&overwrite=false&user.name=hadoop'
+        if namenode_host:
+            url = replace_master_with_ip(url, namenode_host.split(':')[0])
+        try:
+            resp = requests.put(url, allow_redirects=False)
+            if resp.status_code in (307, 201):
+                upload_url = resp.headers['Location'] if 'Location' in resp.headers else url
+                # 对跳转地址也做主机名替换
+                if namenode_host:
+                    upload_url = replace_master_with_ip(upload_url, namenode_host.split(':')[0])
+                resp2 = requests.put(upload_url, data=b'', headers={'Content-Type': 'application/octet-stream'})
+                resp2.raise_for_status()
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'msg': resp.text})
+        except Exception as e:
+            return jsonify({'success': False, 'msg': str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port=5000)

@@ -1,169 +1,1405 @@
 {% extends "base.html" %}
 
-{% block title %}服务条款{% endblock %}
+{% block title %}服务条款 - Hadoop部署系统{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-lg border-0">
-        <div class="card-body p-5">
-            <h1 class="mb-4 fw-bold text-primary"><i class="bi bi-file-earmark-text me-2"></i>服务条款</h1>
-            <hr>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">1. 服务使用</h2>
-                <ul class="ps-4">
-                    <li>遵守所有适用法律法规</li>
-                    <li>不进行任何非法或有害活动</li>
-                    <li>不干扰服务正常运行</li>
+<div class="terms-page-wrapper">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <!-- 页面头部 -->
+                <div class="page-header mb-4">
+                    <div class="header-content">
+                        <div class="header-left">
+                            <h1 class="page-title">
+                                <i class="bi bi-file-earmark-text"></i>
+                                服务条款
+                            </h1>
+                            <p class="page-subtitle">使用本服务前，请仔细阅读并同意以下条款和条件</p>
+                        </div>
+                        <div class="header-right">
+                            <div class="last-updated">
+                                <i class="bi bi-calendar-check"></i>
+                                <span>最后更新：2025-06-28</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区域 -->
+                <div class="main-content">
+                    <!-- 服务条款概述卡片 -->
+                    <div class="overview-card mb-4">
+                        <div class="overview-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h6 class="overview-title">服务条款说明</h6>
+                            <p class="overview-text">本服务条款规定了您使用Hadoop部署工具的权利和义务。使用本服务即表示您同意遵守这些条款。</p>
+                        </div>
+                    </div>
+
+                    <!-- 服务条款内容 -->
+                    <div class="terms-content">
+                        <!-- 服务使用 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-gear"></i>
+                                </div>
+                                <h3 class="section-title">1. 服务使用</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <p class="content-intro">使用本服务时，您需要遵守以下规定：</p>
+                                    <div class="usage-list">
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>遵守所有适用法律法规</span>
+                                        </div>
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>不进行任何非法或有害活动</span>
+                                        </div>
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>不干扰服务正常运行</span>
+                                        </div>
+                                        <div class="usage-item">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>合理使用系统资源</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 用户责任 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-person-check"></i>
+                                </div>
+                                <h3 class="section-title">2. 用户责任</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <p class="content-intro">作为服务用户，您需要承担以下责任：</p>
+                                    <div class="responsibility-grid">
+                                        <div class="responsibility-item">
+                                            <div class="responsibility-icon">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                            <div class="responsibility-content">
+                                                <h6>账户活动</h6>
+                                                <p>对您账户下的所有活动负责</p>
+                                            </div>
+                                        </div>
+                                        <div class="responsibility-item">
+                                            <div class="responsibility-icon">
+                                                <i class="bi bi-info-circle"></i>
+                                            </div>
+                                            <div class="responsibility-content">
+                                                <h6>信息真实性</h6>
+                                                <p>确保提供的信息真实准确</p>
+                                            </div>
+                                        </div>
+                                        <div class="responsibility-item">
+                                            <div class="responsibility-icon">
+                                                <i class="bi bi-key"></i>
+                                            </div>
+                                            <div class="responsibility-content">
+                                                <h6>凭证管理</h6>
+                                                <p>妥善保管您的登录凭证</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 知识产权 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-copyright"></i>
+                                </div>
+                                <h3 class="section-title">3. 知识产权</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="ip-info">
+                                        <div class="info-box">
+                                            <div class="info-icon">
+                                                <i class="bi bi-info-circle"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <h6>知识产权说明</h6>
+                                                <p>本工具及其相关技术、文档等均受知识产权保护。</p>
+                                            </div>
+                                        </div>
+                                        <div class="ip-details">
+                                            <div class="detail-item">
+                                                <i class="bi bi-shield-check"></i>
+                                                <span>保留所有权利</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="bi bi-shield-check"></i>
+                                                <span>未经许可不得复制或修改</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="bi bi-shield-check"></i>
+                                                <span>允许个人非商业使用</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 免责声明 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <h3 class="section-title">4. 免责声明</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="disclaimer-box">
+                                        <div class="warning-icon">
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                        </div>
+                                        <div class="warning-content">
+                                            <h6>重要免责声明</h6>
+                                            <p>请仔细阅读以下免责条款，使用本服务即表示您同意这些条款。</p>
+                                        </div>
+                                    </div>
+                                    <div class="disclaimer-list">
+                                        <div class="disclaimer-item">
+                                            <i class="bi bi-arrow-right"></i>
+                                            <span>不保证服务不间断或无错误</span>
+                                        </div>
+                                        <div class="disclaimer-item">
+                                            <i class="bi bi-arrow-right"></i>
+                                            <span>不承担因使用服务导致的间接损失</span>
+                                        </div>
+                                        <div class="disclaimer-item">
+                                            <i class="bi bi-arrow-right"></i>
+                                            <span>服务按"现状"提供</span>
+                                        </div>
+                                        <div class="disclaimer-item">
+                                            <i class="bi bi-arrow-right"></i>
+                                            <span>用户应自行承担使用风险</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 条款变更 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </div>
+                                <h3 class="section-title">5. 条款变更</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="change-timeline">
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="bi bi-pencil"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6>条款修改</h6>
+                                                <p>我们保留随时修改本条款的权利</p>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="bi bi-bell"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6>通知用户</h6>
+                                                <p>通过适当方式通知用户变更内容</p>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="bi bi-check-circle"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <h6>继续使用</h6>
+                                                <p>继续使用视为接受变更</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 第三方服务 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-link-45deg"></i>
+                                </div>
+                                <h3 class="section-title">6. 第三方服务</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="third-party-warning">
+                                        <div class="warning-box">
+                                            <div class="warning-icon">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                            </div>
+                                            <div class="warning-content">
+                                                <h6>第三方服务说明</h6>
+                                                <p>本工具支持通过第三方端口映射服务进行公网部署，使用第三方服务时请注意相关风险。</p>
+                                            </div>
+                                        </div>
+                                        <div class="third-party-details">
+                                            <div class="detail-item">
+                                                <i class="bi bi-arrow-right"></i>
+                                                <span>本工具支持通过第三方端口映射服务（如ChmlFrp）进行公网部署</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="bi bi-arrow-right"></i>
+                                                <span>使用第三方服务时，需遵守该服务的相关条款和规定</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="bi bi-arrow-right"></i>
+                                                <span>第三方服务的可用性、安全性和稳定性不在本工具保证范围内</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="bi bi-arrow-right"></i>
+                                                <span>用户应自行承担使用第三方服务可能产生的风险和责任</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="bi bi-arrow-right"></i>
+                                                <span>建议优先使用本地部署方式以获得最佳体验和安全性</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 网络安全 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-shield-lock"></i>
+                                </div>
+                                <h3 class="section-title">7. 网络安全</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="security-info">
+                                        <div class="info-box">
+                                            <div class="info-icon">
+                                                <i class="bi bi-shield-check"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <h6>网络安全责任</h6>
+                                                <p>用户应确保部署环境的安全性，包括防火墙配置、端口管理等。</p>
+                                            </div>
+                                        </div>
+                                        <div class="security-measures">
+                                            <div class="measure-item">
+                                                <div class="measure-icon">
+                                                    <i class="bi bi-fire"></i>
+                                                </div>
+                                                <div class="measure-content">
+                                                    <h6>防火墙配置</h6>
+                                                    <p>确保部署环境的安全性</p>
+                                                </div>
+                                            </div>
+                                            <div class="measure-item">
+                                                <div class="measure-icon">
+                                                    <i class="bi bi-key"></i>
+                                                </div>
+                                                <div class="measure-content">
+                                                    <h6>凭证保护</h6>
+                                                    <p>妥善保护服务器访问凭证</p>
+                                                </div>
+                                            </div>
+                                            <div class="measure-item">
+                                                <div class="measure-icon">
+                                                    <i class="bi bi-arrow-clockwise"></i>
+                                                </div>
+                                                <div class="measure-content">
+                                                    <h6>定期更新</h6>
+                                                    <p>及时修复安全漏洞</p>
+                                                </div>
+                                            </div>
+                                            <div class="measure-item">
+                                                <div class="measure-icon">
+                                                    <i class="bi bi-exclamation-triangle"></i>
+                                                </div>
+                                                <div class="measure-content">
+                                                    <h6>风险处理</h6>
+                                                    <p>发现安全风险立即处理</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 部署方式说明 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-server"></i>
+                                </div>
+                                <h3 class="section-title">8. 部署方式说明</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="deployment-methods">
+                                        <div class="method-card local-deployment">
+                                            <div class="method-header">
+                                                <div class="method-icon">
+                                                    <i class="bi bi-house-check"></i>
+                                                </div>
+                                                <div class="method-title">
+                                                    <h6>本地部署</h6>
+                                                    <span class="method-badge recommended">推荐</span>
+                                                </div>
+                                            </div>
+                                            <div class="method-content">
+                                                <p>推荐使用方式，提供完整功能和最佳体验</p>
+                                                <ul class="method-features">
+                                                    <li><i class="bi bi-check"></i>完整功能支持</li>
+                                                    <li><i class="bi bi-check"></i>最佳性能体验</li>
+                                                    <li><i class="bi bi-check"></i>最高安全性</li>
                 </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">2. 用户责任</h2>
-                <ul class="ps-4">
-                    <li>您账户下的所有活动</li>
-                    <li>您提供的信息的真实性</li>
-                    <li>妥善保管您的登录凭证</li>
+                                            </div>
+                                        </div>
+                                        <div class="method-card public-deployment">
+                                            <div class="method-header">
+                                                <div class="method-icon">
+                                                    <i class="bi bi-globe"></i>
+                                                </div>
+                                                <div class="method-title">
+                                                    <h6>公网部署</h6>
+                                                    <span class="method-badge optional">可选</span>
+                                                </div>
+                                            </div>
+                                            <div class="method-content">
+                                                <p>适用于远程场景，需要额外配置端口映射</p>
+                                                <ul class="method-features">
+                                                    <li><i class="bi bi-check"></i>远程访问支持</li>
+                                                    <li><i class="bi bi-check"></i>需要端口映射</li>
+                                                    <li><i class="bi bi-check"></i>适合测试环境</li>
                 </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">3. 知识产权</h2>
-                <ul class="ps-4">
-                    <li>保留所有权利</li>
-                    <li>未经许可不得复制或修改</li>
-                    <li>允许个人非商业使用</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">4. 免责声明</h2>
-                <ul class="ps-4">
-                    <li>不保证服务不间断或无错误</li>
-                    <li>不承担因使用服务导致的间接损失</li>
-                    <li>服务按"现状"提供</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">5. 条款变更</h2>
-                <ul class="ps-4">
-                    <li>随时修改本条款</li>
-                    <li>通过适当方式通知用户</li>
-                    <li>继续使用视为接受变更</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">6. 第三方服务</h2>
-                <ul class="ps-4">
-                    <li>本工具支持通过第三方端口映射服务（如ChmlFrp）进行公网部署</li>
-                    <li>使用第三方服务时，需遵守该服务的相关条款和规定</li>
-                    <li>第三方服务的可用性、安全性和稳定性不在本工具保证范围内</li>
-                    <li>用户应自行承担使用第三方服务可能产生的风险和责任</li>
-                    <li>建议优先使用本地部署方式以获得最佳体验和安全性</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">7. 网络安全</h2>
-                <ul class="ps-4">
-                    <li>用户应确保部署环境的安全性，包括但不限于防火墙配置、端口管理</li>
-                    <li>公网部署时，用户应妥善保护服务器访问凭证和敏感信息</li>
-                    <li>建议定期更新系统和软件版本，及时修复安全漏洞</li>
-                    <li>如发现安全风险，应立即停止相关服务并采取防护措施</li>
-                    <li>本工具不承担因网络安全问题导致的任何损失</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">8. 部署方式说明</h2>
-                <ul class="ps-4">
-                    <li><strong>本地部署：</strong>推荐使用方式，提供完整功能和最佳体验</li>
-                    <li><strong>公网部署：</strong>适用于远程场景，需要额外配置端口映射</li>
-                    <li>不同部署方式的功能完整性和稳定性可能存在差异</li>
-                    <li>用户应根据实际需求选择合适的部署方式</li>
-                    <li>生产环境建议使用本地部署以确保稳定性和安全性</li>
-                </ul>
-            </section>
-            <section class="mb-5">
-                <h2 class="h5 fw-bold mb-3 text-secondary">9. 技术支持</h2>
-                <ul class="ps-4">
-                    <li>本工具提供基础的技术支持和文档</li>
-                    <li>第三方服务相关问题请咨询对应服务提供商</li>
-                    <li>建议在使用前仔细阅读相关文档和配置说明</li>
-                    <li>如遇技术问题，可通过GitHub Issues提交反馈</li>
-                    <li>不保证提供实时的技术支持服务</li>
-                </ul>
-            </section>
-            <p class="text-muted mt-4">最后更新日期：2025-06-28</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="deployment-notes">
+                                        <div class="note-item">
+                                            <i class="bi bi-info-circle"></i>
+                                            <span>不同部署方式的功能完整性和稳定性可能存在差异</span>
+                                        </div>
+                                        <div class="note-item">
+                                            <i class="bi bi-info-circle"></i>
+                                            <span>用户应根据实际需求选择合适的部署方式</span>
+                                        </div>
+                                        <div class="note-item">
+                                            <i class="bi bi-info-circle"></i>
+                                            <span>生产环境建议使用本地部署以确保稳定性和安全性</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 技术支持 -->
+                        <div class="terms-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="bi bi-headset"></i>
+                                </div>
+                                <h3 class="section-title">9. 技术支持</h3>
+                            </div>
+                            <div class="section-content">
+                                <div class="content-card">
+                                    <div class="support-info">
+                                        <div class="support-services">
+                                            <div class="service-item">
+                                                <div class="service-icon">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                                <div class="service-content">
+                                                    <h6>基础支持</h6>
+                                                    <p>本工具提供基础的技术支持和文档</p>
+                                                </div>
+                                            </div>
+                                            <div class="service-item">
+                                                <div class="service-icon">
+                                                    <i class="bi bi-link-45deg"></i>
+                                                </div>
+                                                <div class="service-content">
+                                                    <h6>第三方服务</h6>
+                                                    <p>第三方服务相关问题请咨询对应服务提供商</p>
+                                                </div>
+                                            </div>
+                                            <div class="service-item">
+                                                <div class="service-icon">
+                                                    <i class="bi bi-github"></i>
+                                                </div>
+                                                <div class="service-content">
+                                                    <h6>问题反馈</h6>
+                                                    <p>如遇技术问题，可通过GitHub Issues提交反馈</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="support-notes">
+                                            <div class="note-item">
+                                                <i class="bi bi-lightbulb"></i>
+                                                <span>建议在使用前仔细阅读相关文档和配置说明</span>
+                                            </div>
+                                            <div class="note-item">
+                                                <i class="bi bi-clock"></i>
+                                                <span>不保证提供实时的技术支持服务</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 联系信息 -->
+                        <div class="contact-section">
+                            <div class="contact-card">
+                                <div class="contact-header">
+                                    <i class="bi bi-envelope"></i>
+                                    <h4>联系我们</h4>
+                                </div>
+                                <p>如果您对本服务条款有任何疑问或需要进一步说明，请通过以下方式联系我们：</p>
+                                <div class="contact-info">
+                                    <div class="contact-item">
+                                        <i class="bi bi-envelope-fill"></i>
+                                        <span>邮箱：vioelt@kami666.xyz</span>
+                                    </div>
+                                    <div class="contact-item">
+                                        <i class="bi bi-github"></i>
+                                        <span>GitHub：https://github.com/violet27-chf/HadoopDeploy_tool</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* 响应式服务条款样式 */
-    @media (max-width: 768px) {
-        .container {
-            padding: 0 1rem;
-        }
-        
-        .card-body {
-            padding: 2rem 1.5rem !important;
-        }
-        
-        h1 {
-            font-size: 1.75rem;
-            text-align: center;
-        }
-        
-        .h5 {
+/* 全局页面样式 */
+.terms-page-wrapper {
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+/* 页面头部样式 */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.page-title {
+    color: #2c3e50;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.page-title i {
+    color: #667eea;
+    font-size: 2rem;
+}
+
+.page-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+.last-updated {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+}
+
+.last-updated i {
+    color: #28a745;
+}
+
+/* 主内容区域 */
+.main-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 概述卡片 */
+.overview-card {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 1px solid #90caf9;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+}
+
+.overview-icon {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.overview-icon i {
+    font-size: 1.3rem;
+}
+
+.overview-content {
+    flex: 1;
+}
+
+.overview-title {
+    color: #1565c0;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.overview-text {
+    color: #0d47a1;
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* 条款章节样式 */
+.terms-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.section-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.section-icon i {
+    font-size: 1.1rem;
+}
+
+.section-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+/* 内容卡片 */
+.content-card {
+    background: #f8f9fa;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.content-intro {
+    color: #495057;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+/* 使用列表 */
+.usage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.usage-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.usage-item i {
+    color: #28a745;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.usage-item span {
+    color: #495057;
+    font-weight: 500;
+}
+
+/* 责任网格 */
+.responsibility-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.responsibility-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.responsibility-item .responsibility-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.responsibility-item .responsibility-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.responsibility-item .responsibility-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 知识产权信息 */
+.ip-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.info-box {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border: 1px solid #17a2b8;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.info-box .info-icon {
+    background: #17a2b8;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.info-box .info-content h6 {
+    color: #0c5460;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.info-box .info-content p {
+    color: #0c5460;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.ip-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.detail-item i {
+    color: #28a745;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.detail-item span {
+    color: #495057;
+    font-weight: 500;
+}
+
+/* 免责声明 */
+.disclaimer-box {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.warning-icon {
+    background: #ffc107;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.warning-content h6 {
+    color: #856404;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.warning-content p {
+    color: #856404;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.disclaimer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.disclaimer-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.disclaimer-item i {
+    color: #dc3545;
+    margin-right: 0.75rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.disclaimer-item span {
+    color: #495057;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 时间线 */
+.change-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+    position: relative;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 25px;
+    top: 50px;
+    width: 2px;
+    height: 20px;
+    background: #e9ecef;
+}
+
+.timeline-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.timeline-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.timeline-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 第三方服务 */
+.third-party-warning {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.warning-box {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.warning-icon {
+    background: #ffc107;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.warning-content h6 {
+    color: #856404;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.warning-content p {
+    color: #856404;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.third-party-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* 网络安全 */
+.security-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.security-measures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.measure-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.measure-item .measure-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.measure-item .measure-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.measure-item .measure-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* 部署方式 */
+.deployment-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.method-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.method-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.local-deployment {
+    border-color: #28a745;
+}
+
+.public-deployment {
+    border-color: #ffc107;
+}
+
+.method-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.method-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.method-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.method-title h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
             font-size: 1.1rem;
         }
         
-        ul {
+.method-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.method-badge.recommended {
+    background: #d4edda;
+    color: #155724;
+}
+
+.method-badge.optional {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.method-content p {
+    color: #6c757d;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.method-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.method-features li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: #495057;
             font-size: 0.9rem;
         }
         
-        li {
-            margin-bottom: 0.5rem;
+.method-features li i {
+    color: #28a745;
+    margin-right: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.deployment-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.note-item {
+    display: flex;
+    align-items: flex-start;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border-left: 4px solid #6c757d;
+}
+
+.note-item i {
+    color: #6c757d;
+    margin-right: 0.75rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.note-item span {
+    color: #495057;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 技术支持 */
+.support-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.support-services {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.service-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.service-item .service-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.service-item .service-content h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.service-item .service-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.support-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* 联系部分 */
+.contact-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f8f9fa;
+}
+
+.contact-card {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border: 1px solid #81c784;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+}
+
+.contact-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.contact-header i {
+    color: #2e7d32;
+    font-size: 1.5rem;
+}
+
+.contact-header h4 {
+    color: #1b5e20;
+    font-weight: 600;
+    margin: 0;
+}
+
+.contact-card p {
+    color: #1b5e20;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1b5e20;
+    font-weight: 500;
+}
+
+.contact-item i {
+    color: #2e7d32;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .terms-page-wrapper {
+        padding: 1rem 0;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+    }
+    
+    .responsibility-grid,
+    .security-measures,
+    .support-services {
+        grid-template-columns: 1fr;
+    }
+    
+    .deployment-methods {
+        grid-template-columns: 1fr;
+    }
+    
+    .overview-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .overview-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .section-icon {
+        margin-right: 0;
         }
     }
     
     @media (max-width: 576px) {
-        .card-body {
-            padding: 1.5rem 1rem !important;
+    .header-content {
+        padding: 1rem;
         }
         
-        h1 {
+    .page-title {
             font-size: 1.5rem;
         }
         
-        .h5 {
+    .page-subtitle {
             font-size: 1rem;
         }
         
-        ul {
-            font-size: 0.85rem;
-            padding-left: 1rem;
-        }
-        
-        .ps-4 {
-            padding-left: 1rem !important;
-        }
+    .main-content {
+        padding: 1rem;
     }
     
-    @media (max-width: 480px) {
-        .card-body {
-            padding: 1rem 0.75rem !important;
-        }
-        
-        h1 {
-            font-size: 1.35rem;
-        }
-        
-        .h5 {
-            font-size: 0.95rem;
-        }
-        
-        ul {
-            font-size: 0.8rem;
-        }
-        
-        .bi {
+    .content-card {
+        padding: 1rem;
+    }
+    
+    .responsibility-item,
+    .measure-item,
+    .service-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .responsibility-item .responsibility-icon,
+    .measure-item .measure-icon,
+    .service-item .service-icon {
+        margin-right: 0;
+        margin-bottom: 0.75rem;
+    }
+    
+    .contact-card {
+        padding: 1.5rem;
+    }
+    
+    .contact-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.3rem;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+    }
+    
+    .content-intro {
+        font-size: 0.9rem;
+    }
+    
+    .responsibility-item .responsibility-content h6,
+    .measure-item .measure-content h6,
+    .service-item .service-content h6 {
             font-size: 0.9rem;
+        }
+    
+    .responsibility-item .responsibility-content p,
+    .measure-item .measure-content p,
+    .service-item .service-content p {
+        font-size: 0.8rem;
         }
     }
 </style>
