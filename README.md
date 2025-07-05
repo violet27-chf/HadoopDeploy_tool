@@ -835,7 +835,7 @@ sudo systemctl status ssh
 
 本项目采用 [MIT License](LICENSE) 许可证。
 
-Copyright (c) 2024 violet27-chf
+Copyright (c) 2025 violet27-chf
 
 MIT许可证允许您自由使用、修改和分发本软件，但需要保留版权声明和许可证声明。详情请参阅 [LICENSE](LICENSE) 文件。
 
